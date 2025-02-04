@@ -3,58 +3,52 @@ import { useData } from '../context/DataContext';
 import maplibregl from 'maplibre-gl';
 
 const MarkersForense = ({ map, fetchId, thresholdId }) => {
-  const { forenseRecords, markers, setMarkers, updateMarkers, newForenseDataFetched, setNewForenseDataFetched, COLORS, POINT_RADIUS, fetchedRecords, 
-          forenseMarkers, setForenseMarkers, setTimelineData, updateTimelineData} = useData();
-
-  const MIN_DISTANCE = 0.0001;
-
-  const adjustLatLon = (lat, lon, index) => {
-    const angle = (index % 360) * (Math.PI / 180);
-    const offset = MIN_DISTANCE * (index + 1);
-    return {
-      lat: lat + offset * Math.sin(angle),
-      lon: lon + offset * Math.cos(angle)
-    };
-  };
+  const { forenseRecords, newForenseDataFetched, setNewForenseDataFetched, COLORS, updateLayerData } = useData();
 
   useEffect(() => {
     if (map && newForenseDataFetched) {
-      const newTimelineEntries = [];
-      const newForenseMarkers = forenseRecords.map((record, index) => {
-        const { lat, lon, ID, Fecha_Ingreso, Probable_nombre, Edad, Tatuajes, Indumentarias, Senas_Particulares, Delegacion_IJCF, tipo_marcador } = record;
+      const formattedRecordsForense = forenseRecords.map(record => {
+        let [lat, lon] = record.lat_long ? record.lat_long.split(',').map(coord => parseFloat(coord)) : [null, null];
 
-        if (lat && lon && tipo_marcador === 'personas_sin_identificar') {
-          const adjustedCoords = adjustLatLon(lat, lon, index);
-
-          const marker = new maplibregl.Marker({ color: COLORS.UNKNOWN })
-            .setLngLat([adjustedCoords.lon, adjustedCoords.lat])
-            .setPopup(new maplibregl.Popup().setHTML(`
-              <b>Record ID: ${ID}</b><br>
-              Ingress Date: ${Fecha_Ingreso}<br>
-              Probable Name: ${Probable_nombre}<br>
-              Age: ${Edad}<br>
-              Tattoos: ${Tatuajes}<br>
-              Clothing: ${Indumentarias}<br>
-              Distinctive Signs: ${Senas_Particulares}<br>
-              Delegation: ${Delegacion_IJCF}<br>
-              Type: ${tipo_marcador}
-            `))
-            .addTo(map);
-            marker.getElement().setAttribute('data-tipo-marcador', tipo_marcador);
-            marker.getElement().setAttribute('data-timestamp', new Date(Fecha_Ingreso).getTime());
-            console.log('Marker:', marker.getElement().dataset);
-            //setTimelineData(marker.getElement().dataset);
-            newTimelineEntries.push({ id: ID, timestamp: new Date(Fecha_Ingreso).getTime(), type: 'forense' });
-          return marker;
+        if (!lat || !lon) {
+          const location = Object.keys(LOCATIONS).find(loc => record.Delegacion_IJCF.includes(loc));
+          if (location) {
+            [lat, lon] = LOCATIONS[location];
+          }
         }
-        return null;
-      }).filter(marker => marker !== null);
+        return {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [lon, lat]
+          },
+          properties: {
+            ...record,
+            timestamp: new Date(record.Fecha_Ingreso).getTime(),
+            color: COLORS.UNKNOWN,
+            tipo_marcador: 'personas_sin_identificar',
+            // Add properties for tooltip
+            ID: record.ID,
+            Fecha_Ingreso: record.Fecha_Ingreso,
+            Probable_nombre: record.Probable_nombre,
+            Edad: record.Edad,
+            Tatuajes: record.Tatuajes,
+            Indumentarias: record.Indumentarias,
+            Senas_Particulares: record.Senas_Particulares,
+            Delegacion_IJCF: record.Delegacion_IJCF
+          }
+        };
+      });
 
-      updateMarkers(forenseMarkers, newForenseMarkers, setForenseMarkers);
-      updateTimelineData(newTimelineEntries, true);
+      const geojsonData = {
+        type: 'FeatureCollection',
+        features: formattedRecordsForense
+      };
+
+      updateLayerData('forenseLayer', geojsonData);
       setNewForenseDataFetched(false);
     }
-  }, [forenseRecords, map, markers, setMarkers, newForenseDataFetched, setNewForenseDataFetched, COLORS, POINT_RADIUS, fetchId, thresholdId, updateMarkers]);
+  }, [forenseRecords, map, newForenseDataFetched, setNewForenseDataFetched, COLORS, updateLayerData]);
 
   return null;
 };

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useData } from '../context/DataContext';
 
 const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateMarkers, fetchedRecords, setTimelineData, mergeRecords } = useData();
+  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateLayerData, fetchedRecords, setTimelineData, mergeRecords, COLORS } = useData();
 
   const LOCATIONS = {
     'San PedroTlaquepaque': [20.6253, -103.3123],
@@ -48,20 +48,29 @@ const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComple
           }
         }
         return {
-          ...record,
-          lat,
-          lon,
-          tipo_marcador: 'personas_sin_identificar'
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [lon, lat]
+          },
+          properties: {
+            ...record,
+            timestamp: new Date(record.Fecha_Ingreso).getTime(),
+            color: COLORS.UNKNOWN,
+            tipo_marcador: 'personas_sin_identificar'
+          }
         };
-      })
-      
+      });
 
-      setForenseRecords(formattedRecordsForense);
+      const geojsonData = {
+        type: 'FeatureCollection',
+        features: formattedRecordsForense
+      };
+
+      setForenseRecords(geojsonData);
       setNewForenseDataFetched(true);
-      mergeRecords(fetchedRecords, formattedRecordsForense); // Update markers with combined records
-      // Example of setting timeline data
-      //console.log(formattedRecordsForense);
-
+      //mergeRecords(fetchedRecords, geojsonData);
+      updateLayerData('forenseLayer', geojsonData);
       console.log('Fetched Forense records:', formattedRecordsForense);
     } catch (error) {
       console.error("Error fetching Forense data:", error);

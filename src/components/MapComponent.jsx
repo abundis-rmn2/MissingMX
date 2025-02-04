@@ -2,12 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { useData } from '../context/DataContext';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import MarkersCedulas from './MarkersCedulas';
-import MarkersForense from './MarkersForense';
-import TimelineSlider from './TimelineSlider';
 
 const MapComponent = () => {
-  const { map, setMap, setFilterMonth } = useData();
+  const { map, setMap } = useData();
   const mapContainer = useRef(null);
 
   useEffect(() => {
@@ -15,9 +12,9 @@ const MapComponent = () => {
       try {
         const newMap = new maplibregl.Map({
           container: mapContainer.current,
-          style: 'https://demotiles.maplibre.org/style.json',
+          style: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
           center: [-103.349609, 20.659698],
-          zoom: 10
+          zoom: 8
         });
 
         newMap.on('load', () => {
@@ -27,14 +24,11 @@ const MapComponent = () => {
         console.error("Error initializing map:", error);
       }
     }
-  }, [map, setMap, setFilterMonth]);
+  }, [map, setMap]);
 
   return (
     <div>
-      <div ref={mapContainer} style={{ height: '100vh', width: '100vw' }}>
-        {map && <MarkersForense map={map} />}
-        {map && <MarkersCedulas map={map} />}
-      </div>
+      <div ref={mapContainer} style={{ height: '100vh', width: '100vw' }} />
     </div>
   );
 };

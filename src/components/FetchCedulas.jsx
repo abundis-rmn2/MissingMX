@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useData } from '../context/DataContext';
 
 const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateMarkers, forenseRecords, setTimelineData, mergeRecords } = useData();
+  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateLayerData, forenseRecords, setTimelineData, mergeRecords, COLORS } = useData();
 
   useEffect(() => {
     if (fetchCedulas && fetchId) {
@@ -30,26 +30,30 @@ const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComple
       const formattedRecordsCedula = records.map(record => {
         const [lat, lon] = record.lat_long ? record.lat_long.split(',').map(coord => parseFloat(coord)) : [null, null];
         return {
-          ...record,
-          lat,
-          lon,
-          id: record.id_cedula_busqueda,
-          fecha_desaparicion: record.fecha_desaparicion,
-          sexo: record.sexo,
-          edad_momento_desaparicion: record.edad_momento_desaparicion,
-          condicion_localizacion: record.condicion_localizacion,
-          descripcion_desaparicion: record.descripcion_desaparicion,
-          tipo_marcador: 'cedula_busqueda'
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [lon, lat]
+          },
+          properties: {
+            ...record,
+            id: record.id_cedula_busqueda,
+            timestamp: new Date(record.fecha_desaparicion).getTime(),
+            color: record.sexo === 'MUJER' ? COLORS.MUJER : COLORS.HOMBRE,
+            tipo_marcador: 'cedula_busqueda'
+          }
         };
-      })
-      
+      });
 
-      setFetchedRecords(formattedRecordsCedula);
+      const geojsonData = {
+        type: 'FeatureCollection',
+        features: formattedRecordsCedula
+      };
+
+      setFetchedRecords(geojsonData);
       setNewDataFetched(true);
-      // Example of setting timeline data
-      //console.log(formattedRecordsCedula);
- 
-      mergeRecords(formattedRecordsCedula, forenseRecords); // Update markers with combined records
+      //mergeRecords(geojsonData, forenseRecords);
+      updateLayerData('cedulaLayer', geojsonData);
       console.log('Fetched Cedulas records:', formattedRecordsCedula);
       onFetchComplete();
     } catch (error) {

@@ -40,6 +40,7 @@ const App = () => {
 
   return (
     <DataProvider>
+            <ErrorBoundary>
       <DateForm
         startDate={startDate}
         endDate={endDate}
@@ -66,7 +67,7 @@ const App = () => {
         fetchId={fetchId} // Pass fetchId instead of triggerFetch
         onFetchComplete={handleFetchComplete}
       />
-      <ErrorBoundary>
+
         <TimelineSlider />
         <MapComponent />
       </ErrorBoundary>
