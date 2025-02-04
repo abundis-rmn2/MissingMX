@@ -1,8 +1,13 @@
-# React + Vite
+# Jalisco Missing Reports Geolocation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project ports working code from [datades.abundis.com.mx](https://datades.abundis.com.mx/) to a React application. The principal function is to geolocate missing reports in Jalisco.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+The application fetches data from APIs and visualizes it on a map using React and Leaflet. It includes components to fetch and display forensic and missing persons data, and allows users to filter the timeline of events.
+
+## Key Components
+
+### FetchForense
+
+Fetches forensic data from the API and updates the markers on the map.
