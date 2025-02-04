@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
 import { useData } from '../context/DataContext';
+import L from 'leaflet';
 
-const MarkersForense = ({ map }) => {
-  const { forenseRecords, markers, setMarkers, newForenseDataFetched, setNewForenseDataFetched, COLORS, POINT_RADIUS } = useData(); // Get the forense records, current markers, setMarkers function, new data flag, COLORS, and POINT_RADIUS from context
+const MarkersForense = ({ map, fetchId, thresholdId }) => {
+  const { forenseRecords, markers, setMarkers, updateMarkers, newForenseDataFetched, setNewForenseDataFetched, COLORS, POINT_RADIUS } = useData(); // Get the forense records, current markers, setMarkers function, new data flag, COLORS, POINT_RADIUS, and updateMarkers function from context
 
   const MIN_DISTANCE = 0.0001; // Minimum distance threshold to avoid overlap
 
@@ -16,19 +17,20 @@ const MarkersForense = ({ map }) => {
   };
 
   useEffect(() => {
+    console.log('useEffect triggered');
+    console.log('map:', map);
+    console.log('newForenseDataFetched:', newForenseDataFetched);
+    console.log('forenseRecords:', forenseRecords);
+    console.log('fetchId:', fetchId);
+
     if (map && newForenseDataFetched) {
-      // Remove existing markers from the map
-      markers.forEach(marker => {
-        if (marker) {
-          map.removeLayer(marker);
-        }
-      });
+      console.log('Creating new markers');
 
       // Create new markers from forense records
       const newMarkers = forenseRecords.map((record, index) => {
-        const { lat, lon, ID, Fecha_Ingreso, Probable_nombre, Edad, Tatuajes, Indumentarias, Senas_Particulares, Delegacion_IJCF } = record;
-        console.log(lat, lon, ID, Fecha_Ingreso, Probable_nombre, Edad, Tatuajes, Indumentarias, Senas_Particulares, Delegacion_IJCF);
-        if (lat && lon) {
+        const { lat, lon, ID, Fecha_Ingreso, Probable_nombre, Edad, Tatuajes, Indumentarias, Senas_Particulares, Delegacion_IJCF, tipo_marcador } = record;
+
+        if (lat && lon && tipo_marcador === 'personas_sin_identificar') {
           // Adjust lat and lon to avoid overlap
           const adjustedCoords = adjustLatLon(lat, lon, index);
 
@@ -38,7 +40,8 @@ const MarkersForense = ({ map }) => {
           // Create a marker for each record
           const marker = L.circleMarker([adjustedCoords.lat, adjustedCoords.lon], {
             color,
-            radius: POINT_RADIUS
+            radius: POINT_RADIUS,
+            tipo_marcador: tipo_marcador
           }).bindPopup(`
             <b>Record ID: ${ID}</b><br>
             Ingress Date: ${Fecha_Ingreso}<br>
@@ -55,10 +58,17 @@ const MarkersForense = ({ map }) => {
         return null;
       }).filter(marker => marker !== null); // Filter out any null markers
 
-      setMarkers(newMarkers); // Update context with new markers
+      console.log('newMarkers:', newMarkers);
+
+      if (fetchId > thresholdId) {
+        updateMarkers([], newMarkers); // Update markers with new markers
+      } else {
+        setMarkers(prevMarkers => [...prevMarkers, ...newMarkers]); // Append new markers to existing markers
+      }
+
       setNewForenseDataFetched(false); // Reset new data flag
     }
-  }, [forenseRecords, map, markers, setMarkers, newForenseDataFetched, setNewForenseDataFetched, COLORS, POINT_RADIUS]);
+  }, [forenseRecords, map, markers, setMarkers, newForenseDataFetched, setNewForenseDataFetched, COLORS, POINT_RADIUS, fetchId, thresholdId, updateMarkers]);
 
   return null; // This component doesn't need to render anything directly
 };

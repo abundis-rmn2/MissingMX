@@ -7,14 +7,13 @@ export const DataProvider = ({ children }) => {
   const [fetchedRecords, setFetchedRecords] = useState([]);
   const [forenseRecords, setForenseRecords] = useState([]);
   const [markers, setMarkers] = useState([]);
-  const [forenseMarkers, setForenseMarkers] = useState([]);
   const [heatmapLayer, setHeatmapLayer] = useState(null);
-  const [markerClusterGroup, setMarkerClusterGroup] = useState(null);
   const [timelineData, setTimelineData] = useState(null);
   const [timeline, setTimeline] = useState(null);
   const [timelineControl, setTimelineControl] = useState(null);
-  const [newDataFetched, setNewDataFetched] = useState(false); // New flag for new data
-  const [newForenseDataFetched, setNewForenseDataFetched] = useState(false); // New flag for new forense data
+  const [newDataFetched, setNewDataFetched] = useState(false);
+  const [newForenseDataFetched, setNewForenseDataFetched] = useState(false);
+  const [loading, setLoading] = useState(false); // New loading state
 
   const COLORS = {
     MUJER: '#FF69B4',
@@ -23,30 +22,42 @@ export const DataProvider = ({ children }) => {
     SIN_VIDA: '#000000',
     NO_APLICA: '#FF0000',
     UNKNOWN: '#808080'
-  };
+};
 
-  const POINT_RADIUS = 6;
+const POINT_RADIUS = 6;
 
-  return (
+const updateMarkers = (fetchedRecords, forenseRecords) => {
+    console.log('Updating markers');
+    const mergedRecords = [...fetchedRecords, ...forenseRecords];
+    console.log("Merged Records:", mergedRecords);
+    setMarkers(mergedRecords);
+    markers.forEach(marker => {
+      map.removeLayer(marker);
+    });
+};
+
+return (
     <DataContext.Provider value={{
-      map, setMap,
-      fetchedRecords, setFetchedRecords,
-      forenseRecords, setForenseRecords,
-      markers, setMarkers,
-      forenseMarkers, setForenseMarkers,
-      heatmapLayer, setHeatmapLayer,
-      markerClusterGroup, setMarkerClusterGroup,
-      timelineData, setTimelineData,
-      timeline, setTimeline,
-      timelineControl, setTimelineControl,
-      newDataFetched, setNewDataFetched, // Include new flag in context
-      newForenseDataFetched, setNewForenseDataFetched, // Include new flag for forense data in context
-      COLORS, // Include COLORS in context
-      POINT_RADIUS // Include POINT_RADIUS in context
+        map, setMap,
+        fetchedRecords, setFetchedRecords,
+        forenseRecords, setForenseRecords,
+        markers, setMarkers,
+        heatmapLayer, setHeatmapLayer,
+        timelineData, setTimelineData,
+        timeline, setTimeline,
+        timelineControl, setTimelineControl,
+        newDataFetched, setNewDataFetched,
+        newForenseDataFetched, setNewForenseDataFetched,
+        loading, setLoading, // Include loading state in context
+        COLORS,
+        POINT_RADIUS,
+        updateMarkers // Add updateMarkers function to context
     }}>
-      {children}
+        {children}
     </DataContext.Provider>
-  );
+);
+
+
 };
 
 export const useData = () => useContext(DataContext);

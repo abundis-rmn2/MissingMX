@@ -1,55 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import L from 'leaflet'; // Assuming you're using Leaflet for the map
+import React, { useEffect } from 'react';
+import { useData } from '../context/DataContext';
+import L from 'leaflet';
 import MarkersCedulas from './MarkersCedulas';
 import MarkersForense from './MarkersForense';
-import { useData } from '../context/DataContext';
 
 const MapComponent = () => {
-  const { map, setMap } = useData(); // Get map state and setter from context
-  const [mapInstance, setMapInstance] = useState(null);
+  const { map, setMap } = useData();
 
   useEffect(() => {
-    const initializeMap = () => {
+    if (!map) {
       try {
-        const map = L.map('map').setView([20.6597, -103.3496], 13); // Center the map on Guadalajara City
-        const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          errorTileUrl: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' // Fallback tile URL
-        });
-
-        tileLayer.on('tileerror', (error) => {
-          console.error('Error loading tile:', error);
-        });
-
-        tileLayer.addTo(map);
-        setMap(map); // Set the map in context once it's initialized
-        setMapInstance(map); // Store map instance locally
+        const newMap = L.map('map').setView([20.659698, -103.349609], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(newMap);
+        setMap(newMap);
       } catch (error) {
-        console.error('Error initializing map:', error);
+        console.error("Error initializing map:", error);
       }
-    };
-
-    if (!mapInstance) {
-      initializeMap(); // Initialize map only once
     }
+  }, [map, setMap]);
 
-    return () => {
-      if (mapInstance) {
-        mapInstance.remove(); // Clean up the map instance when the component unmounts
-      }
-    };
-  }, [mapInstance, setMap]);
-
-return (
-  <div style={{ height: '100vh', width: '100vw' }}>
-    <div id="map" style={{ height: 'calc(100% - 40px)', width: '100%' }}></div>
-    {mapInstance && (
-      <>
-        <MarkersCedulas map={mapInstance} />
-        <MarkersForense map={mapInstance} />
-      </>
-    )} {/* Load markers when map is ready */}
-  </div>
-);
+  return (
+    <div id="map" style={{ height: '100vh', width: '100vw' }}>
+      {map && <MarkersForense map={map} />}
+      {map && <MarkersCedulas map={map} />}
+    </div>
+  );
 };
 
 export default MapComponent;

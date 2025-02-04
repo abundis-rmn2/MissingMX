@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useData } from '../context/DataContext';
 
-const FetchDataDesaparecidos = () => {
-  const { setFetchedRecords, setNewDataFetched } = useData(); // Get function to update the context and new data flag
-  const [startDate, setStartDate] = useState('2024-01-01'); // Default start date
-  const [endDate, setEndDate] = useState('2024-02-02'); // Default end date
-  const [loading, setLoading] = useState(false);
+const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComplete }) => {
+  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateMarkers, forenseRecords } = useData();
+
+  useEffect(() => {
+    if (fetchCedulas && fetchId) {
+      console.log('Fetching Cedulas data');
+      fetchData(startDate, endDate);
+    }
+  }, [fetchId]);
 
   const fetchData = async (start_date, end_date) => {
     try {
@@ -23,7 +27,7 @@ const FetchDataDesaparecidos = () => {
       });
 
       const records = response.data.records || [];
-      const formattedRecords = records.map(record => {
+      const formattedRecordsCedula = records.map(record => {
         const [lat, lon] = record.lat_long ? record.lat_long.split(',').map(coord => parseFloat(coord)) : [null, null];
         return {
           ...record,
@@ -39,50 +43,23 @@ const FetchDataDesaparecidos = () => {
         };
       });
 
-      setFetchedRecords(formattedRecords); // Update context with fetched records
-      setNewDataFetched(true); // Set new data flag to true
-      console.log('Fetched records:', formattedRecords);
+      setFetchedRecords(formattedRecordsCedula);
+      setNewDataFetched(true);
+      //updateMarkers(formattedRecordsCedula, forenseRecords); // Update markers with combined records
+      console.log('Fetched Cedulas records:', formattedRecordsCedula);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching Cedulas data:", error);
     } finally {
       setLoading(false);
+      onFetchComplete();
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetchData(startDate, endDate);
   };
 
   return (
     <div>
-      <span>Missing Persons Data</span>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Start Date:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          End Date:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Fetch Data'}
-        </button>
-      </form>
-      {loading && <div>Loading data...</div>}
+      {loading && <div>Loading Cedulas data...</div>}
     </div>
   );
 };
 
-export default FetchDataDesaparecidos;
+export default FetchCedulas;

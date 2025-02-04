@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useData } from '../context/DataContext';
 
-const FetchForense = () => {
-  const { setForenseRecords, setNewForenseDataFetched } = useData(); // Get function to update the context and new data flag
-  const [startDate, setStartDate] = useState('2024-01-01'); // Default start date
-  const [endDate, setEndDate] = useState('2024-02-02'); // Default end date
-  const [loading, setLoading] = useState(false);
+const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComplete }) => {
+  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateMarkers, fetchedRecords } = useData();
 
-  // Location coordinates for Delegacion_IJCF
-const LOCATIONS = {
+  const LOCATIONS = {
     'San PedroTlaquepaque': [20.6253, -103.3123],
     'Puerto Vallarta': [20.6432, -105.2335],
     'Colotlán': [21.2159, -103.1278],
@@ -19,7 +15,14 @@ const LOCATIONS = {
     'Ciudad Guzmán': [19.8833, -103.3667],
     'El Grullo': [20.4333, -103.9667],
     'Ocotlán': [19.9833, -103.3667]
-};
+  };
+
+  useEffect(() => {
+    if (fetchForense && fetchId) {
+      console.log('Fetching Forense data');
+      fetchData(startDate, endDate);
+    }
+  }, [fetchId]);
 
   const fetchData = async (start_date, end_date) => {
     try {
@@ -34,16 +37,15 @@ const LOCATIONS = {
         }
       });
 
-      
       const records = response.data.records || [];
-      const formattedRecords = records.map(record => {
+      const formattedRecordsForense = records.map(record => {
         let [lat, lon] = record.lat_long ? record.lat_long.split(',').map(coord => parseFloat(coord)) : [null, null];
 
         if (!lat || !lon) {
-            const location = Object.keys(LOCATIONS).find(loc => record.Delegacion_IJCF.includes(loc));
-            if (location) {
-                [lat, lon] = LOCATIONS[location];
-            }
+          const location = Object.keys(LOCATIONS).find(loc => record.Delegacion_IJCF.includes(loc));
+          if (location) {
+            [lat, lon] = LOCATIONS[location];
+          }
         }
         return {
           ...record,
@@ -53,48 +55,21 @@ const LOCATIONS = {
         };
       });
 
-      setForenseRecords(formattedRecords); // Update context with fetched records
-      setNewForenseDataFetched(true); // Set new data flag to true
-      console.log('Fetched Forense records:', formattedRecords);
+      setForenseRecords(formattedRecordsForense);
+      setNewForenseDataFetched(true);
+      updateMarkers(fetchedRecords, formattedRecordsForense); // Update markers with combined records
+      console.log('Fetched Forense records:', formattedRecordsForense);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching Forense data:", error);
     } finally {
       setLoading(false);
+      onFetchComplete();
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetchData(startDate, endDate);
   };
 
   return (
     <div>
-        <span> Forensic Data</span>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Start Date:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          End Date:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Loading...' : 'Fetch Data'}
-        </button>
-      </form>
-      {loading && <div>Loading data...</div>}
+      {loading && <div>Loading Forense data...</div>}
     </div>
   );
 };

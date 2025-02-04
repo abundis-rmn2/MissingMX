@@ -6,14 +6,12 @@ const CurrentState = () => {
     map,
     fetchedRecords,
     forenseRecords,
-    markers,
-    forenseMarkers,
     heatmapLayer,
     markerClusterGroup,
     timelineData,
     timeline,
     timelineControl,
-    COLORS
+    COLORS,
   } = useData(); // Get all data from context
 
   return (
@@ -31,8 +29,6 @@ const CurrentState = () => {
       <p>Map: {map ? 'Initialized' : 'Not Initialized'}</p>
       <p>Fetched Records: {fetchedRecords.length}</p>
       <p>Forense Records: {forenseRecords.length}</p>
-      <p>Markers: {markers.length}</p>
-      <p>Forense Markers: {forenseMarkers.length}</p>
       <p>Heatmap Layer: {heatmapLayer ? 'Initialized' : 'Not Initialized'}</p>
       <p>Marker Cluster Group: {markerClusterGroup ? 'Initialized' : 'Not Initialized'}</p>
       <p>Timeline Data: {timelineData ? 'Available' : 'Not Available'}</p>
