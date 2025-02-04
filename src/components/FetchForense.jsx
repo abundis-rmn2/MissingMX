@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useData } from '../context/DataContext';
 
 const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateMarkers, fetchedRecords } = useData();
+  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateMarkers, fetchedRecords, setTimelineData, mergeRecords } = useData();
 
   const LOCATIONS = {
     'San PedroTlaquepaque': [20.6253, -103.3123],
@@ -53,11 +53,15 @@ const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComple
           lon,
           tipo_marcador: 'personas_sin_identificar'
         };
-      });
+      })
+      
 
       setForenseRecords(formattedRecordsForense);
       setNewForenseDataFetched(true);
-      updateMarkers(fetchedRecords, formattedRecordsForense); // Update markers with combined records
+      mergeRecords(fetchedRecords, formattedRecordsForense); // Update markers with combined records
+      // Example of setting timeline data
+      //console.log(formattedRecordsForense);
+
       console.log('Fetched Forense records:', formattedRecordsForense);
     } catch (error) {
       console.error("Error fetching Forense data:", error);

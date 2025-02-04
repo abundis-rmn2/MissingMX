@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useData } from '../context/DataContext';
 
 const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateMarkers, forenseRecords } = useData();
+  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateMarkers, forenseRecords, setTimelineData, mergeRecords } = useData();
 
   useEffect(() => {
     if (fetchCedulas && fetchId) {
@@ -41,25 +41,25 @@ const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComple
           descripcion_desaparicion: record.descripcion_desaparicion,
           tipo_marcador: 'cedula_busqueda'
         };
-      });
+      })
+      
 
       setFetchedRecords(formattedRecordsCedula);
       setNewDataFetched(true);
-      //updateMarkers(formattedRecordsCedula, forenseRecords); // Update markers with combined records
+      // Example of setting timeline data
+      //console.log(formattedRecordsCedula);
+ 
+      mergeRecords(formattedRecordsCedula, forenseRecords); // Update markers with combined records
       console.log('Fetched Cedulas records:', formattedRecordsCedula);
+      onFetchComplete();
     } catch (error) {
       console.error("Error fetching Cedulas data:", error);
     } finally {
       setLoading(false);
-      onFetchComplete();
     }
   };
 
-  return (
-    <div>
-      {loading && <div>Loading Cedulas data...</div>}
-    </div>
-  );
+  return null;
 };
 
 export default FetchCedulas;

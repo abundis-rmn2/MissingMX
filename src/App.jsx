@@ -6,6 +6,7 @@ import MapComponent from './components/MapComponent';
 import CurrentState from './context/currrentState';
 import DateForm from './components/DateForm';
 import ErrorBoundary from './context/ErrorBoundary';
+import TimelineSlider from './components/TimelineSlider';
 
 const App = () => {
   const [startDate, setStartDate] = useState('2024-01-01');
@@ -66,6 +67,7 @@ const App = () => {
         onFetchComplete={handleFetchComplete}
       />
       <ErrorBoundary>
+        <TimelineSlider />
         <MapComponent />
       </ErrorBoundary>
       <CurrentState />
