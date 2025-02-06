@@ -7,6 +7,8 @@ import CurrentState from './context/currrentState';
 import DateForm from './components/DateForm';
 import ErrorBoundary from './context/ErrorBoundary';
 import TimelineSlider from './components/TimelineSlider';
+import Clustering from './components/Clustering';
+import LayoutForm from './components/LayoutForm';
 
 const App = () => {
   const [startDate, setStartDate] = useState('2024-01-01');
@@ -29,14 +31,6 @@ const App = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    console.log('Loading state changed:', loading);
-    console.log(updatedMarkers);
-  }, [loading]);
-
-  useEffect(() => {
-    console.log('Fetch ID changed:', fetchId);
-  }, [fetchId]);
 
   return (
     <DataProvider>
@@ -67,7 +61,8 @@ const App = () => {
         fetchId={fetchId} // Pass fetchId instead of triggerFetch
         onFetchComplete={handleFetchComplete}
       />
-
+        <Clustering type="personas_sin_identificar" />
+        <LayoutForm />
         <TimelineSlider />
         <MapComponent />
       </ErrorBoundary>

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useData } from '../context/DataContext';
 
 const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateLayerData, forenseRecords, setTimelineData, mergeRecords, COLORS } = useData();
+  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateLayerData, sexoLayout, forenseRecords, setTimelineData, mergeRecords, COLORS } = useData();
 
   useEffect(() => {
     if (fetchCedulas && fetchId) {
@@ -53,8 +53,8 @@ const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComple
       setFetchedRecords(geojsonData);
       setNewDataFetched(true);
       //mergeRecords(geojsonData, forenseRecords);
-      updateLayerData('cedulaLayer', geojsonData);
-      console.log('Fetched Cedulas records:', formattedRecordsCedula);
+      updateLayerData('cedulaLayer', geojsonData, sexoLayout);
+      //console.log('Fetched Cedulas records:', formattedRecordsCedula);
       onFetchComplete();
     } catch (error) {
       console.error("Error fetching Cedulas data:", error);

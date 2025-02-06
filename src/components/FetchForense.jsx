@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useData } from '../context/DataContext';
 
 const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateLayerData, fetchedRecords, setTimelineData, mergeRecords, COLORS } = useData();
+  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateLayerData, fetchedRecords, setTimelineData, mergeRecords, COLORS, clusteringLayout} = useData();
 
   const LOCATIONS = {
     'San PedroTlaquepaque': [20.6253, -103.3123],
@@ -70,7 +70,7 @@ const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComple
       setForenseRecords(geojsonData);
       setNewForenseDataFetched(true);
       //mergeRecords(fetchedRecords, geojsonData);
-      updateLayerData('forenseLayer', geojsonData);
+      updateLayerData('forenseLayer', geojsonData, clusteringLayout);
       console.log('Fetched Forense records:', formattedRecordsForense);
     } catch (error) {
       console.error("Error fetching Forense data:", error);
