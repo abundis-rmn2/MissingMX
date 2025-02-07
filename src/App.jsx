@@ -9,6 +9,7 @@ import ErrorBoundary from './context/ErrorBoundary';
 import TimelineSlider from './components/TimelineSlider';
 import Clustering from './components/Clustering';
 import LayoutForm from './components/LayoutForm';
+import FilterForm from './components/FilterForm';
 
 const App = () => {
   const [startDate, setStartDate] = useState('2024-01-01');
@@ -62,8 +63,9 @@ const App = () => {
         onFetchComplete={handleFetchComplete}
       />
         <Clustering type="personas_sin_identificar" />
-        <LayoutForm />
         <TimelineSlider />
+        <LayoutForm />
+        <FilterForm />
         <MapComponent />
       </ErrorBoundary>
       <CurrentState />

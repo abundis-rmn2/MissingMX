@@ -19,6 +19,10 @@ export const DataProvider = ({ children }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [daysRange, setDaysRange] = useState(5); // Default to 5 days range
   const [activeHeatmapCategories, setActiveHeatmapCategories] = useState([]); // Add this line
+  const [selectedSexo, setSelectedSexo] = useState(['HOMBRE', 'MUJER']);
+  const [selectedCondicion, setSelectedCondicion] = useState(['CON VIDA', 'SIN VIDA', 'NO APLICA']);
+  const [edadRange, setEdadRange] = useState([0, 100]);
+  
 
   const COLORS = Object.fromEntries(
     ["MUJER", "HOMBRE", "CON_VIDA", "SIN_VIDA", "NO_APLICA", "UNKNOWN"].map((key) => {
@@ -281,8 +285,15 @@ export const DataProvider = ({ children }) => {
     setTimelineData(reset ? timelineEntries : [...timelineData, ...timelineEntries]);
   };
 
-  const filterMarkersByDate = (selectedDate, daysRange) => {
+  const filterMarkersByDate = (selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange) => {
     if (!map) return;
+  
+    console.log('Filtering markers by date...');
+    console.log('Selected Date:', selectedDate);
+    console.log('Days Range:', daysRange);
+    console.log('Selected Sexo:', selectedSexo);
+    console.log('Selected Condicion:', selectedCondicion);
+    console.log('Edad Range:', edadRange);
   
     const endDate = new Date(selectedDate);
     endDate.setDate(selectedDate.getDate() + daysRange);
@@ -291,58 +302,55 @@ export const DataProvider = ({ children }) => {
     const selectedTimestamp = selectedDate.getTime();
     const endTimestamp = endDate.getTime();
   
-    //console.log(`Filtering layers by date: ${selectedDate} to ${endDate}`);
+    console.log('Selected Timestamp:', selectedTimestamp);
+    console.log('End Timestamp:', endTimestamp);
   
-    // Apply a filter to the "cedula" layer
+    // Attribute filters
+    const attributeFilters = [];
+    if (selectedSexo.length > 0) {
+      attributeFilters.push(['in', ['get', 'sexo'], ['literal', selectedSexo]]);
+    }
+    if (selectedCondicion.length > 0) {
+      attributeFilters.push(['in', ['get', 'condicion_localizacion'], ['literal', selectedCondicion]]);
+    }
+    attributeFilters.push([">=", ["to-number", ["get", "edad_momento_desaparicion"]], edadRange[0]]);
+    attributeFilters.push(["<=", ["to-number", ["get", "edad_momento_desaparicion"]], edadRange[1]]);
+  
+
+    console.log('Attribute Filters:', attributeFilters);
+  
+    // Date filters
+    const dateFilters = [
+      [">=", ["to-number", ["get", "timestamp"]], selectedTimestamp],
+      ["<=", ["to-number", ["get", "timestamp"]], endTimestamp]
+    ];
+  
+    console.log('Date Filters:', dateFilters);
+  
+    // Combined filters
+    const combinedFilter = ['all', ...attributeFilters, ...dateFilters];
+  
+    console.log('Combined Filter:', combinedFilter);
+  
+    // Apply the combined filter to the "cedulaLayer"
     if (map.getLayer("cedulaLayer")) {
-      //console.log("Filtering cedula layer");
-      map.setFilter("cedulaLayer", [
-        "all",
-        [">=", ["to-number", ["get", "timestamp"]], selectedTimestamp],
-        ["<=", ["to-number", ["get", "timestamp"]], endTimestamp]
-      ]);
+      console.log('Applying filter to cedulaLayer');
+      map.setFilter("cedulaLayer", combinedFilter);
     }
   
-    /*
-    // Apply a filter to the "forenseLayer"
-    if (map.getLayer("forenseLayer")) {
-      //console.log("Filtering forense layer");
-      map.setFilter("forenseLayer", [
-        "all",
-        [">=", ["to-number", ["get", "timestamp"]], selectedTimestamp],
-        ["<=", ["to-number", ["get", "timestamp"]], endTimestamp]
-      ]);
-    }
-
-        // Get the filtered features from the "forenseLayer"
-    const filteredFeatures = map.querySourceFeatures('forenseLayer', {
-      sourceLayer: 'forenseLayer',
-      filter: [
-        "all",
-        [">=", ["to-number", ["get", "timestamp"]], selectedTimestamp],
-        ["<=", ["to-number", ["get", "timestamp"]], endTimestamp]
-      ]
+    // Update heatmap layers
+    activeHeatmapCategories.forEach(category => {
+      const layerId = `cedulaLayer-${category}`;
+      if (map.getLayer(layerId)) {
+        const categoryFilter = category === 'HOMBRE' || category === 'MUJER'
+          ? ['==', ['get', 'sexo'], category]
+          : ['==', ['get', 'condicion_localizacion'], category];
+        const heatmapFilter = ['all', categoryFilter, ...attributeFilters, ...dateFilters];
+        console.log(`Applying filter to heatmap layer: ${layerId}`);
+        console.log('Heatmap Filter:', heatmapFilter);
+        map.setFilter(layerId, heatmapFilter);
+      }
     });
-
-    // Call avoidLayerOverlap with the filtered features
-    avoidLayerOverlap(forenseRecords.features, 'personas_sin_identificar', selectedTimestamp, endTimestamp);
-    */
-       // Update heatmap layers
-       activeHeatmapCategories.forEach(category => {
-        const layerId = `cedulaLayer-${category}`;
-        if (map.getLayer(layerId)) {
-          const categoryFilter = category === 'HOMBRE' || category === 'MUJER' 
-            ? ['==', ['get', 'sexo'], category]
-            : ['==', ['get', 'condicion_localizacion'], category];
-          
-          map.setFilter(layerId, [
-            "all",
-            categoryFilter,
-            [">=", ["to-number", ["get", "timestamp"]], selectedTimestamp],
-            ["<=", ["to-number", ["get", "timestamp"]], endTimestamp]
-          ]);
-        }
-      });
   };
   
   const avoidLayerOverlap = (records, tipo_marcador, selectedTimestamp, endTimestamp) => {
@@ -386,40 +394,43 @@ export const DataProvider = ({ children }) => {
     const geojsonData = {
       type: 'FeatureCollection',
       features: clusterFeatures
-    };
+    }
     updateLayerData('forenseLayer', geojsonData, clusteringLayout);
 };
 
   return (
-    <DataContext.Provider value={{
-      map, setMap,
-      fetchedRecords, setFetchedRecords,
-      forenseRecords, setForenseRecords,
-      cedulaLayer, setCedulaLayer,
-      forenseLayer, setForenseLayer,
-      timelineData, setTimelineData,
-      timeline, setTimeline,
-      timelineControl, setTimelineControl,
-      newDataFetched, setNewDataFetched,
-      newForenseDataFetched, setNewForenseDataFetched,
-      loading, setLoading,
-      selectedDate, setSelectedDate,
-      daysRange, setDaysRange,
-      COLORS,
-      POINT_RADIUS,
-      clusteringLayout,
-      sexoLayout,
-      condicionLocalizacionLayout,
-      heatmapLayout,
-      activeHeatmapCategories, setActiveHeatmapCategories,
-      updateLayerData,
-      filterMarkersByDate,
-      mergeRecords,
-      updateTimelineData,
-      avoidLayerOverlap
-    }}>
-      {children}
-    </DataContext.Provider>
+<DataContext.Provider value={{
+  map, setMap,
+  fetchedRecords, setFetchedRecords,
+  forenseRecords, setForenseRecords,
+  cedulaLayer, setCedulaLayer,
+  forenseLayer, setForenseLayer,
+  timelineData, setTimelineData,
+  timeline, setTimeline,
+  timelineControl, setTimelineControl,
+  newDataFetched, setNewDataFetched,
+  newForenseDataFetched, setNewForenseDataFetched,
+  loading, setLoading,
+  selectedDate, setSelectedDate,
+  daysRange, setDaysRange,
+  COLORS,
+  POINT_RADIUS,
+  clusteringLayout,
+  sexoLayout,
+  condicionLocalizacionLayout,
+  heatmapLayout,
+  activeHeatmapCategories, setActiveHeatmapCategories,
+  updateLayerData,
+  filterMarkersByDate,
+  mergeRecords,
+  updateTimelineData,
+  avoidLayerOverlap,
+  selectedSexo, setSelectedSexo,
+  selectedCondicion, setSelectedCondicion,
+  edadRange, setEdadRange
+}}>
+  {children}
+</DataContext.Provider>
   );
 };
 

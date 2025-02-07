@@ -8,7 +8,10 @@ const TimelineSlider = () => {
     selectedDate, 
     setSelectedDate, 
     daysRange, 
-    setDaysRange 
+    setDaysRange,
+    selectedSexo,
+    selectedCondicion,
+    edadRange
   } = useData();
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -27,18 +30,18 @@ const TimelineSlider = () => {
         const minDate = new Date(Math.min(...timestamps));
         if (!selectedDate) {
           setSelectedDate(minDate);
-          filterMarkersByDate(minDate, daysRange);
+          filterMarkersByDate(minDate, daysRange, selectedSexo, selectedCondicion, edadRange);
         }
       }
     }
-  }, [timelineData, filterMarkersByDate, daysRange, setSelectedDate, selectedDate]);
+  }, [timelineData, filterMarkersByDate, daysRange, setSelectedDate, selectedDate, selectedSexo, selectedCondicion, edadRange]);
 
   // Handle date filtering when selectedDate or daysRange changes
   useEffect(() => {
     if (selectedDate) {
-      filterMarkersByDate(selectedDate, daysRange);
+      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange);
     }
-  }, [selectedDate, filterMarkersByDate, daysRange]);
+  }, [selectedDate, filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange]);
 
   // Handle play/pause functionality with velocity control
   useEffect(() => {
@@ -155,7 +158,7 @@ const TimelineSlider = () => {
         onChange={(e) => {
           const newDate = new Date(parseInt(e.target.value));
           setSelectedDate(newDate);
-          filterMarkersByDate(newDate, daysRange);
+          filterMarkersByDate(newDate, daysRange, selectedSexo, selectedCondicion, edadRange);
         }}
       />
       <span style={{ marginLeft: '5px' }}>{selectedDate ? selectedDate.toDateString() : 'Select a date'}</span>

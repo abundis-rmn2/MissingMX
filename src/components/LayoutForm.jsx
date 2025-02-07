@@ -8,7 +8,13 @@ const LayoutForm = () => {
     sexoLayout,
     condicionLocalizacionLayout,
     COLORS,
-    setActiveHeatmapCategories
+    setActiveHeatmapCategories,
+    selectedDate,
+    daysRange,
+    selectedSexo,
+    selectedCondicion,
+    edadRange,
+    filterMarkersByDate
   } = useData();
 
   const [mapType, setMapType] = useState('point');
@@ -52,7 +58,6 @@ const LayoutForm = () => {
         ['zoom'],
         0, 12,
         13, 28
-    
       ],
       'heatmap-opacity': [
         'interpolate',
@@ -174,11 +179,19 @@ const LayoutForm = () => {
       });
       setActiveHeatmapCategories(activeCategories);
     }
+    console.log(geojsonData);
+
+    // Trigger filter update after updating the map layer
+    if (selectedDate) {
+      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange);
+    } else {
+      console.warn('Selected date is null, skipping filter update.');
+    }
   };
 
   useEffect(() => {
     updateMapLayer();
-  }, [mapType, colorScheme]);
+  }, [mapType, colorScheme, selectedSexo, selectedCondicion, edadRange]);
 
   const handleMapTypeChange = (e) => {
     setMapType(e.target.value);

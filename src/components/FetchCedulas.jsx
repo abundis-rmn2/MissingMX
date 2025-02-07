@@ -54,7 +54,7 @@ const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComple
       setNewDataFetched(true);
       //mergeRecords(geojsonData, forenseRecords);
       updateLayerData('cedulaLayer', geojsonData, sexoLayout);
-      //console.log('Fetched Cedulas records:', formattedRecordsCedula);
+      console.log('Fetched Cedulas records:', formattedRecordsCedula);
       onFetchComplete();
     } catch (error) {
       console.error("Error fetching Cedulas data:", error);
