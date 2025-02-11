@@ -40,7 +40,8 @@ const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComple
             id: record.id_cedula_busqueda,
             timestamp: new Date(record.fecha_desaparicion).getTime(),
             color: record.sexo === 'MUJER' ? COLORS.MUJER : COLORS.HOMBRE,
-            tipo_marcador: 'cedula_busqueda'
+            tipo_marcador: 'cedula_busqueda',
+            num_score: record.num_score,
           }
         };
       });

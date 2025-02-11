@@ -11,7 +11,8 @@ const TimelineSlider = () => {
     setDaysRange,
     selectedSexo,
     selectedCondicion,
-    edadRange
+    edadRange,
+    sumScoreRange
   } = useData();
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -30,18 +31,18 @@ const TimelineSlider = () => {
         const minDate = new Date(Math.min(...timestamps));
         if (!selectedDate) {
           setSelectedDate(minDate);
-          filterMarkersByDate(minDate, daysRange, selectedSexo, selectedCondicion, edadRange);
+          filterMarkersByDate(minDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
         }
       }
     }
-  }, [timelineData, filterMarkersByDate, daysRange, setSelectedDate, selectedDate, selectedSexo, selectedCondicion, edadRange]);
+  }, [timelineData, filterMarkersByDate, daysRange, setSelectedDate, selectedDate, selectedSexo, selectedCondicion, edadRange, sumScoreRange]);
 
   // Handle date filtering when selectedDate or daysRange changes
   useEffect(() => {
     if (selectedDate) {
-      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange);
+      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
     }
-  }, [selectedDate, filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange]);
+  }, [selectedDate, filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange]);
 
   // Handle play/pause functionality with velocity control
   useEffect(() => {
@@ -158,7 +159,7 @@ const TimelineSlider = () => {
         onChange={(e) => {
           const newDate = new Date(parseInt(e.target.value));
           setSelectedDate(newDate);
-          filterMarkersByDate(newDate, daysRange, selectedSexo, selectedCondicion, edadRange);
+          filterMarkersByDate(newDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
         }}
       />
       <span style={{ marginLeft: '5px' }}>{selectedDate ? selectedDate.toDateString() : 'Select a date'}</span>

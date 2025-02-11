@@ -13,7 +13,9 @@ const FilterForm = () => {
     selectedCondicion,
     setSelectedCondicion,
     edadRange,
-    setEdadRange
+    setEdadRange,
+    sumScoreRange,
+    setsumScoreRange,
   } = useData();
 
   // Track whether filters have been initialized after the time slider
@@ -27,13 +29,13 @@ const FilterForm = () => {
       }
       applyFilters();
     }
-  }, [selectedSexo, selectedCondicion, edadRange, selectedDate, daysRange, map]);
+  }, [selectedSexo, selectedCondicion, edadRange, sumScoreRange, selectedDate, daysRange, map]);
 
   const applyFilters = () => {
     if (!map || !filtersInitialized.current) return;
 
     console.log('Applying filters...');
-    filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange);
+    filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
   };
 
   const handleSexoChange = (e) => {
@@ -59,6 +61,15 @@ const FilterForm = () => {
     setEdadRange((prev) => {
       const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
       console.log(`Edad range updated: ${updated}`);
+      return updated;
+    });
+  };
+
+  const handleSumScoreRangeChange = (e) => {
+    const { value, name } = e.target;
+    setsumScoreRange((prev) => {
+      const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
+      console.log(`Sum Score range updated: ${updated}`);
       return updated;
     });
   };
@@ -143,6 +154,34 @@ const FilterForm = () => {
       max="100"
     />
     <span>{edadRange[1]}</span>
+  </label>
+</fieldset>
+
+<fieldset>
+  <legend>Score de Violencia</legend>
+  <label>
+    Min:
+    <input
+      type="range"
+      name="min"
+      value={sumScoreRange[0]}
+      onChange={handleSumScoreRangeChange}
+      min="0.5"
+      max={sumScoreRange[1]}
+    />
+    <span>{sumScoreRange[0]}</span>
+  </label>
+  <label>
+    Max:
+    <input
+      type="range"
+      name="max"
+      value={sumScoreRange[1]}
+      onChange={handleSumScoreRangeChange}
+      min={sumScoreRange[0]}
+      max="20"
+    />
+    <span>{sumScoreRange[1]}</span>
   </label>
 </fieldset>
     </div>

@@ -22,6 +22,7 @@ export const DataProvider = ({ children }) => {
   const [selectedSexo, setSelectedSexo] = useState(['HOMBRE', 'MUJER']);
   const [selectedCondicion, setSelectedCondicion] = useState(['CON VIDA', 'SIN VIDA', 'NO APLICA']);
   const [edadRange, setEdadRange] = useState([0, 100]);
+  const [sumScoreRange, setsumScoreRange] = useState([0.5, 20]);
   
 
   const COLORS = Object.fromEntries(
@@ -45,7 +46,7 @@ export const DataProvider = ({ children }) => {
     })
   );
   
-  const POINT_RADIUS = 6;
+  const POINT_RADIUS = 30;
 
   const addTooltip = (layerId) => {
     if (!map) return;
@@ -62,9 +63,10 @@ export const DataProvider = ({ children }) => {
         <b>Record ID: ${properties.id || properties.ID}</b><br>
         Marker Type: ${properties.tipo_marcador}<br>
         ${properties.fecha_desaparicion ? `Disappearance Date: ${properties.fecha_desaparicion}<br>` : ''}
-        ${properties.sexo ? `Gender: ${properties.sexo}<br>` : ''}
+        ${properties.sexo ? `Sex: ${properties.sexo}<br>` : ''}
         ${properties.edad_momento_desaparicion ? `Age at Disappearance: ${properties.edad_momento_desaparicion}<br>` : ''}
         ${properties.condicion_localizacion ? `Location Condition: ${properties.condicion_localizacion}<br>` : ''}
+        ${properties.sum_score ? `Sum Score: ${properties.sum_score}<br>` : ''}
         ${properties.descripcion_desaparicion ? `Disappearance Description: ${properties.descripcion_desaparicion}<br>` : ''}
         ${properties.Fecha_Ingreso ? `Ingress Date: ${properties.Fecha_Ingreso}<br>` : ''}
         ${properties.Probable_nombre ? `Probable Name: ${properties.Probable_nombre}<br>` : ''}
@@ -119,6 +121,7 @@ export const DataProvider = ({ children }) => {
       return;
     }
     console.log('Updating layer data:', layerId, layoutConfig);
+    console.log('Data:', data);
     if (map.getSource(layerId)) {
       map.getSource(layerId).setData(data);
     } else {
@@ -131,24 +134,7 @@ export const DataProvider = ({ children }) => {
         id: layerId,
         type: 'circle',
         source: layerId,
-        paint: layoutConfig || {
-          'circle-radius': POINT_RADIUS,
-          'circle-color': [
-            'case',
-            ['==', ['get', 'sexo'], 'MUJER'], COLORS.MUJER.opacity30,
-            ['==', ['get', 'sexo'], 'HOMBRE'], COLORS.HOMBRE.opacity30,
-            COLORS.UNKNOWN.opacity30,
-          ],
-          'circle-stroke-color': [
-            'case',
-            ['==', ['get', 'sexo'], 'MUJER'], COLORS.MUJER.opacity100,
-            ['==', ['get', 'sexo'], 'HOMBRE'], COLORS.HOMBRE.opacity100,
-            COLORS.UNKNOWN.opacity100,
-          ],
-          'circle-stroke-width': 2,
-          'circle-opacity': ['case', ['get', 'visible'], 0.8, 0],
-          'circle-stroke-opacity': 1,
-        },
+        paint: layoutConfig
       });
   
       addTooltip(layerId);
@@ -187,7 +173,15 @@ export const DataProvider = ({ children }) => {
   };
 
   const sexoLayout = {
-    'circle-radius': 6,
+    'circle-radius': [
+      'interpolate',
+      ['linear'],
+      ['to-number', ['get', 'sum_score']],
+      0, 3,
+      5, 6,
+      9, 9,
+      21, 12
+    ],
     'circle-color': [
       'case',
       ['==', ['get', 'sexo'], 'MUJER'], COLORS.MUJER.opacity30,
@@ -206,7 +200,15 @@ export const DataProvider = ({ children }) => {
   };
 
   const condicionLocalizacionLayout = {
-    'circle-radius': 6,
+    'circle-radius': [
+      'interpolate',
+      ['linear'],
+      ['to-number', ['get', 'sum_score']],
+      0, 3,
+      5, 6,
+      9, 9,
+      21, 12
+    ],
     'circle-color': [
       'case',
       ['==', ['get', 'condicion_localizacion'], 'CON VIDA'], COLORS.CON_VIDA.opacity30,
@@ -285,7 +287,7 @@ export const DataProvider = ({ children }) => {
     setTimelineData(reset ? timelineEntries : [...timelineData, ...timelineEntries]);
   };
 
-  const filterMarkersByDate = (selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange) => {
+  const filterMarkersByDate = (selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange) => {
     if (!map) return;
   
     console.log('Filtering markers by date...');
@@ -294,6 +296,7 @@ export const DataProvider = ({ children }) => {
     console.log('Selected Sexo:', selectedSexo);
     console.log('Selected Condicion:', selectedCondicion);
     console.log('Edad Range:', edadRange);
+    console.log('Sum Score Range:', sumScoreRange);
   
     const endDate = new Date(selectedDate);
     endDate.setDate(selectedDate.getDate() + daysRange);
@@ -315,6 +318,9 @@ export const DataProvider = ({ children }) => {
     }
     attributeFilters.push([">=", ["to-number", ["get", "edad_momento_desaparicion"]], edadRange[0]]);
     attributeFilters.push(["<=", ["to-number", ["get", "edad_momento_desaparicion"]], edadRange[1]]);
+
+    attributeFilters.push([">=", ["to-number", ["get", "sum_score"]], sumScoreRange[0]]);
+    attributeFilters.push(["<=", ["to-number", ["get", "sum_score"]], sumScoreRange[1]]);
   
 
     console.log('Attribute Filters:', attributeFilters);
@@ -427,7 +433,8 @@ export const DataProvider = ({ children }) => {
   avoidLayerOverlap,
   selectedSexo, setSelectedSexo,
   selectedCondicion, setSelectedCondicion,
-  edadRange, setEdadRange
+  edadRange, setEdadRange,
+  sumScoreRange, setsumScoreRange
 }}>
   {children}
 </DataContext.Provider>

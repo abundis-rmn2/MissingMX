@@ -14,6 +14,7 @@ const LayoutForm = () => {
     selectedSexo,
     selectedCondicion,
     edadRange,
+    sumScoreRange,
     filterMarkersByDate
   } = useData();
 
@@ -183,7 +184,7 @@ const LayoutForm = () => {
 
     // Trigger filter update after updating the map layer
     if (selectedDate) {
-      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange);
+      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange,);
     } else {
       console.warn('Selected date is null, skipping filter update.');
     }
@@ -191,7 +192,7 @@ const LayoutForm = () => {
 
   useEffect(() => {
     updateMapLayer();
-  }, [mapType, colorScheme, selectedSexo, selectedCondicion, edadRange]);
+  }, [mapType, colorScheme, selectedSexo, selectedCondicion, edadRange, sumScoreRange,]);
 
   const handleMapTypeChange = (e) => {
     setMapType(e.target.value);
