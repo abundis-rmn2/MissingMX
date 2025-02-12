@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useData } from '../context/DataContext';
 
 const TimelineSlider = () => {
@@ -16,60 +16,52 @@ const TimelineSlider = () => {
     timeScale // Get timeScale from context instead of local state
   } = useData();
 
-  // Remove local timeScale state
   const [isPlaying, setIsPlaying] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
   const [velocity, setVelocity] = useState(500);
 
-  // Function to calculate the number of days based on the selected time scale
   const getDaysRange = (date, scale) => {
     switch(scale) {
       case 'weekly':
-        console.log('Weekly');
         return 7;
       case 'bi-weekly':
-        console.log('Biweekly');
         return 14;
       case 'monthly':
-        console.log('Monthly');
-        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+        return 30;
       default:
         return 1;
     }
   };
 
-  // Handle initial date setup
+  const handleDateChange = useCallback((date) => {
+    if (!date) return;
+    setSelectedDate(date);
+    filterMarkersByDate(date, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
+  }, [filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange]);
+
   useEffect(() => {
-    if (timelineData.length > 0) {
-      const timestamps = timelineData
-        .map(d => parseInt(d.timestamp))
-        .filter(timestamp => !isNaN(timestamp));
-
-      if (timestamps.length > 0) {
-        const minDate = new Date(Math.min(...timestamps));
-        if (!selectedDate) {
-          setSelectedDate(minDate);
-          filterMarkersByDate(minDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
-        }
-      }
+    if (timelineData.length > 0 && !selectedDate) {
+      const initialDate = new Date(Math.min(...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))));
+      handleDateChange(initialDate);
+      setDaysRange(getDaysRange(initialDate, timeScale));
     }
-  }, [timelineData, filterMarkersByDate, daysRange, setSelectedDate, selectedDate, selectedSexo, selectedCondicion, edadRange, sumScoreRange]);
+  }, [timelineData, handleDateChange, setDaysRange, timeScale]);
 
-  // Handle date filtering when selectedDate or daysRange changes
   useEffect(() => {
     if (selectedDate) {
-      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
-      // Update daysRange based on the selected time scale
-      setDaysRange(getDaysRange(selectedDate, timeScale));
+      handleDateChange(selectedDate);
     }
-  }, [selectedDate, filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange, timeScale]);
+  }, [selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange, handleDateChange]);
 
-  // Handle play/pause functionality with velocity control
   useEffect(() => {
     if (isPlaying) {
       const id = setInterval(() => {
-        playForward();
-      }, velocity); // use velocity as the interval delay
+        setSelectedDate(prevDate => {
+          const newDate = new Date(prevDate);
+          newDate.setDate(newDate.getDate() + 1);
+          return newDate;
+        });
+      }, velocity);
       setIntervalId(id);
     } else if (intervalId) {
       clearInterval(intervalId);
@@ -81,16 +73,13 @@ const TimelineSlider = () => {
         clearInterval(intervalId);
       }
     };
-  }, [isPlaying, selectedDate, velocity]);
+  }, [isPlaying, velocity, intervalId]);
 
-  // Update useEffect to react to timeScale changes
   useEffect(() => {
     if (selectedDate) {
-      const newDaysRange = getDaysRange(selectedDate, timeScale);
-      setDaysRange(newDaysRange);
-      filterMarkersByDate(selectedDate, newDaysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
+      setDaysRange(getDaysRange(selectedDate, timeScale));
     }
-  }, [timeScale, selectedDate]); // Add timeScale as dependency
+  }, [timeScale, selectedDate, setDaysRange]);
 
   const playForward = () => {
     if (!selectedDate) return;
@@ -102,21 +91,16 @@ const TimelineSlider = () => {
       ...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))
     ));
 
-    if (newDate > maxDate) {
-      setIsPlaying(false);
-      return;
-    }
+    if (newDate > maxDate) return;
 
     setSelectedDate(newDate);
   };
 
-  // Step forward by one day
   const stepForward = () => {
     if (!selectedDate) return;
     playForward();
   };
 
-  // Step backward by one day
   const stepBackward = () => {
     if (!selectedDate) return;
 
@@ -160,7 +144,6 @@ const TimelineSlider = () => {
         Step Forward &gt;
       </button>
 
-      {/* Velocity (play speed) slider */}
       <div style={{ marginTop: '10px' }}>
         <div>
         <label htmlFor="velocitySlider">Velocity play: </label>
@@ -189,8 +172,6 @@ const TimelineSlider = () => {
           const newDate = new Date(parseInt(e.target.value));
           setSelectedDate(newDate);
           filterMarkersByDate(newDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
-          // Update daysRange based on the selected time scale
-          setDaysRange(getDaysRange(newDate, timeScale));
         }}
       />
       <span style={{ marginLeft: '5px' }}>{selectedDate ? selectedDate.toDateString() : 'Select a date'}</span>
@@ -208,8 +189,6 @@ const TimelineSlider = () => {
       />
       <span style={{ marginLeft: '5px' }}>{daysRange} days</span>
       </div>
-
-      {/* Remove the time scale radio buttons from this component since they're now in GlobalTimeGraph */}
     </div>
   );
 };
