@@ -12,13 +12,31 @@ const TimelineSlider = () => {
     selectedSexo,
     selectedCondicion,
     edadRange,
-    sumScoreRange
+    sumScoreRange,
+    timeScale // Get timeScale from context instead of local state
   } = useData();
 
+  // Remove local timeScale state
   const [isPlaying, setIsPlaying] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
-  // New state: velocity in milliseconds (default 1000 ms = 1 sec)
   const [velocity, setVelocity] = useState(500);
+
+  // Function to calculate the number of days based on the selected time scale
+  const getDaysRange = (date, scale) => {
+    switch(scale) {
+      case 'weekly':
+        console.log('Weekly');
+        return 7;
+      case 'bi-weekly':
+        console.log('Biweekly');
+        return 14;
+      case 'monthly':
+        console.log('Monthly');
+        return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+      default:
+        return 1;
+    }
+  };
 
   // Handle initial date setup
   useEffect(() => {
@@ -41,8 +59,10 @@ const TimelineSlider = () => {
   useEffect(() => {
     if (selectedDate) {
       filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
+      // Update daysRange based on the selected time scale
+      setDaysRange(getDaysRange(selectedDate, timeScale));
     }
-  }, [selectedDate, filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange]);
+  }, [selectedDate, filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange, timeScale]);
 
   // Handle play/pause functionality with velocity control
   useEffect(() => {
@@ -62,6 +82,15 @@ const TimelineSlider = () => {
       }
     };
   }, [isPlaying, selectedDate, velocity]);
+
+  // Update useEffect to react to timeScale changes
+  useEffect(() => {
+    if (selectedDate) {
+      const newDaysRange = getDaysRange(selectedDate, timeScale);
+      setDaysRange(newDaysRange);
+      filterMarkersByDate(selectedDate, newDaysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
+    }
+  }, [timeScale, selectedDate]); // Add timeScale as dependency
 
   const playForward = () => {
     if (!selectedDate) return;
@@ -120,7 +149,7 @@ const TimelineSlider = () => {
   const maxDate = new Date(Math.max(...timestamps));
 
   return (
-    <div style={{ padding: '10px', background: 'white', borderRadius: '8px', position: 'absolute', bottom: 0, zIndex: 99 }}>
+    <div>
       <button onClick={stepBackward} style={{ marginRight: '10px' }}>
         &lt; Step Back
       </button>
@@ -160,6 +189,8 @@ const TimelineSlider = () => {
           const newDate = new Date(parseInt(e.target.value));
           setSelectedDate(newDate);
           filterMarkersByDate(newDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
+          // Update daysRange based on the selected time scale
+          setDaysRange(getDaysRange(newDate, timeScale));
         }}
       />
       <span style={{ marginLeft: '5px' }}>{selectedDate ? selectedDate.toDateString() : 'Select a date'}</span>
@@ -175,8 +206,10 @@ const TimelineSlider = () => {
         value={daysRange}
         onChange={(e) => setDaysRange(Number(e.target.value))}
       />
-      <span style={{ marginLeft: '5px' }}>{daysRange} ms</span>
+      <span style={{ marginLeft: '5px' }}>{daysRange} days</span>
       </div>
+
+      {/* Remove the time scale radio buttons from this component since they're now in GlobalTimeGraph */}
     </div>
   );
 };

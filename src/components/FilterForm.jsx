@@ -75,7 +75,7 @@ const FilterForm = () => {
   };
 
   return (
-    <div style={{ padding: '10px', background: 'white', borderRadius: '8px', marginBottom: '10px' }}>
+    <div >
       <fieldset>
         <legend>Sexo</legend>
         <label>
@@ -132,7 +132,7 @@ const FilterForm = () => {
       <fieldset>
   <legend>Edad de Desaparición</legend>
   <label>
-    Min:
+    Min: 0
     <input
       type="range"
       name="min"
@@ -141,10 +141,10 @@ const FilterForm = () => {
       min="0"
       max={edadRange[1]}
     />
-    <span>{edadRange[0]}</span>
   </label>
+  <br></br>
   <label>
-    Max:
+    Max: 100
     <input
       type="range"
       name="max"
@@ -153,14 +153,15 @@ const FilterForm = () => {
       min={edadRange[0]}
       max="100"
     />
-    <span>{edadRange[1]}</span>
   </label>
+  <hr></hr>
+  <div className='rangeLegend'>    <span>Selected Age Range: {edadRange[0]} - {edadRange[1]}</span></div>
 </fieldset>
 
 <fieldset>
   <legend>Score de Violencia</legend>
   <label>
-    Min:
+   Min: 0.5
     <input
       type="range"
       name="min"
@@ -169,10 +170,10 @@ const FilterForm = () => {
       min="0.5"
       max={sumScoreRange[1]}
     />
-    <span>{sumScoreRange[0]}</span>
   </label>
+  <br></br>
   <label>
-    Max:
+    Max: 20
     <input
       type="range"
       name="max"
@@ -181,8 +182,9 @@ const FilterForm = () => {
       min={sumScoreRange[0]}
       max="20"
     />
-    <span>{sumScoreRange[1]}</span>
   </label>
+  <hr></hr>
+  <div className='rangeLegend'>    <span>Selected Score Range: {sumScoreRange[0]} - {sumScoreRange[1]}</span></div>
 </fieldset>
     </div>
   );

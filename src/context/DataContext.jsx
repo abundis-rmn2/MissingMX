@@ -23,6 +23,7 @@ export const DataProvider = ({ children }) => {
   const [selectedCondicion, setSelectedCondicion] = useState(['CON VIDA', 'SIN VIDA', 'NO APLICA']);
   const [edadRange, setEdadRange] = useState([0, 100]);
   const [sumScoreRange, setsumScoreRange] = useState([0.5, 20]);
+  const [timeScale, setTimeScale] = useState('daily');
   
 
   const COLORS = Object.fromEntries(
@@ -404,40 +405,43 @@ export const DataProvider = ({ children }) => {
     updateLayerData('forenseLayer', geojsonData, clusteringLayout);
 };
 
+  const value = {
+    map, setMap,
+    fetchedRecords, setFetchedRecords,
+    forenseRecords, setForenseRecords,
+    cedulaLayer, setCedulaLayer,
+    forenseLayer, setForenseLayer,
+    timelineData, setTimelineData,
+    timeline, setTimeline,
+    timelineControl, setTimelineControl,
+    newDataFetched, setNewDataFetched,
+    newForenseDataFetched, setNewForenseDataFetched,
+    loading, setLoading,
+    selectedDate, setSelectedDate,
+    daysRange, setDaysRange,
+    COLORS,
+    POINT_RADIUS,
+    clusteringLayout,
+    sexoLayout,
+    condicionLocalizacionLayout,
+    heatmapLayout,
+    activeHeatmapCategories, setActiveHeatmapCategories,
+    updateLayerData,
+    filterMarkersByDate,
+    mergeRecords,
+    updateTimelineData,
+    avoidLayerOverlap,
+    selectedSexo, setSelectedSexo,
+    selectedCondicion, setSelectedCondicion,
+    edadRange, setEdadRange,
+    sumScoreRange, setsumScoreRange,
+    timeScale, setTimeScale
+  };
+
   return (
-<DataContext.Provider value={{
-  map, setMap,
-  fetchedRecords, setFetchedRecords,
-  forenseRecords, setForenseRecords,
-  cedulaLayer, setCedulaLayer,
-  forenseLayer, setForenseLayer,
-  timelineData, setTimelineData,
-  timeline, setTimeline,
-  timelineControl, setTimelineControl,
-  newDataFetched, setNewDataFetched,
-  newForenseDataFetched, setNewForenseDataFetched,
-  loading, setLoading,
-  selectedDate, setSelectedDate,
-  daysRange, setDaysRange,
-  COLORS,
-  POINT_RADIUS,
-  clusteringLayout,
-  sexoLayout,
-  condicionLocalizacionLayout,
-  heatmapLayout,
-  activeHeatmapCategories, setActiveHeatmapCategories,
-  updateLayerData,
-  filterMarkersByDate,
-  mergeRecords,
-  updateTimelineData,
-  avoidLayerOverlap,
-  selectedSexo, setSelectedSexo,
-  selectedCondicion, setSelectedCondicion,
-  edadRange, setEdadRange,
-  sumScoreRange, setsumScoreRange
-}}>
-  {children}
-</DataContext.Provider>
+    <DataContext.Provider value={value}>
+      {children}
+    </DataContext.Provider>
   );
 };
 
