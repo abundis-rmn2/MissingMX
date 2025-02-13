@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useData } from '../context/DataContext';
 
 const GlobalTimeGraph = () => {
   const { map, COLORS, setSelectedDate, timeScale, setTimeScale } = useData();
-  
+  const [showChart, setShowChart] = useState(false);
+
   const processedData = useMemo(() => {
     if (!map) return [];
 
@@ -114,15 +115,22 @@ const GlobalTimeGraph = () => {
     }
   };
 
+  const handleTimeScaleChange = (e) => {
+    setTimeScale(e.target.value);
+    setShowChart(true);
+  };
+
   return (
-    <div style={{ width: '100%', height: '150px' }}>
-      <div style={{ marginBottom: '20px' }}>
+    <div className="GlobalTimeLine" style={{ width: '100%', 
+                                            height: showChart ? '150px' : '40px',
+                                            marginTop: '60px' }}>
+        <div className="GlobalTimeLine" style={{ marginBottom: '20px' }}>
         <label style={{ marginRight: '15px' }}>
           <input
             type="radio"
             value="daily"
             checked={timeScale === 'daily'}
-            onChange={(e) => setTimeScale(e.target.value)}
+            onChange={handleTimeScaleChange}
           /> Daily
         </label>
         <label style={{ marginRight: '15px' }}>
@@ -130,7 +138,7 @@ const GlobalTimeGraph = () => {
             type="radio"
             value="weekly"
             checked={timeScale === 'weekly'}
-            onChange={(e) => setTimeScale(e.target.value)}
+            onChange={handleTimeScaleChange}
           /> Weekly
         </label>
         <label style={{ marginRight: '15px' }}>
@@ -138,7 +146,7 @@ const GlobalTimeGraph = () => {
             type="radio"
             value="bi-weekly"
             checked={timeScale === 'bi-weekly'}
-            onChange={(e) => setTimeScale(e.target.value)}
+            onChange={handleTimeScaleChange}
           /> Bi-weekly
         </label>
         <label>
@@ -146,69 +154,73 @@ const GlobalTimeGraph = () => {
             type="radio"
             value="monthly"
             checked={timeScale === 'monthly'}
-            onChange={(e) => setTimeScale(e.target.value)}
+            onChange={handleTimeScaleChange}
           /> Monthly
         </label>
       </div>
+      {!showChart && (<div className='PickScale'>        
+          <span>Pick your timeScale</span></div>)}
 
-      <ResponsiveContainer>
-        <LineChart
-          data={processedData}
-          margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
-          onClick={handleDateClick}
-        >
-          <XAxis 
-            dataKey="date"
-            tickFormatter={formatDateLabel}
-          />
-          <YAxis />
-          <Tooltip content={<CustomTooltip />} />
-          <Legend />
-          <Line
-            type="monotone"
-            dataKey="HOMBRE"
-            name="Men"
-            stroke={COLORS.HOMBRE.opacity100}
-            dot={true}
-            strokeWidth={2}
-          />
-          <Line
-            type="monotone"
-            dataKey="MUJER"
-            name="Women"
-            stroke={COLORS.MUJER.opacity100}
-            dot={true}
-            strokeWidth={2}
-          />
-          <Line
-            type="monotone"
-            dataKey="CON VIDA"
-            name="Found Alive"
-            stroke={COLORS.CON_VIDA.opacity100}
-            dot={true}
-            strokeWidth={1}
-            strokeDasharray="3 3"
-          />
-          <Line
-            type="monotone"
-            dataKey="SIN VIDA"
-            name="Found Deceased" 
-            stroke={COLORS.SIN_VIDA.opacity100}
-            dot={true}
-            strokeWidth={1}
-            strokeDasharray="3 3"
-          />
-          <Line
-            type="monotone"
-            dataKey="NO APLICA"
-            name="Not Applicable"
-            stroke={COLORS.NO_APLICA.opacity100}
-            dot={true}
-            strokeWidth={1}
-            strokeDasharray="3 3"
-          />
-        </LineChart>
-      </ResponsiveContainer>
+      {showChart && map && (
+        <ResponsiveContainer>
+          <LineChart
+            data={processedData}
+            margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+            onClick={handleDateClick}
+          >
+            <XAxis 
+              dataKey="date"
+              tickFormatter={formatDateLabel}
+            />
+            <YAxis />
+            <Tooltip content={<CustomTooltip />} />
+            {timeScale && <Legend />}
+            <Line
+              type="monotone"
+              dataKey="HOMBRE"
+              name="Men"
+              stroke={COLORS.HOMBRE.opacity100}
+              dot={true}
+              strokeWidth={2}
+            />
+            <Line
+              type="monotone"
+              dataKey="MUJER"
+              name="Women"
+              stroke={COLORS.MUJER.opacity100}
+              dot={true}
+              strokeWidth={2}
+            />
+            <Line
+              type="monotone"
+              dataKey="CON VIDA"
+              name="Found Alive"
+              stroke={COLORS.CON_VIDA.opacity100}
+              dot={true}
+              strokeWidth={1}
+              strokeDasharray="3 3"
+            />
+            <Line
+              type="monotone"
+              dataKey="SIN VIDA"
+              name="Found Deceased" 
+              stroke={COLORS.SIN_VIDA.opacity100}
+              dot={true}
+              strokeWidth={1}
+              strokeDasharray="3 3"
+            />
+            <Line
+              type="monotone"
+              dataKey="NO APLICA"
+              name="Not Applicable"
+              stroke={COLORS.NO_APLICA.opacity100}
+              dot={true}
+              strokeWidth={1}
+              strokeDasharray="3 3"
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 };

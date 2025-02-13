@@ -11,8 +11,6 @@ import Clustering from './components/Clustering';
 import LayoutForm from './components/LayoutForm';
 import FilterForm from './components/FilterForm';
 import TimeGraph from './components/TimeGraph';
-import SexoTimeGraph from './components/SexoTimeGraph';
-import CondicionTimeGraph from './components/CondicionTimeGraph';
 import GlobalTimeGraph from './components/GlobalTimeGraph';
 import ViolenceCases from './components/ViolenceCases';
 
@@ -22,7 +20,7 @@ const App = () => {
   const [fetchCedulas, setFetchCedulas] = useState(true);
   const [fetchForense, setFetchForense] = useState(true);
   const [fetchId, setFetchId] = useState(0); // Unique identifier for each fetch operation
-  const { loading, setLoading, updatedMarkers } = useData(); // Use loading state from context
+  const { loading, setLoading, updatedMarkers, timeScale } = useData(); // Use loading state from context
   const [isFormsVisible, setIsFormsVisible] = useState(true); // State to manage form visibility
 
   const handleDateSelect = (start, end) => {
@@ -52,9 +50,6 @@ const App = () => {
     <DataProvider>
       <ErrorBoundary>
         <div className="App">
-          <button onClick={toggleFormsVisibility}>
-            {isFormsVisible ? 'Minimize Forms' : 'Maximize Forms'}
-          </button>
           {isFormsVisible && (
             <div className="DateForm">
               <DateForm
@@ -87,15 +82,18 @@ const App = () => {
               <GlobalTimeGraph onDateSelect={handleDateSelect} />
             </div>
           )}
-          <div className="TimelineSlider">
+
+          <div className='MobileContainer'>
+            <div className="TimelineSlider">
             <TimelineSlider />
-            <ViolenceCases />
-            <TimeGraph />
-          </div>
-          <div className="MapForms">
-            <LayoutForm />
-            <FilterForm />
-            <CurrentState />
+              <ViolenceCases />
+              <TimeGraph />
+            </div>
+            <div className="MapForms">
+              <LayoutForm />
+              <FilterForm />
+              <CurrentState />
+            </div>
           </div>
           <div className="Map">
             <MapComponent />
