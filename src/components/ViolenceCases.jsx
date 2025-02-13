@@ -246,16 +246,17 @@ const ViolenceCases = () => {
       borderRadius: "10px",
       width: "40%",
       minWidth: "300px",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.3)"
+      boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+      position: "relative"
     },
     closeButton: {
       position: "absolute",
       top: "10px",
       right: "15px",
-      fontSize: "20px",
+      fontSize: "30px",
       cursor: "pointer",
       border: "none",
-      background: "none"
+      background: "red"
     },
     details: {
       marginTop: "15px"

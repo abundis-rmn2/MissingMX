@@ -12,7 +12,7 @@ const MapComponent = () => {
       try {
         const newMap = new maplibregl.Map({
           container: mapContainer.current,
-          style: 'https://tiles.stadiamaps.com/styles/osm_bright.json',
+          style: 'https://tiles.stadiamaps.com/styles/osm_bright.json?api_key=cf6b8388-7d50-4714-8aac-6ecb7fedd428',
           center: [-103.349609, 20.659698],
           zoom: 8
         });
