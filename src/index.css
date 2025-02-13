@@ -117,3 +117,27 @@ button:focus-visible {
   height: 150px;
   transition: height 1.3s ease;
 }
+.cases-overlay {
+  z-index: 1000;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.close-overlay {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.close-overlay:hover {
+  background: rgba(255,255,255,0.3);
+}

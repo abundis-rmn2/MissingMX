@@ -101,10 +101,10 @@ export const DataProvider = ({ children }) => {
         const feature = features[0];
         if (feature.properties.tipo_marcador === 'cluster') {
           const originalLayers = JSON.parse(feature.properties.originalLayers);
-          console.log('Cluster clicked:', originalLayers);
+          //console.log('Cluster clicked:', originalLayers);
           // Display the original layers in a popup or sidebar
         } else {
-          console.log('Feature clicked:', feature);
+          //console.log('Feature clicked:', feature);
           // Display the feature details in a popup or sidebar
         }
       }
@@ -121,8 +121,8 @@ export const DataProvider = ({ children }) => {
       console.error("Input data given to 'forenseLayer' is not a valid GeoJSON object.");
       return;
     }
-    console.log('Updating layer data:', layerId, layoutConfig);
-    console.log('Data:', data);
+    //console.log('Updating layer data:', layerId, layoutConfig);
+    //console.log('Data:', data);
     if (map.getSource(layerId)) {
       map.getSource(layerId).setData(data);
     } else {
@@ -272,15 +272,15 @@ export const DataProvider = ({ children }) => {
   };
 
   const mergeRecords = (cedulasRecords, forenseRecords) => {
-    console.log('Merging records');
+    //console.log('Merging records');
     const mergedRecordsObj = [...cedulasRecords, ...forenseRecords];
-    console.log("Merged Records:", mergedRecordsObj);
+    //console.log("Merged Records:", mergedRecordsObj);
     setMergedRecords(mergedRecordsObj);
     updateTimelineData(mergedRecordsObj);
   };
 
   const updateTimelineData = (records, reset = false) => {
-    console.log('Updating timeline data');
+    //console.log('Updating timeline data');
     const timelineEntries = records.map(record => ({
       timestamp: record.timestamp || record.properties.timestamp,
       type: record.type || record.properties.tipo_marcador
@@ -291,13 +291,13 @@ export const DataProvider = ({ children }) => {
   const filterMarkersByDate = (selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange) => {
     if (!map) return;
   
-    console.log('Filtering markers by date...');
-    console.log('Selected Date:', selectedDate);
-    console.log('Days Range:', daysRange);
-    console.log('Selected Sexo:', selectedSexo);
-    console.log('Selected Condicion:', selectedCondicion);
-    console.log('Edad Range:', edadRange);
-    console.log('Sum Score Range:', sumScoreRange);
+    //console.log('Filtering markers by date...');
+    //console.log('Selected Date:', selectedDate);
+    //console.log('Days Range:', daysRange);
+    //console.log('Selected Sexo:', selectedSexo);
+    //console.log('Selected Condicion:', selectedCondicion);
+    //console.log('Edad Range:', edadRange);
+    //console.log('Sum Score Range:', sumScoreRange);
   
     const endDate = new Date(selectedDate);
     endDate.setDate(selectedDate.getDate() + daysRange);
@@ -306,8 +306,8 @@ export const DataProvider = ({ children }) => {
     const selectedTimestamp = selectedDate.getTime();
     const endTimestamp = endDate.getTime();
   
-    console.log('Selected Timestamp:', selectedTimestamp);
-    console.log('End Timestamp:', endTimestamp);
+    //console.log('Selected Timestamp:', selectedTimestamp);
+    //console.log('End Timestamp:', endTimestamp);
   
     // Attribute filters
     const attributeFilters = [];
@@ -324,7 +324,7 @@ export const DataProvider = ({ children }) => {
     attributeFilters.push(["<=", ["to-number", ["get", "sum_score"]], sumScoreRange[1]]);
   
 
-    console.log('Attribute Filters:', attributeFilters);
+    //console.log('Attribute Filters:', attributeFilters);
   
     // Date filters
     const dateFilters = [
@@ -332,16 +332,16 @@ export const DataProvider = ({ children }) => {
       ["<=", ["to-number", ["get", "timestamp"]], endTimestamp]
     ];
   
-    console.log('Date Filters:', dateFilters);
+    //console.log('Date Filters:', dateFilters);
   
     // Combined filters
     const combinedFilter = ['all', ...attributeFilters, ...dateFilters];
   
-    console.log('Combined Filter:', combinedFilter);
+    //console.log('Combined Filter:', combinedFilter);
   
     // Apply the combined filter to the "cedulaLayer"
     if (map.getLayer("cedulaLayer")) {
-      console.log('Applying filter to cedulaLayer');
+      //console.log('Applying filter to cedulaLayer');
       map.setFilter("cedulaLayer", combinedFilter);
     }
   
@@ -353,15 +353,15 @@ export const DataProvider = ({ children }) => {
           ? ['==', ['get', 'sexo'], category]
           : ['==', ['get', 'condicion_localizacion'], category];
         const heatmapFilter = ['all', categoryFilter, ...attributeFilters, ...dateFilters];
-        console.log(`Applying filter to heatmap layer: ${layerId}`);
-        console.log('Heatmap Filter:', heatmapFilter);
+        //console.log(`Applying filter to heatmap layer: ${layerId}`);
+        //console.log('Heatmap Filter:', heatmapFilter);
         map.setFilter(layerId, heatmapFilter);
       }
     });
   };
   
   const avoidLayerOverlap = (records, tipo_marcador, selectedTimestamp, endTimestamp) => {
-    //console.log('Clustering nodes with the same position');
+    ////console.log('Clustering nodes with the same position');
   
     if (!Array.isArray(records)) {
         console.error("Records should be an array");
@@ -370,12 +370,12 @@ export const DataProvider = ({ children }) => {
   
     const clusterMap = new Map();
 
-    //console.log(tipo_marcador, selectedTimestamp, endTimestamp)
+    ////console.log(tipo_marcador, selectedTimestamp, endTimestamp)
     records.forEach(record => {
       const { timestamp, tipo_marcador: recordTipoMarcador } = record.properties;
       const coordinates = record.geometry.coordinates.join(',');
       if (record.properties.tipo_marcador === tipo_marcador) {
-       // console.log('Record:', record);
+       // //console.log('Record:', record);
         if (!clusterMap.has(coordinates)) {
           clusterMap.set(coordinates, { 
             type: 'Feature', 
@@ -397,7 +397,7 @@ export const DataProvider = ({ children }) => {
     });
     
     const clusterFeatures = Array.from(clusterMap.values());
-    //console.log('Cluster features', clusterFeatures);
+    ////console.log('Cluster features', clusterFeatures);
     const geojsonData = {
       type: 'FeatureCollection',
       features: clusterFeatures
