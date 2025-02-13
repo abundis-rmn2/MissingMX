@@ -14,6 +14,7 @@ import TimeGraph from './components/TimeGraph';
 import SexoTimeGraph from './components/SexoTimeGraph';
 import CondicionTimeGraph from './components/CondicionTimeGraph';
 import GlobalTimeGraph from './components/GlobalTimeGraph';
+import ViolenceCases from './components/ViolenceCases';
 
 const App = () => {
   const [startDate, setStartDate] = useState('2023-01-01');
@@ -88,6 +89,7 @@ const App = () => {
           )}
           <div className="TimelineSlider">
             <TimelineSlider />
+            <ViolenceCases />
             <TimeGraph />
           </div>
           <div className="MapForms">

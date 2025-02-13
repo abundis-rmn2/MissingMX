@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useData } from '../context/DataContext';
-import getFilteredFeatures from './FilteredFeatures';
+import getFilteredFeatures from '../context/FilteredFeatures';
 import '../App.css'; // Ensure App.css is imported
 
 const TimeGraph = () => {
@@ -36,7 +36,7 @@ const TimeGraph = () => {
     const features = getFilteredFeatures(map, selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange)
       .filter(feature => feature.properties.tipo_marcador === 'cedula_busqueda');
 
-    console.log('Retrieved Features:', features);
+    //console.log('Retrieved Features:', features);
 
     const startDate = new Date(selectedDate);
     const endDate = new Date(selectedDate);
@@ -85,7 +85,7 @@ const TimeGraph = () => {
       })
       .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    console.log('Processed Data:', result);
+    //console.log('Processed Data:', result);
     return result;
   }, [map, selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange]);
 
