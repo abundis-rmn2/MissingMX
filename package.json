@@ -10,7 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-sigma/core": "^5.0.2",
+    "@react-sigma/layout-forceatlas2": "^5.0.2",
     "@reduxjs/toolkit": "^2.0.0",
+    "graphology": "^0.25.4",
+    "graphology-layout": "^0.6.1",
+    "graphology-layout-forceatlas2": "^0.10.1",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "lodash": "^4.17.21",
@@ -21,8 +26,8 @@
     "react-leaflet": "^5.0.0",
     "react-map-gl": "^8.0.0",
     "react-redux": "^9.1.2",
-    "react-sigma": "^1.2.35",
-    "recharts": "^2.15.1"
+    "recharts": "^2.15.1",
+    "sigma": "^3.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
