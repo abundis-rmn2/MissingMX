@@ -1,14 +1,19 @@
 import React, { useMemo } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useData } from '../context/DataContext';
+import getFilteredFeatures from './FilteredFeatures';
+import '../App.css'; // Ensure App.css is imported
 
 const TimeGraph = () => {
   const { 
-    timelineData,
     selectedDate,
     daysRange,
     COLORS,
-    map
+    map,
+    selectedSexo,
+    selectedCondicion,
+    edadRange,
+    sumScoreRange
   } = useData();
 
   const AGE_RANGES = [
@@ -19,8 +24,6 @@ const TimeGraph = () => {
     { min: 61, max: 100, label: '61+' }
   ];
 
-  const CONDITIONS = ['CON VIDA', 'SIN VIDA', 'NO APLICA'];
-
   const AGE_COLORS = {
     '0-15': '#8884d8',  // Purple
     '16-30': '#82ca9d', // Green
@@ -29,28 +32,17 @@ const TimeGraph = () => {
     '61+': '#d84848'    // Red
   };
 
-  const CONDITION_OPACITY = {
-    'CON VIDA': 1,
-    'SIN VIDA': 0.5,
-    'NO APLICA': 0.25
-  };
-
   const processedData = useMemo(() => {
-    if (!map || !selectedDate) return [];
-
-    const layers = map.getStyle().layers;
-    const features = layers
-      .filter(layer => layer.type === 'circle')
-      .flatMap(layer => {
-        const source = map.getSource(layer.source);
-        return source?._data?.features || [];
-      })
+    const features = getFilteredFeatures(map, selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange)
       .filter(feature => feature.properties.tipo_marcador === 'cedula_busqueda');
 
-    const dailyData = new Map();
+    console.log('Retrieved Features:', features);
+
     const startDate = new Date(selectedDate);
     const endDate = new Date(selectedDate);
     endDate.setDate(endDate.getDate() + daysRange);
+
+    const dailyData = new Map();
 
     features.forEach(feature => {
       const timestamp = feature.properties?.timestamp;
@@ -60,7 +52,7 @@ const TimeGraph = () => {
       if (date < startDate || date > endDate) return;
 
       const dateKey = date.toISOString().split('T')[0];
-      
+
       if (!dailyData.has(dateKey)) {
         dailyData.set(dateKey, {
           date: dateKey,
@@ -71,7 +63,7 @@ const TimeGraph = () => {
 
       const entry = dailyData.get(dateKey);
       const age = parseInt(feature.properties.edad_momento_desaparicion);
-      
+
       if (!isNaN(age)) {
         const ageRange = AGE_RANGES.find(range => age >= range.min && age <= range.max);
         if (ageRange) {
@@ -81,7 +73,7 @@ const TimeGraph = () => {
       }
     });
 
-    return Array.from(dailyData.values())
+    const result = Array.from(dailyData.values())
       .map(entry => {
         const withPercentages = { ...entry };
         AGE_RANGES.forEach(range => {
@@ -92,12 +84,15 @@ const TimeGraph = () => {
         return withPercentages;
       })
       .sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [map, selectedDate, daysRange]);
+
+    console.log('Processed Data:', result);
+    return result;
+  }, [map, selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange]);
 
   const CustomYAxisTick = ({ x, y, payload }) => {
     const value = payload.value;
     const ageRange = AGE_RANGES[Math.floor(value * AGE_RANGES.length)];
-    
+
     return (
       <g transform={`translate(${x},${y})`}>
         <text
@@ -119,7 +114,8 @@ const TimeGraph = () => {
   }
 
   return (
-    <div style={{ width: '100%', height: '300px' }}>
+    <div className="time-graph-container">
+        <span> Selected Date: {new Date(selectedDate).toLocaleDateString()} | Date Range: {daysRange} days</span>
       <ResponsiveContainer>
         <AreaChart
           data={processedData}
@@ -135,7 +131,7 @@ const TimeGraph = () => {
             formatter={(value, name) => [`${Math.round(value)}%`, `Age ${name}`]}
           />
           <Legend />
-          
+
           {AGE_RANGES.map((range, index) => (
             <Area
               key={range.label}
