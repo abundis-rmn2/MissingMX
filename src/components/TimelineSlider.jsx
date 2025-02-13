@@ -133,63 +133,7 @@ const TimelineSlider = () => {
   const maxDate = new Date(Math.max(...timestamps));
 
   return (
-    <div>
-      <button onClick={stepBackward} style={{ marginRight: '10px' }}>
-        &lt; Step Back
-      </button>
-      <button onClick={togglePlayPause} style={{ marginRight: '10px' }}>
-        {isPlaying ? 'Pause' : 'Play'}
-      </button>
-      <button onClick={stepForward} style={{ marginRight: '10px' }}>
-        Step Forward &gt;
-      </button>
-
-      <div style={{ marginTop: '10px' }}>
-        <div>
-        <label htmlFor="velocitySlider">Velocity play: </label>
-        <input 
-          id="velocitySlider"
-          type="range"
-          min="100"
-          max="2000"
-          step="100"
-          value={velocity}
-          onChange={(e) => setVelocity(Number(e.target.value))}
-        />
-        <span style={{ marginLeft: '5px' }}>{velocity} ms</span>
-        </div>
-      </div>
-
-      <div>
-      <label htmlFor="dateSlider">Date: </label>
-      <input 
-        type="range"
-        min={minDate.getTime()}
-        max={maxDate.getTime()}
-        step={24 * 60 * 60 * 1000}
-        value={selectedDate ? selectedDate.getTime() : minDate.getTime()}
-        onChange={(e) => {
-          const newDate = new Date(parseInt(e.target.value));
-          setSelectedDate(newDate);
-          filterMarkersByDate(newDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
-        }}
-      />
-      <span style={{ marginLeft: '5px' }}>{selectedDate ? selectedDate.toDateString() : 'Select a date'}</span>
-      </div>
-
-      <div>
-      <label htmlFor="daysRangeSlider">Days range: </label>
-      <input
-        type="range"
-        min="0"
-        max="31"
-        step="1"
-        value={daysRange}
-        onChange={(e) => setDaysRange(Number(e.target.value))}
-      />
-      <span style={{ marginLeft: '5px' }}>{daysRange} days</span>
-      </div>
-    </div>
+<></>
   );
 };
 
