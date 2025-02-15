@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { DataProvider, useData } from './context/DataContext';
 import FetchCedulas from './components/FetchCedulas';
 import FetchForense from './components/FetchForense';
@@ -6,13 +6,18 @@ import MapComponent from './components/MapComponent';
 import CurrentState from './context/currrentState';
 import DateForm from './components/DateForm';
 import ErrorBoundary from './context/ErrorBoundary';
-import TimelineSlider from './components/TimelineSlider';
 import Clustering from './components/Clustering';
-import LayoutForm from './components/LayoutForm';
-import FilterForm from './components/FilterForm';
-import TimeGraph from './components/TimeGraph';
-import GlobalTimeGraph from './components/GlobalTimeGraph';
-import ViolenceCases from './components/ViolenceCases';
+
+
+
+// Lazy load non-map components
+const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
+const ViolenceCases = lazy(() => import('./components/ViolenceCases'));
+const CrossRef = lazy(() => import('./components/CrossRef'));
+const FilterForm = lazy(() => import('./components/FilterForm'));
+const LayoutForm = lazy(() => import('./components/LayoutForm'));
+const TimeGraph = lazy(() => import('./components/TimeGraph'));
+const GlobalTimeGraph = lazy(() => import('./components/GlobalTimeGraph'));
 
 const App = () => {
   const [startDate, setStartDate] = useState('2023-01-01');
@@ -22,6 +27,13 @@ const App = () => {
   const [fetchId, setFetchId] = useState(0); // Unique identifier for each fetch operation
   const { loading, setLoading, updatedMarkers, timeScale } = useData(); // Use loading state from context
   const [isFormsVisible, setIsFormsVisible] = useState(true); // State to manage form visibility
+  const [visibleComponents, setVisibleComponents] = useState({
+    filterForm: true,
+    currentState: true,
+    violenceCases: false,
+    timeGraph: false,
+    crossRef: false,
+  });
 
   const handleDateSelect = (start, end) => {
     setStartDate(start);
@@ -44,6 +56,13 @@ const App = () => {
 
   const toggleFormsVisibility = () => {
     setIsFormsVisible(!isFormsVisible);
+  };
+
+  const toggleComponent = (component) => {
+    setVisibleComponents(prev => ({
+      ...prev,
+      [component]: !prev[component]
+    }));
   };
 
   return (
@@ -83,20 +102,34 @@ const App = () => {
             </div>
           )}
 
+          <div className="ComponentToggles">
+            {Object.entries(visibleComponents).map(([key, value]) => (
+              <label key={key}>
+                <input
+                  type="checkbox"
+                  checked={value}
+                  onChange={() => toggleComponent(key)}
+                />
+                {key.charAt(0).toUpperCase() + key.slice(1)}
+              </label>
+            ))}
+          </div>
+
           <div className='MobileContainer'>
-            <div className="TimelineSlider">
-            <TimelineSlider />
-              <ViolenceCases />
-              <TimeGraph />
-            </div>
             <div className="MapForms">
-              <LayoutForm />
-              <FilterForm />
-              <CurrentState />
+              <Suspense fallback={<div>Loading...</div>}>
+              <TimelineSlider />
+                 <LayoutForm />
+                {visibleComponents.filterForm && <FilterForm />}
+                {visibleComponents.currentState && <CurrentState />}
+                {visibleComponents.violenceCases && <ViolenceCases />}
+                {visibleComponents.timeGraph && <TimeGraph />}
+                {visibleComponents.crossRef && <CrossRef />}
+              </Suspense>
             </div>
           </div>
           <div className="Map">
-            <MapComponent />
+             <MapComponent />
           </div>
         </div>
       </ErrorBoundary>

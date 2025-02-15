@@ -54,17 +54,23 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-.MapForms { position: absolute;
-  width: 25rem;
-  height: 25rem;
+.MapForms {
+  position: absolute;
+  width: 26.5rem;
+  max-height: calc(100vh - 21.5rem);
   left: 1rem;
-  bottom: 1rem;
+  bottom: 4rem;
   z-index: 9;
   background: white;
-  overflow-y: scroll;
+  overflow: auto;
   border: 1px solid gray;
   padding: 1rem;
-  border-radius: 1rem;}
+  border-radius: 1rem;
+}
+
+.MapForms fieldset {
+  width: 23.4rem;
+}
 
 .Map {
   position: absolute;
@@ -89,7 +95,7 @@ button:focus-visible {
 .TimelineSlider {
   position: absolute;
   right: 1rem;
-  bottom: 2rem;
+  bottom: 4rem;
   z-index: 1;
   background: white;
   padding: 1rem;
@@ -268,4 +274,167 @@ button:disabled {
   bottom: -4.3rem;
   color: white;
   padding: 0.5rem;
+}
+
+.ComponentToggles {
+  display: flex
+;
+  gap: 1rem;
+  padding: 1rem;
+  flex-wrap: wrap;
+  z-index: 9999;
+  position: absolute;
+  bottom: 0;
+  background: white;
+  width: 100%;
+  border-top: 1px solid gray;
+}
+.ComponentToggles label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.ComponentToggles input[type="checkbox"] {
+  cursor: pointer;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.map-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  canvas {
+    outline: none;
+  }
+}
+
+/* Adjust other component z-indices */
+.MapForms { z-index: 2; }
+.TimelineSlider { z-index: 2; }
+.DateForm { z-index: 3; }
+.ComponentToggles { z-index: 4; }
+
+.violence-cases {
+  height: 19rem;
+  width: 25rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.violence-cases--fullscreen {
+  position: fixed;
+  top: 14rem;
+  left: 0;
+  width: calc(100vw - 1rem);
+  height: calc(100vh - 19.4rem);
+  z-index: 1000;
+  background: white;
+  padding: 1rem;
+  z-index: 99999999;
+}
+
+.violence-cases__controls {
+  display: flex
+;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  position: absolute;
+  bottom: 0;
+  z-index: 99;
+}
+
+.violence-cases__fullscreen-btn {
+  padding: 0.5rem;
+  border: none;
+  background: #ff0303;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1.2rem;
+}
+
+.violence-cases--fullscreen .violence-cases__graph-wrapper {
+  height: calc(100vh - 24rem);
+  width: calc(100% - 1.5rem);
+    margin-bottom: 20px;
+}
+
+.violence-cases--fullscreen .violence-cases__sigma {
+  height: 100%;
+}
+
+.violence-cases__graph-wrapper {
+  height: 18rem;
+  width: 100%;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.violence-cases__sigma {
+  height: 280px;
+  width: 100%;
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+}
+
+.violence-cases__back-btn {
+  margin-right: 0.5rem;;
+}
+
+.violence-cases__modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.violence-cases__modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 40%;
+  min-width: 300px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.violence-cases__modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+  border: none;
+  background: red;
+  color: white;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.violence-cases__modal-details {
+  margin-top: 15px;
+}
+
+.current-state  {
+  padding: 0.5rem;
+  border: 1px solid #e2e2e2;
+  margin-top: 1rem;
 }

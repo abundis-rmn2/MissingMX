@@ -43,6 +43,9 @@ const GlobalTimeGraph = () => {
         case 'monthly':
           key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
           break;
+        case 'yearly':
+          key = `${date.getFullYear()}-01-01`;
+          break;
         default:
           key = date.toISOString().split('T')[0];
       }
@@ -103,6 +106,8 @@ const GlobalTimeGraph = () => {
         return `${day <= 15 ? 'First' : 'Second'} half of ${d.toLocaleDateString('default', { month: 'short', year: 'numeric' })}`;
       case 'monthly':
         return d.toLocaleDateString('default', { month: 'short', year: 'numeric' });
+      case 'yearly':
+        return d.getFullYear().toString();
       default:
         return d.toLocaleDateString();
     }
@@ -156,6 +161,14 @@ const GlobalTimeGraph = () => {
             checked={timeScale === 'monthly'}
             onChange={handleTimeScaleChange}
           /> Monthly
+        </label>
+        <label style={{ marginRight: '15px' }}>
+          <input
+            type="radio"
+            value="yearly"
+            checked={timeScale === 'yearly'}
+            onChange={handleTimeScaleChange}
+          /> Yearly
         </label>
       </div>
       {!showChart && (<div className='PickScale'>        
