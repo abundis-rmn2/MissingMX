@@ -448,7 +448,9 @@ const CrossRef = () => {
                 tattooScore: tattooMatch.score,
                 tattooReasons: tattooMatch.reasons,
                 cedulaTattoos: cedula.properties.tatuajes,
-                forenseTattoos: forense.properties.Tatuajes
+                forenseTattoos: forense.properties.Tatuajes,
+                cedulaMunicipio: cedula.properties.municipio_desaparicion,
+                forenseDelegation: forense.properties.Delegacion,
               });
             }
           }
@@ -489,6 +491,7 @@ const CrossRef = () => {
                   <li>Name: {match.cedulaName}</li>
                   <li>Age: {match.cedulaAge || 'N/A'}</li>
                   <li>Date: {match.cedulaDate || 'N/A'}</li>
+                  <li>Municipality: {match.cedulaMunicipio || 'N/A'}</li>
                 </ul>
               </div>
 
@@ -498,6 +501,7 @@ const CrossRef = () => {
                   <li>Name: {match.forenseName}</li>
                   <li>Age: {match.forenseAge || 'N/A'}</li>
                   <li>Date: {match.forenseDate || 'N/A'}</li>
+                  <li>Delegation: {match.forenseDelegation || 'N/A'}</li>
                 </ul>
               </div>
             </div>

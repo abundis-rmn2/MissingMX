@@ -9,7 +9,6 @@ function Map() {
     if (!map.current) {
       map.current = new maplibregl.Map({
         container: mapContainer.current,
-        // ...other map options
         preserveDrawingBuffer: true, // Helps with WebGL context
         antialias: false // Reduce WebGL load
       });

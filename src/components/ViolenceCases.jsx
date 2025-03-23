@@ -7,7 +7,8 @@ import {
 import Graph from 'graphology';
 import { circular } from 'graphology-layout';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
-import "@react-sigma/core/lib/style.css";
+//import "@react-sigma/core/lib/style.css"; //is giving problems at build time
+import "../styles/sigma.css";
 import { useData } from '../context/DataContext';
 import getFilteredFeatures from '../context/FilteredFeatures';
 
@@ -33,6 +34,43 @@ const COLORS = {
   TERM: '#8884d8',
   CASE: '#82ca9d'
 };
+
+const modalStyles = {
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000
+  },
+  container: {
+    backgroundColor: "white",
+    padding: "20px",
+    borderRadius: "10px",
+    width: "40%",
+    minWidth: "300px",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
+    position: "relative"
+  },
+  closeButton: {
+    position: "absolute",
+    top: "10px",
+    right: "15px",
+    fontSize: "30px",
+    cursor: "pointer",
+    border: "none",
+    background: "red"
+  },
+  details: {
+    marginTop: "15px"
+  }
+};
+
 
 const GraphEvents = ({ onNodeClick }) => {
   const registerEvents = useRegisterEvents();
@@ -233,42 +271,6 @@ const ViolenceCases = () => {
       )}
     </div>
   );
-};
-
-const modalStyles = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100vw",
-    height: "100vh",
-    backgroundColor: "rgba(0,0,0,0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000
-  },
-  container: {
-    backgroundColor: "white",
-    padding: "20px",
-    borderRadius: "10px",
-    width: "40%",
-    minWidth: "300px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.3)",
-    position: "relative"
-  },
-  closeButton: {
-    position: "absolute",
-    top: "10px",
-    right: "15px",
-    fontSize: "30px",
-    cursor: "pointer",
-    border: "none",
-    background: "red"
-  },
-  details: {
-    marginTop: "15px"
-  }
 };
 
 export default ViolenceCases;

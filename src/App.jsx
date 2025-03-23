@@ -7,8 +7,7 @@ import CurrentState from './context/currrentState';
 import DateForm from './components/DateForm';
 import ErrorBoundary from './context/ErrorBoundary';
 import Clustering from './components/Clustering';
-
-
+import PasswordForm from './components/PasswordForm'; // Import PasswordForm
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -29,11 +28,12 @@ const App = () => {
   const [isFormsVisible, setIsFormsVisible] = useState(true); // State to manage form visibility
   const [visibleComponents, setVisibleComponents] = useState({
     filterForm: true,
-    currentState: true,
-    violenceCases: false,
+    currentState: false,
+    violenceCases: true,
     timeGraph: false,
     crossRef: false,
   });
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleDateSelect = (start, end) => {
     setStartDate(start);
@@ -65,72 +65,96 @@ const App = () => {
     }));
   };
 
+  const handlePasswordSubmit = (password) => {
+    fetch('https://datades.abundis.com.mx/dist/check_password.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setIsAuthenticated(true);
+        } else {
+          alert('Incorrect password');
+        }
+      });
+  };
+
   return (
     <DataProvider>
       <ErrorBoundary>
         <div className="App">
-          {isFormsVisible && (
-            <div className="DateForm">
-              <DateForm
-                startDate={startDate}
-                endDate={endDate}
-                setStartDate={setStartDate}
-                setEndDate={setEndDate}
-                handleSubmit={handleSubmit}
-                loading={loading}
-                fetchCedulas={fetchCedulas}
-                setFetchCedulas={setFetchCedulas}
-                fetchForense={fetchForense}
-                setFetchForense={setFetchForense}
-              />
-              <FetchCedulas
-                fetchCedulas={fetchCedulas}
-                startDate={startDate}
-                endDate={endDate}
-                fetchId={fetchId} // Pass fetchId instead of triggerFetch
-                onFetchComplete={handleFetchComplete}
-              />
-              <FetchForense
-                fetchForense={fetchForense}
-                startDate={startDate}
-                endDate={endDate}
-                fetchId={fetchId} // Pass fetchId instead of triggerFetch
-                onFetchComplete={handleFetchComplete}
-              />
-              <Clustering type="personas_sin_identificar" />
-              <GlobalTimeGraph onDateSelect={handleDateSelect} />
-            </div>
+          {!isAuthenticated ? (
+            <PasswordForm onSubmit={handlePasswordSubmit} />
+          ) : (
+            <>
+              {isFormsVisible && (
+                <div className="DateForm">
+                  <DateForm
+                    startDate={startDate}
+                    endDate={endDate}
+                    setStartDate={setStartDate}
+                    setEndDate={setEndDate}
+                    handleSubmit={handleSubmit}
+                    loading={loading}
+                    fetchCedulas={fetchCedulas}
+                    setFetchCedulas={setFetchCedulas}
+                    fetchForense={fetchForense}
+                    setFetchForense={setFetchForense}
+                  />
+                  <FetchCedulas
+                    fetchCedulas={fetchCedulas}
+                    startDate={startDate}
+                    endDate={endDate}
+                    fetchId={fetchId} // Pass fetchId instead of triggerFetch
+                    onFetchComplete={handleFetchComplete}
+                  />
+                  <FetchForense
+                    fetchForense={fetchForense}
+                    startDate={startDate}
+                    endDate={endDate}
+                    fetchId={fetchId} // Pass fetchId instead of triggerFetch
+                    onFetchComplete={handleFetchComplete}
+                  />
+                  <Clustering type="personas_sin_identificar" />
+                  <GlobalTimeGraph onDateSelect={handleDateSelect} />
+                </div>
+              )}
+
+              <div className="ComponentToggles">
+                {Object.entries(visibleComponents).map(([key, value]) => (
+                  <label key={key}>
+                    <input
+                      type="checkbox"
+                      checked={value}
+                      onChange={() => toggleComponent(key)}
+                    />
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </label>
+                ))}
+              </div>
+
+              <div className='MobileContainer'>
+                <div className="MapForms">
+                  <Suspense fallback={<div>Loading...</div>}>
+                  <TimelineSlider />
+                     <LayoutForm />
+                    {visibleComponents.filterForm && <FilterForm />}
+                    {visibleComponents.currentState && <CurrentState />}
+                    {visibleComponents.violenceCases && <ViolenceCases />}
+                    {visibleComponents.timeGraph && <TimeGraph />}
+                    {visibleComponents.crossRef && <CrossRef />}
+                  </Suspense>
+                </div>
+              </div>
+              <div className="Map">
+                 <MapComponent />
+              </div>
+            </>
           )}
-
-          <div className="ComponentToggles">
-            {Object.entries(visibleComponents).map(([key, value]) => (
-              <label key={key}>
-                <input
-                  type="checkbox"
-                  checked={value}
-                  onChange={() => toggleComponent(key)}
-                />
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </label>
-            ))}
-          </div>
-
-          <div className='MobileContainer'>
-            <div className="MapForms">
-              <Suspense fallback={<div>Loading...</div>}>
-              <TimelineSlider />
-                 <LayoutForm />
-                {visibleComponents.filterForm && <FilterForm />}
-                {visibleComponents.currentState && <CurrentState />}
-                {visibleComponents.violenceCases && <ViolenceCases />}
-                {visibleComponents.timeGraph && <TimeGraph />}
-                {visibleComponents.crossRef && <CrossRef />}
-              </Suspense>
-            </div>
-          </div>
-          <div className="Map">
-             <MapComponent />
-          </div>
         </div>
       </ErrorBoundary>
     </DataProvider>
