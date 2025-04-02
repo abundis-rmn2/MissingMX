@@ -23,7 +23,12 @@ const Notebook = () => {
     setTimeScale,
     map,
     setSelectedDate,
-    setDaysRange
+    setDaysRange,
+    // Add layout settings
+    mapType,
+    setMapType,
+    colorScheme,
+    setColorScheme
   } = useData();
 
   // Load saved notes from localStorage when component mounts
@@ -64,7 +69,10 @@ const Notebook = () => {
         edadRange: [...edadRange],
         sumScoreRange: [...sumScoreRange],
         timeScale,
-        mapState
+        mapState,
+        // Add layout settings
+        mapType,
+        colorScheme
       }
     };
     
@@ -117,6 +125,14 @@ const Notebook = () => {
     setEdadRange(savedState.edadRange);
     setsumScoreRange(savedState.sumScoreRange);
     setTimeScale(savedState.timeScale);
+    
+    // Restore layout settings
+    if (savedState.mapType) {
+      setMapType(savedState.mapType);
+    }
+    if (savedState.colorScheme) {
+      setColorScheme(savedState.colorScheme);
+    }
     
     // Restore map position if mapState and map exist
     if (savedState.mapState && map) {

@@ -24,7 +24,15 @@ export const DataProvider = ({ children }) => {
   const [edadRange, setEdadRange] = useState([0, 100]);
   const [sumScoreRange, setsumScoreRange] = useState([0.5, 20]);
   const [timeScale, setTimeScale] = useState('daily');
-  
+  const [mapType, setMapType] = useState('point');
+  const [colorScheme, setColorScheme] = useState('sexo');
+
+  useEffect(() => {
+    console.log('DataContext state initialized:', { 
+      mapType, setMapType, 
+      colorScheme, setColorScheme 
+    });
+  }, []);
 
   const COLORS = Object.fromEntries(
     ["MUJER", "HOMBRE", "CON_VIDA", "SIN_VIDA", "NO_APLICA", "UNKNOWN"].map((key) => {
@@ -435,7 +443,9 @@ export const DataProvider = ({ children }) => {
     selectedCondicion, setSelectedCondicion,
     edadRange, setEdadRange,
     sumScoreRange, setsumScoreRange,
-    timeScale, setTimeScale
+    timeScale, setTimeScale,
+    mapType, setMapType,
+    colorScheme, setColorScheme
   };
 
   return (
