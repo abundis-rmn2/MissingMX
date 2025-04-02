@@ -8,6 +8,7 @@ import DateForm from './components/DateForm';
 import ErrorBoundary from './context/ErrorBoundary';
 import Clustering from './components/Clustering';
 import PasswordForm from './components/PasswordForm'; // Import PasswordForm
+import Notebook from './components/Notebook'; // Import Notebook component
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -140,19 +141,21 @@ const App = () => {
               <div className='MobileContainer'>
                 <div className="MapForms">
                   <Suspense fallback={<div>Loading...</div>}>
-                  <TimelineSlider />
-                     <LayoutForm />
+                    <TimelineSlider />
+                    <LayoutForm />
                     {visibleComponents.filterForm && <FilterForm />}
                     {visibleComponents.currentState && <CurrentState />}
                     {visibleComponents.violenceCases && <ViolenceCases />}
                     {visibleComponents.timeGraph && <TimeGraph />}
                     {visibleComponents.crossRef && <CrossRef />}
+                   
                   </Suspense>
                 </div>
               </div>
               <div className="Map">
-                 <MapComponent />
+                <MapComponent />
               </div>
+              <Notebook /> {/* Add Notebook component here */}
             </>
           )}
         </div>
