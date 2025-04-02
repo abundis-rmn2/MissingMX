@@ -26,13 +26,28 @@ export const DataProvider = ({ children }) => {
   const [timeScale, setTimeScale] = useState('daily');
   const [mapType, setMapType] = useState('point');
   const [colorScheme, setColorScheme] = useState('sexo');
+  const [visibleComponents, setVisibleComponents] = useState({
+    filterForm: true,
+    currentState: false,
+    violenceCases: true,
+    timeGraph: false,
+    crossRef: false,
+  });
 
   useEffect(() => {
     console.log('DataContext state initialized:', { 
       mapType, setMapType, 
-      colorScheme, setColorScheme 
+      colorScheme, setColorScheme,
+      visibleComponents
     });
   }, []);
+
+  useEffect(() => {
+    console.log('DataContext initialized with:', {
+      visibleComponents,
+      setVisibleComponents: typeof setVisibleComponents === 'function' ? 'function' : typeof setVisibleComponents
+    });
+  }, [visibleComponents]);
 
   const COLORS = Object.fromEntries(
     ["MUJER", "HOMBRE", "CON_VIDA", "SIN_VIDA", "NO_APLICA", "UNKNOWN"].map((key) => {
@@ -445,7 +460,8 @@ export const DataProvider = ({ children }) => {
     sumScoreRange, setsumScoreRange,
     timeScale, setTimeScale,
     mapType, setMapType,
-    colorScheme, setColorScheme
+    colorScheme, setColorScheme,
+    visibleComponents, setVisibleComponents
   };
 
   return (

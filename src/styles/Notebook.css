@@ -6,19 +6,22 @@
   transition: all 0.3s ease;
   position: absolute;
   z-index: 20;
-  top: 10px;
+  bottom: 70px;
   right: 10px;
   width: 350px;
+}
+
+.notebook.expanded {
+  display: flex;
+  flex-direction: column; /* Reverse the order of children */
 }
 
 .notebook-header {
   padding: 10px 15px;
   background-color: #e9ecef;
-  border-radius: 8px 8px 0 0;
   cursor: pointer;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
 }
 
 .notebook-header h3 {
@@ -31,6 +34,7 @@
   padding: 15px;
   max-height: 400px;
   overflow-y: auto;
+  border-top: 1px solid #dee2e6; /* Add a border to separate content from the header */
 }
 
 .notebook-input {

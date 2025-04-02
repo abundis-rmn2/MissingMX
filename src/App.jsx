@@ -7,8 +7,8 @@ import CurrentState from './context/currrentState';
 import DateForm from './components/DateForm';
 import ErrorBoundary from './context/ErrorBoundary';
 import Clustering from './components/Clustering';
-import PasswordForm from './components/PasswordForm'; // Import PasswordForm
-import Notebook from './components/Notebook'; // Import Notebook component
+import PasswordForm from './components/PasswordForm';
+import Notebook from './components/Notebook';
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -19,22 +19,28 @@ const LayoutForm = lazy(() => import('./components/LayoutForm'));
 const TimeGraph = lazy(() => import('./components/TimeGraph'));
 const GlobalTimeGraph = lazy(() => import('./components/GlobalTimeGraph'));
 
-const App = () => {
+const AppContent = () => {
   const [startDate, setStartDate] = useState('2023-01-01');
   const [endDate, setEndDate] = useState('2024-01-01');
   const [fetchCedulas, setFetchCedulas] = useState(true);
   const [fetchForense, setFetchForense] = useState(true);
-  const [fetchId, setFetchId] = useState(0); // Unique identifier for each fetch operation
-  const { loading, setLoading, updatedMarkers, timeScale } = useData(); // Use loading state from context
-  const [isFormsVisible, setIsFormsVisible] = useState(true); // State to manage form visibility
-  const [visibleComponents, setVisibleComponents] = useState({
-    filterForm: true,
-    currentState: false,
-    violenceCases: true,
-    timeGraph: false,
-    crossRef: false,
-  });
+  const [fetchId, setFetchId] = useState(0);
+  const [isFormsVisible, setIsFormsVisible] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Get data from context
+  const { 
+    loading, 
+    setLoading, 
+    visibleComponents,
+    setVisibleComponents 
+  } = useData();
+
+  // For debugging - log the visibility state
+  useEffect(() => {
+    console.log('App received visibleComponents:', visibleComponents);
+    console.log('setVisibleComponents is:', typeof setVisibleComponents);
+  }, [visibleComponents, setVisibleComponents]);
 
   const handleDateSelect = (start, end) => {
     setStartDate(start);
@@ -60,10 +66,18 @@ const App = () => {
   };
 
   const toggleComponent = (component) => {
-    setVisibleComponents(prev => ({
-      ...prev,
-      [component]: !prev[component]
-    }));
+    console.log('Toggling component:', component);
+    console.log('Current state:', visibleComponents);
+    
+    if (typeof setVisibleComponents === 'function') {
+      setVisibleComponents(prev => {
+        const updated = { ...prev, [component]: !prev[component] };
+        console.log('New visibility state:', updated);
+        return updated;
+      });
+    } else {
+      console.error('setVisibleComponents is not a function!');
+    }
   };
 
   const handlePasswordSubmit = (password) => {
@@ -85,80 +99,85 @@ const App = () => {
   };
 
   return (
+    <div className="App">
+      {!isAuthenticated ? (
+        <PasswordForm onSubmit={handlePasswordSubmit} />
+      ) : (
+        <>
+          {isFormsVisible && (
+            <div className="DateForm">
+              <DateForm
+                startDate={startDate}
+                endDate={endDate}
+                setStartDate={setStartDate}
+                setEndDate={setEndDate}
+                handleSubmit={handleSubmit}
+                loading={loading}
+                fetchCedulas={fetchCedulas}
+                setFetchCedulas={setFetchCedulas}
+                fetchForense={fetchForense}
+                setFetchForense={setFetchForense}
+              />
+              <FetchCedulas
+                fetchCedulas={fetchCedulas}
+                startDate={startDate}
+                endDate={endDate}
+                fetchId={fetchId} // Pass fetchId instead of triggerFetch
+                onFetchComplete={handleFetchComplete}
+              />
+              <FetchForense
+                fetchForense={fetchForense}
+                startDate={startDate}
+                endDate={endDate}
+                fetchId={fetchId} // Pass fetchId instead of triggerFetch
+                onFetchComplete={handleFetchComplete}
+              />
+              <Clustering type="personas_sin_identificar" />
+              <GlobalTimeGraph onDateSelect={handleDateSelect} />
+            </div>
+          )}
+
+          <div className="ComponentToggles">
+            {Object.entries(visibleComponents).map(([key, value]) => (
+              <label key={key}>
+                <input
+                  type="checkbox"
+                  checked={value}
+                  onChange={() => toggleComponent(key)}
+                />
+                {key.charAt(0).toUpperCase() + key.slice(1)}
+              </label>
+            ))}
+          </div>
+
+          <div className='MobileContainer'>
+            <div className="MapForms">
+              <Suspense fallback={<div>Loading...</div>}>
+                <TimelineSlider />
+                <LayoutForm />
+                {visibleComponents.filterForm && <FilterForm />}
+                {visibleComponents.currentState && <CurrentState />}
+                {visibleComponents.violenceCases && <ViolenceCases />}
+                {visibleComponents.timeGraph && <TimeGraph />}
+                {visibleComponents.crossRef && <CrossRef />}
+              </Suspense>
+            </div>
+          </div>
+          <div className="Map">
+            <MapComponent />
+          </div>
+          <Notebook />
+        </>
+      )}
+    </div>
+  );
+};
+
+const App = () => {
+  return (
     <DataProvider>
       <ErrorBoundary>
-        <div className="App">
-          {!isAuthenticated ? (
-            <PasswordForm onSubmit={handlePasswordSubmit} />
-          ) : (
-            <>
-              {isFormsVisible && (
-                <div className="DateForm">
-                  <DateForm
-                    startDate={startDate}
-                    endDate={endDate}
-                    setStartDate={setStartDate}
-                    setEndDate={setEndDate}
-                    handleSubmit={handleSubmit}
-                    loading={loading}
-                    fetchCedulas={fetchCedulas}
-                    setFetchCedulas={setFetchCedulas}
-                    fetchForense={fetchForense}
-                    setFetchForense={setFetchForense}
-                  />
-                  <FetchCedulas
-                    fetchCedulas={fetchCedulas}
-                    startDate={startDate}
-                    endDate={endDate}
-                    fetchId={fetchId} // Pass fetchId instead of triggerFetch
-                    onFetchComplete={handleFetchComplete}
-                  />
-                  <FetchForense
-                    fetchForense={fetchForense}
-                    startDate={startDate}
-                    endDate={endDate}
-                    fetchId={fetchId} // Pass fetchId instead of triggerFetch
-                    onFetchComplete={handleFetchComplete}
-                  />
-                  <Clustering type="personas_sin_identificar" />
-                  <GlobalTimeGraph onDateSelect={handleDateSelect} />
-                </div>
-              )}
-
-              <div className="ComponentToggles">
-                {Object.entries(visibleComponents).map(([key, value]) => (
-                  <label key={key}>
-                    <input
-                      type="checkbox"
-                      checked={value}
-                      onChange={() => toggleComponent(key)}
-                    />
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </label>
-                ))}
-              </div>
-
-              <div className='MobileContainer'>
-                <div className="MapForms">
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <TimelineSlider />
-                    <LayoutForm />
-                    {visibleComponents.filterForm && <FilterForm />}
-                    {visibleComponents.currentState && <CurrentState />}
-                    {visibleComponents.violenceCases && <ViolenceCases />}
-                    {visibleComponents.timeGraph && <TimeGraph />}
-                    {visibleComponents.crossRef && <CrossRef />}
-                   
-                  </Suspense>
-                </div>
-              </div>
-              <div className="Map">
-                <MapComponent />
-              </div>
-              <Notebook /> {/* Add Notebook component here */}
-            </>
-          )}
-        </div>
+        <AppContent />
       </ErrorBoundary>
     </DataProvider>
   );

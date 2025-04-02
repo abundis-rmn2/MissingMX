@@ -28,8 +28,19 @@ const Notebook = () => {
     mapType,
     setMapType,
     colorScheme,
-    setColorScheme
+    setColorScheme,
+    // Add visibleComponents
+    visibleComponents,
+    setVisibleComponents
   } = useData();
+
+  // For debugging - log the context values we receive
+  useEffect(() => {
+    console.log('Notebook received from context:', {
+      visibleComponents,
+      setVisibleComponents: typeof setVisibleComponents === 'function' ? 'function' : typeof setVisibleComponents
+    });
+  }, [visibleComponents, setVisibleComponents]);
 
   // Load saved notes from localStorage when component mounts
   useEffect(() => {
@@ -49,6 +60,8 @@ const Notebook = () => {
   }, [notes]);
 
   const captureCurrentState = () => {
+    console.log('Capturing current state, visibleComponents:', visibleComponents);
+    
     // Create a timestamp
     const timestamp = new Date().toISOString();
     
@@ -72,10 +85,13 @@ const Notebook = () => {
         mapState,
         // Add layout settings
         mapType,
-        colorScheme
+        colorScheme,
+        // Explicitly clone the visibleComponents object
+        visibleComponents: visibleComponents ? { ...visibleComponents } : null
       }
     };
     
+    console.log('Created state snapshot:', stateSnapshot);
     return stateSnapshot;
   };
 
@@ -113,6 +129,8 @@ const Notebook = () => {
   const restoreState = (savedState) => {
     if (!savedState) return;
     
+    console.log('Restoring state:', savedState);
+    
     // Restore date and range
     if (savedState.selectedDate) {
       setSelectedDate(new Date(savedState.selectedDate));
@@ -134,6 +152,17 @@ const Notebook = () => {
       setColorScheme(savedState.colorScheme);
     }
     
+    // Restore component visibility with extra checks
+    if (savedState.visibleComponents && typeof setVisibleComponents === 'function') {
+      console.log('Restoring visibleComponents:', savedState.visibleComponents);
+      setVisibleComponents(savedState.visibleComponents);
+    } else {
+      console.error('Cannot restore visibleComponents:', {
+        saved: savedState.visibleComponents,
+        setter: typeof setVisibleComponents
+      });
+    }
+    
     // Restore map position if mapState and map exist
     if (savedState.mapState && map) {
       map.flyTo({
@@ -153,10 +182,6 @@ const Notebook = () => {
 
   return (
     <div className={`notebook ${isExpanded ? 'expanded' : 'collapsed'}`}>
-      <div className="notebook-header" onClick={() => setIsExpanded(!isExpanded)}>
-        <h3>📔 Notebook {isExpanded ? '▼' : '▶'}</h3>
-      </div>
-      
       {isExpanded && (
         <div className="notebook-content">
           <div className="notebook-input">
@@ -208,6 +233,10 @@ const Notebook = () => {
           </div>
         </div>
       )}
+      
+      <div className="notebook-header" onClick={() => setIsExpanded(!isExpanded)}>
+        <h3>Notebook {isExpanded ? '▼' : '▲'}</h3>
+      </div>
     </div>
   );
 };
