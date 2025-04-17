@@ -7,8 +7,8 @@ import CurrentState from './context/currrentState';
 import DateForm from './components/DateForm';
 import ErrorBoundary from './context/ErrorBoundary';
 import Clustering from './components/Clustering';
-import PasswordForm from './components/PasswordForm';
 import Notebook from './components/Notebook';
+import PasswordCheck from './components/PasswordCheck';
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -42,6 +42,16 @@ const AppContent = () => {
     console.log('setVisibleComponents is:', typeof setVisibleComponents);
   }, [visibleComponents, setVisibleComponents]);
 
+  useEffect(() => {
+    console.log('isFormsVisible state updated:', isFormsVisible);
+  }, [isFormsVisible]);
+
+  useEffect(() => {
+    if (window.location.hostname === 'localhost') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const handleDateSelect = (start, end) => {
     setStartDate(start);
     setEndDate(end);
@@ -62,7 +72,9 @@ const AppContent = () => {
   };
 
   const toggleFormsVisibility = () => {
+    console.log('Toggling forms visibility. Current state:', isFormsVisible);
     setIsFormsVisible(!isFormsVisible);
+    console.log('New forms visibility state:', !isFormsVisible);
   };
 
   const toggleComponent = (component) => {
@@ -80,28 +92,10 @@ const AppContent = () => {
     }
   };
 
-  const handlePasswordSubmit = (password) => {
-    fetch('https://datades.abundis.com.mx/dist/check_password.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ password }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setIsAuthenticated(true);
-        } else {
-          alert('Incorrect password');
-        }
-      });
-  };
-
   return (
     <div className="App">
       {!isAuthenticated ? (
-        <PasswordForm onSubmit={handlePasswordSubmit} />
+        <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
       ) : (
         <>
           {isFormsVisible && (
