@@ -12,6 +12,11 @@ function Map() {
         preserveDrawingBuffer: true, // Helps with WebGL context
         antialias: false // Reduce WebGL load
       });
+
+      // Add an event listener to confirm map initialization
+      map.current.on('load', () => {
+        console.log('Map has been initialized');
+      });
     }
 
     // Cleanup function

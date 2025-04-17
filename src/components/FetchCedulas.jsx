@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useData } from '../context/DataContext';
 
 const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateLayerData, sexoLayout, forenseRecords, setTimelineData, mergeRecords, COLORS } = useData();
+  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateLayerData, sexoLayout, forenseRecords, setTimelineData, mergeRecords, COLORS, map } = useData();
 
   useEffect(() => {
     if (fetchCedulas && fetchId) {
@@ -53,8 +53,11 @@ const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComple
 
       setFetchedRecords(geojsonData);
       setNewDataFetched(true);
-      //mergeRecords(geojsonData, forenseRecords);
-      updateLayerData('cedulaLayer', geojsonData, sexoLayout);
+      if (map && map.isStyleLoaded()) {
+        updateLayerData('cedulaLayer', geojsonData, sexoLayout);
+      } else {
+        console.error('Map is not initialized or style is not loaded');
+      }
       console.log('Fetched Cedulas records:', formattedRecordsCedula);
       onFetchComplete();
     } catch (error) {
