@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'; // Import useParams from React Router
 import { useData } from '../context/DataContext';
 import '../styles/Notebook.css'; // Import the CSS styles
 
@@ -6,7 +7,9 @@ const Notebook = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-  
+
+  const { id } = useParams(); // Get the 'id' parameter from the URL
+
   // Get all necessary state from DataContext
   const {
     selectedDate,
@@ -180,6 +183,42 @@ const Notebook = () => {
     return new Date(timestamp).toLocaleString();
   };
 
+  const saveNotesToBackend = async () => {
+    try {
+      const response = await fetch(`https://datades.abundis.com.mx/api/save.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notes }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to save notes to backend');
+      }
+      alert('Notes saved successfully!');
+    } catch (error) {
+      console.error('Error saving notes to backend:', error);
+    }
+  };
+
+  const loadNotesFromBackend = async (notebookId) => {
+    try {
+      const response = await fetch(`https://datades.abundis.com.mx/api/load.php?id=${notebookId}`);
+      if (!response.ok) {
+        throw new Error('Failed to load notes from backend');
+      }
+      const data = await response.json();
+      setNotes(data.notes || []);
+    } catch (error) {
+      console.error('Error loading notes from backend:', error);
+    }
+  };
+
+  // Automatically load notes when the component mounts and 'id' is available
+  useEffect(() => {
+    if (id) {
+      loadNotesFromBackend(id);
+    }
+  }, [id]);
+
   return (
     <div className={`notebook ${isExpanded ? 'expanded' : 'collapsed'}`}>
       {isExpanded && (
@@ -194,6 +233,10 @@ const Notebook = () => {
             <div className="notebook-buttons">
               <button onClick={addNote}>Note + State</button>
               <button onClick={addTextOnlyNote}>Note</button>
+              <button onClick={saveNotesToBackend}>Save to Backend</button>
+              <button onClick={() => loadNotesFromBackend(prompt('Enter Notebook ID:'))}>
+                Load from Backend
+              </button>
             </div>
           </div>
           

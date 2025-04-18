@@ -136,7 +136,6 @@ export const DataProvider = ({ children }) => {
 
   const updateLayerData = (layerId, data, layoutConfig) => {
     if (!map || !map.isStyleLoaded()) {
-      console.error('Map is not initialized or style is not loaded');
       return;
     }
   
