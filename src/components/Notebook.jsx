@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // Import useParams from React Router
+import { useParams, useNavigate } from 'react-router-dom'; // Import useParams and useNavigate
 import { useData } from '../context/DataContext';
 import '../styles/Notebook.css'; // Import the CSS styles
 
@@ -7,10 +7,12 @@ const Notebook = () => {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal state
+  const [notebookList, setNotebookList] = useState([]); // Store the list of notebooks
 
   const { id } = useParams(); // Get the 'id' parameter from the URL
+  const navigate = useNavigate(); // Use navigate to update the URL
 
-  // Get all necessary state from DataContext
   const {
     selectedDate,
     daysRange,
@@ -27,17 +29,14 @@ const Notebook = () => {
     map,
     setSelectedDate,
     setDaysRange,
-    // Add layout settings
     mapType,
     setMapType,
     colorScheme,
     setColorScheme,
-    // Add visibleComponents
     visibleComponents,
     setVisibleComponents
   } = useData();
 
-  // For debugging - log the context values we receive
   useEffect(() => {
     console.log('Notebook received from context:', {
       visibleComponents,
@@ -45,7 +44,6 @@ const Notebook = () => {
     });
   }, [visibleComponents, setVisibleComponents]);
 
-  // Load saved notes from localStorage when component mounts
   useEffect(() => {
     const savedNotes = localStorage.getItem('datades-notebook');
     if (savedNotes) {
@@ -57,7 +55,6 @@ const Notebook = () => {
     }
   }, []);
 
-  // Save notes to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('datades-notebook', JSON.stringify(notes));
   }, [notes]);
@@ -65,16 +62,13 @@ const Notebook = () => {
   const captureCurrentState = () => {
     console.log('Capturing current state, visibleComponents:', visibleComponents);
     
-    // Create a timestamp
     const timestamp = new Date().toISOString();
     
-    // Capture current map center and zoom if map exists
     const mapState = map ? {
       center: map.getCenter(),
       zoom: map.getZoom()
     } : null;
     
-    // Create state snapshot
     const stateSnapshot = {
       timestamp,
       state: {
@@ -86,10 +80,8 @@ const Notebook = () => {
         sumScoreRange: [...sumScoreRange],
         timeScale,
         mapState,
-        // Add layout settings
         mapType,
         colorScheme,
-        // Explicitly clone the visibleComponents object
         visibleComponents: visibleComponents ? { ...visibleComponents } : null
       }
     };
@@ -103,7 +95,6 @@ const Notebook = () => {
     
     const stateSnapshot = captureCurrentState();
     
-    // Add new note with text and state
     const newNoteEntry = {
       id: Date.now(),
       text: newNote,
@@ -117,12 +108,11 @@ const Notebook = () => {
   const addTextOnlyNote = () => {
     if (!newNote.trim()) return;
     
-    // Add new note with text only, no state
     const newNoteEntry = {
       id: Date.now(),
       text: newNote,
       timestamp: new Date().toISOString(),
-      state: null // explicitly set state to null to indicate no state was captured
+      state: null
     };
     
     setNotes([newNoteEntry, ...notes]);
@@ -134,20 +124,17 @@ const Notebook = () => {
     
     console.log('Restoring state:', savedState);
     
-    // Restore date and range
     if (savedState.selectedDate) {
       setSelectedDate(new Date(savedState.selectedDate));
     }
     setDaysRange(savedState.daysRange);
     
-    // Restore filters
     setSelectedSexo(savedState.selectedSexo);
     setSelectedCondicion(savedState.selectedCondicion);
     setEdadRange(savedState.edadRange);
     setsumScoreRange(savedState.sumScoreRange);
     setTimeScale(savedState.timeScale);
     
-    // Restore layout settings
     if (savedState.mapType) {
       setMapType(savedState.mapType);
     }
@@ -155,7 +142,6 @@ const Notebook = () => {
       setColorScheme(savedState.colorScheme);
     }
     
-    // Restore component visibility with extra checks
     if (savedState.visibleComponents && typeof setVisibleComponents === 'function') {
       console.log('Restoring visibleComponents:', savedState.visibleComponents);
       setVisibleComponents(savedState.visibleComponents);
@@ -166,7 +152,6 @@ const Notebook = () => {
       });
     }
     
-    // Restore map position if mapState and map exist
     if (savedState.mapState && map) {
       map.flyTo({
         center: [savedState.mapState.center.lng, savedState.mapState.center.lat],
@@ -185,16 +170,24 @@ const Notebook = () => {
 
   const saveNotesToBackend = async () => {
     try {
+      const name = prompt('Enter a name for the notebook:');
+      if (!name) {
+        alert('Notebook name is required to save.');
+        return;
+      }
+
+      alert('Saving notes to the backend...');
       const response = await fetch(`https://datades.abundis.com.mx/api/save.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes }),
+        body: JSON.stringify({ notes, name }),
       });
       if (!response.ok) {
         throw new Error('Failed to save notes to backend');
       }
       alert('Notes saved successfully!');
     } catch (error) {
+      alert('Error saving notes to backend.');
       console.error('Error saving notes to backend:', error);
     }
   };
@@ -212,7 +205,30 @@ const Notebook = () => {
     }
   };
 
-  // Automatically load notes when the component mounts and 'id' is available
+  const listNotebooks = async () => {
+    try {
+      const response = await fetch(`https://datades.abundis.com.mx/api/list.php`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch notebooks');
+      }
+      const data = await response.json();
+      if (data.success) {
+        setNotebookList(data.notebooks);
+        setIsModalOpen(true);
+      } else {
+        alert('No notebooks found.');
+      }
+    } catch (error) {
+      alert('Error fetching notebooks.');
+      console.error('Error fetching notebooks:', error);
+    }
+  };
+
+  const selectNotebook = (notebook) => {
+    setIsModalOpen(false);
+    navigate(`/notebook/${notebook}`);
+  };
+
   useEffect(() => {
     if (id) {
       loadNotesFromBackend(id);
@@ -237,6 +253,7 @@ const Notebook = () => {
               <button onClick={() => loadNotesFromBackend(prompt('Enter Notebook ID:'))}>
                 Load from Backend
               </button>
+              <button onClick={listNotebooks}>List Notebooks</button>
             </div>
           </div>
           
@@ -280,6 +297,22 @@ const Notebook = () => {
       <div className="notebook-header" onClick={() => setIsExpanded(!isExpanded)}>
         <h3>Notebook {isExpanded ? '▼' : '▲'}</h3>
       </div>
+
+      {isModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <h3>Select a Notebook</h3>
+            <ul>
+              {notebookList.map((notebook) => (
+                <li key={notebook}>
+                  <button onClick={() => selectNotebook(notebook)}>{notebook}</button>
+                </li>
+              ))}
+            </ul>
+            <button onClick={() => setIsModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

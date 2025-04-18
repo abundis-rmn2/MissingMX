@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Import Router components
 import { DataProvider, useData } from './context/DataContext';
 import FetchCedulas from './components/FetchCedulas';
 import FetchForense from './components/FetchForense';
@@ -160,7 +161,6 @@ const AppContent = () => {
           <div className="Map">
             <MapComponent />
           </div>
-          <Notebook />
         </>
       )}
     </div>
@@ -169,11 +169,13 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <DataProvider>
-      <ErrorBoundary>
-        <AppContent />
-      </ErrorBoundary>
-    </DataProvider>
+    <Router basename="/dist"> {/* Set the base path to /dist */}
+      <AppContent /> {/* Keep the background layer */}
+      <Routes>
+        <Route path="/notebook/:id" element={<Notebook />} /> {/* Route for Notebook */}
+        <Route path="/" element={<Notebook />} /> {/* Default route */}
+      </Routes>
+    </Router>
   );
 };
 
