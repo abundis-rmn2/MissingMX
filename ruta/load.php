@@ -27,12 +27,18 @@ if (!file_exists($filePath)) {
     exit;
 }
 
-$notes = json_decode(file_get_contents($filePath), true);
-if ($notes === null) {
+$savedData = json_decode(file_get_contents($filePath), true);
+if ($savedData === null) {
     http_response_code(500);
     echo json_encode(['error' => 'Failed to read notebook']);
     exit;
 }
 
-echo json_encode(['success' => true, 'notes' => $notes]);
+// Include startDate and endDate in the response
+echo json_encode([
+    'success' => true,
+    'notes' => $savedData['notes'] ?? [],
+    'startDate' => $savedData['startDate'] ?? null, // Ensure startDate is included
+    'endDate' => $savedData['endDate'] ?? null     // Ensure endDate is included
+]);
 ?>

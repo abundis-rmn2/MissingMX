@@ -33,6 +33,8 @@ export const DataProvider = ({ children }) => {
     timeGraph: false,
     crossRef: false,
   });
+  const [startDate, setStartDate] = useState('2023-01-01'); // Default start date
+  const [endDate, setEndDate] = useState('2024-01-01'); // Default end date
 
   useEffect(() => {
     console.log('DataContext state initialized:', { 
@@ -48,6 +50,14 @@ export const DataProvider = ({ children }) => {
       setVisibleComponents: typeof setVisibleComponents === 'function' ? 'function' : typeof setVisibleComponents
     });
   }, [visibleComponents]);
+
+  useEffect(() => {
+    console.log('DataContext: startDate updated:', startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    console.log('DataContext: endDate updated:', endDate);
+  }, [endDate]);
 
   const COLORS = Object.fromEntries(
     ["MUJER", "HOMBRE", "CON_VIDA", "SIN_VIDA", "NO_APLICA", "UNKNOWN"].map((key) => {
@@ -460,7 +470,9 @@ export const DataProvider = ({ children }) => {
     timeScale, setTimeScale,
     mapType, setMapType,
     colorScheme, setColorScheme,
-    visibleComponents, setVisibleComponents
+    visibleComponents, setVisibleComponents,
+    startDate, setStartDate,
+    endDate, setEndDate
   };
 
   return (

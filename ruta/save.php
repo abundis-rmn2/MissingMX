@@ -10,10 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
+// Decode the incoming JSON payload
 $data = json_decode(file_get_contents('php://input'), true);
-if (!$data || !isset($data['notes'])) {
+
+// Validate the payload
+if (!$data || !isset($data['notes']) || !isset($data['name']) || !isset($data['startDate']) || !isset($data['endDate'])) {
     http_response_code(400);
-    echo json_encode(['error' => 'Invalid input']);
+    echo json_encode(['error' => 'Invalid input. Missing required fields: notes, name, startDate, or endDate.']);
     exit;
 }
 
@@ -29,12 +32,19 @@ if (!is_dir($notebooksDir)) {
     }
 }
 
-// Get the notebook name from the request, or use a unique ID if not provided
-$name = $data['name'] ?? uniqid();
-$name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $name); // Sanitize the name to avoid invalid characters
+// Sanitize the notebook name
+$name = preg_replace('/[^a-zA-Z0-9_-]/', '_', $data['name']); // Sanitize the name to avoid invalid characters
 $filePath = $notebooksDir . "/$name.txt";
 
-if (file_put_contents($filePath, json_encode($data['notes'], JSON_PRETTY_PRINT))) {
+// Prepare the data to save
+$savedData = [
+    'notes' => $data['notes'],
+    'startDate' => $data['startDate'],
+    'endDate' => $data['endDate']
+];
+
+// Save the data to the file
+if (file_put_contents($filePath, json_encode($savedData, JSON_PRETTY_PRINT))) {
     echo json_encode(['success' => true, 'name' => $name]);
 } else {
     http_response_code(500);

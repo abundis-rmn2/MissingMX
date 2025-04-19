@@ -9,8 +9,8 @@ const DateForm = ({ startDate, endDate, setStartDate, setEndDate, handleSubmit, 
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    setStartDate(localStartDate);
-    setEndDate(localEndDate);
+    setStartDate(localStartDate); // Update the parent state
+    setEndDate(localEndDate); // Update the parent state
     setIsModalMode(false);
     handleSubmit(e);
   };

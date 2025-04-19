@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useParams and useNavigate
+import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
-import '../styles/Notebook.css'; // Import the CSS styles
+import '../styles/Notebook.css';
 
-const Notebook = () => {
+const Notebook = ({ startDate, endDate, setStartDate, setEndDate }) => { // Use props for startDate and endDate
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Track modal state
-  const [notebookList, setNotebookList] = useState([]); // Store the list of notebooks
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [notebookList, setNotebookList] = useState([]);
 
-  const { id } = useParams(); // Get the 'id' parameter from the URL
-  const navigate = useNavigate(); // Use navigate to update the URL
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const {
     selectedDate,
@@ -38,13 +38,6 @@ const Notebook = () => {
   } = useData();
 
   useEffect(() => {
-    console.log('Notebook received from context:', {
-      visibleComponents,
-      setVisibleComponents: typeof setVisibleComponents === 'function' ? 'function' : typeof setVisibleComponents
-    });
-  }, [visibleComponents, setVisibleComponents]);
-
-  useEffect(() => {
     const savedNotes = localStorage.getItem('datades-notebook');
     if (savedNotes) {
       try {
@@ -60,15 +53,15 @@ const Notebook = () => {
   }, [notes]);
 
   const captureCurrentState = () => {
-    console.log('Capturing current state, visibleComponents:', visibleComponents);
-    
+    console.log('Capturing current state with startDate and endDate:', { startDate, endDate });
+
     const timestamp = new Date().toISOString();
-    
+
     const mapState = map ? {
       center: map.getCenter(),
       zoom: map.getZoom()
     } : null;
-    
+
     const stateSnapshot = {
       timestamp,
       state: {
@@ -82,66 +75,68 @@ const Notebook = () => {
         mapState,
         mapType,
         colorScheme,
-        visibleComponents: visibleComponents ? { ...visibleComponents } : null
+        visibleComponents: visibleComponents ? { ...visibleComponents } : null,
+        startDate, // Use startDate from props
+        endDate    // Use endDate from props
       }
     };
-    
+
     console.log('Created state snapshot:', stateSnapshot);
     return stateSnapshot;
   };
 
   const addNote = () => {
     if (!newNote.trim()) return;
-    
+
     const stateSnapshot = captureCurrentState();
-    
+
     const newNoteEntry = {
       id: Date.now(),
       text: newNote,
       ...stateSnapshot
     };
-    
+
     setNotes([newNoteEntry, ...notes]);
     setNewNote('');
   };
 
   const addTextOnlyNote = () => {
     if (!newNote.trim()) return;
-    
+
     const newNoteEntry = {
       id: Date.now(),
       text: newNote,
       timestamp: new Date().toISOString(),
       state: null
     };
-    
+
     setNotes([newNoteEntry, ...notes]);
     setNewNote('');
   };
 
   const restoreState = (savedState) => {
     if (!savedState) return;
-    
+
     console.log('Restoring state:', savedState);
-    
+
     if (savedState.selectedDate) {
       setSelectedDate(new Date(savedState.selectedDate));
     }
     setDaysRange(savedState.daysRange);
-    
+
     setSelectedSexo(savedState.selectedSexo);
     setSelectedCondicion(savedState.selectedCondicion);
     setEdadRange(savedState.edadRange);
     setsumScoreRange(savedState.sumScoreRange);
     setTimeScale(savedState.timeScale);
-    
+
     if (savedState.mapType) {
       setMapType(savedState.mapType);
     }
     if (savedState.colorScheme) {
       setColorScheme(savedState.colorScheme);
     }
-    
+
     if (savedState.visibleComponents && typeof setVisibleComponents === 'function') {
       console.log('Restoring visibleComponents:', savedState.visibleComponents);
       setVisibleComponents(savedState.visibleComponents);
@@ -151,12 +146,20 @@ const Notebook = () => {
         setter: typeof setVisibleComponents
       });
     }
-    
+
     if (savedState.mapState && map) {
       map.flyTo({
         center: [savedState.mapState.center.lng, savedState.mapState.center.lat],
         zoom: savedState.mapState.zoom
       });
+    }
+
+    // Restore startDate and endDate using props
+    if (savedState.startDate) {
+      setStartDate(savedState.startDate);
+    }
+    if (savedState.endDate) {
+      setEndDate(savedState.endDate);
     }
   };
 
@@ -175,16 +178,27 @@ const Notebook = () => {
         alert('Notebook name is required to save.');
         return;
       }
+      
+      const payload = {
+        notes,
+        name,
+        startDate: startDate || '', // Use startDate from props
+        endDate: endDate || ''     // Use endDate from props
+      };
+
+      console.log('Saving payload:', payload);
 
       alert('Saving notes to the backend...');
       const response = await fetch(`https://datades.abundis.com.mx/api/save.php`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes, name }),
+        body: JSON.stringify(payload),
       });
+
       if (!response.ok) {
         throw new Error('Failed to save notes to backend');
       }
+
       alert('Notes saved successfully!');
     } catch (error) {
       alert('Error saving notes to backend.');
@@ -200,8 +214,20 @@ const Notebook = () => {
       }
       const data = await response.json();
       setNotes(data.notes || []);
+
+      console.log("Notebook: Loaded notebook data:", data);
+
+      if (data.startDate) {
+        console.log("Notebook: Updating startDate in DataContext:", data.startDate);
+        setStartDate(data.startDate); // Update startDate in DataContext
+      }
+
+      if (data.endDate) {
+        console.log("Notebook: Updating endDate in DataContext:", data.endDate);
+        setEndDate(data.endDate); // Update endDate in DataContext
+      }
     } catch (error) {
-      console.error('Error loading notes from backend:', error);
+      console.error('Notebook: Error loading notes from backend:', error);
     }
   };
 
@@ -256,7 +282,7 @@ const Notebook = () => {
               <button onClick={listNotebooks}>List Notebooks</button>
             </div>
           </div>
-          
+
           <div className="notebook-entries">
             {notes.length === 0 ? (
               <p className="no-notes">No notes yet. Add one to get started!</p>
@@ -270,7 +296,7 @@ const Notebook = () => {
                     </span>
                     <div className="note-actions">
                       {note.state && (
-                        <button 
+                        <button
                           className="restore-button"
                           onClick={() => restoreState(note.state)}
                           title="Restore this state"
@@ -278,7 +304,7 @@ const Notebook = () => {
                           ⟲ Restore
                         </button>
                       )}
-                      <button 
+                      <button
                         className="delete-button"
                         onClick={() => deleteNote(note.id)}
                         title="Delete this note"
@@ -293,7 +319,7 @@ const Notebook = () => {
           </div>
         </div>
       )}
-      
+
       <div className="notebook-header" onClick={() => setIsExpanded(!isExpanded)}>
         <h3>Notebook {isExpanded ? '▼' : '▲'}</h3>
       </div>

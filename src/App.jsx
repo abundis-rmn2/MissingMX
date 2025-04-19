@@ -1,12 +1,11 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Import Router components
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { DataProvider, useData } from './context/DataContext';
 import FetchCedulas from './components/FetchCedulas';
 import FetchForense from './components/FetchForense';
 import MapComponent from './components/MapComponent';
 import CurrentState from './context/currrentState';
 import DateForm from './components/DateForm';
-import ErrorBoundary from './context/ErrorBoundary';
 import Clustering from './components/Clustering';
 import Notebook from './components/Notebook';
 import PasswordCheck from './components/PasswordCheck';
@@ -20,9 +19,7 @@ const LayoutForm = lazy(() => import('./components/LayoutForm'));
 const TimeGraph = lazy(() => import('./components/TimeGraph'));
 const GlobalTimeGraph = lazy(() => import('./components/GlobalTimeGraph'));
 
-const AppContent = () => {
-  const [startDate, setStartDate] = useState('2023-01-01');
-  const [endDate, setEndDate] = useState('2024-01-01');
+const App = () => {
   const [fetchCedulas, setFetchCedulas] = useState(true);
   const [fetchForense, setFetchForense] = useState(true);
   const [fetchId, setFetchId] = useState(0);
@@ -30,14 +27,17 @@ const AppContent = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Get data from context
-  const { 
-    loading, 
-    setLoading, 
+  const {
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
+    loading,
+    setLoading,
     visibleComponents,
-    setVisibleComponents 
+    setVisibleComponents
   } = useData();
 
-  // For debugging - log the visibility state
   useEffect(() => {
     console.log('App received visibleComponents:', visibleComponents);
     console.log('setVisibleComponents is:', typeof setVisibleComponents);
@@ -46,6 +46,15 @@ const AppContent = () => {
   useEffect(() => {
     console.log('isFormsVisible state updated:', isFormsVisible);
   }, [isFormsVisible]);
+
+  // check changes in start and end date
+  useEffect(() => {
+    console.log('App: startDate updated:', startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    console.log('App: endDate updated:', endDate);
+  }, [endDate]);
 
   useEffect(() => {
     if (window.location.hostname === 'localhost') {
@@ -81,7 +90,7 @@ const AppContent = () => {
   const toggleComponent = (component) => {
     console.log('Toggling component:', component);
     console.log('Current state:', visibleComponents);
-    
+
     if (typeof setVisibleComponents === 'function') {
       setVisibleComponents(prev => {
         const updated = { ...prev, [component]: !prev[component] };
@@ -94,88 +103,95 @@ const AppContent = () => {
   };
 
   return (
-    <div className="App">
-      {!isAuthenticated ? (
-        <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
-      ) : (
-        <>
-          {isFormsVisible && (
-            <div className="DateForm">
-              <DateForm
-                startDate={startDate}
-                endDate={endDate}
-                setStartDate={setStartDate}
-                setEndDate={setEndDate}
-                handleSubmit={handleSubmit}
-                loading={loading}
-                fetchCedulas={fetchCedulas}
-                setFetchCedulas={setFetchCedulas}
-                fetchForense={fetchForense}
-                setFetchForense={setFetchForense}
-              />
-              <FetchCedulas
-                fetchCedulas={fetchCedulas}
-                startDate={startDate}
-                endDate={endDate}
-                fetchId={fetchId} // Pass fetchId instead of triggerFetch
-                onFetchComplete={handleFetchComplete}
-              />
-              <FetchForense
-                fetchForense={fetchForense}
-                startDate={startDate}
-                endDate={endDate}
-                fetchId={fetchId} // Pass fetchId instead of triggerFetch
-                onFetchComplete={handleFetchComplete}
-              />
-              <Clustering type="personas_sin_identificar" />
-              <GlobalTimeGraph onDateSelect={handleDateSelect} />
-            </div>
-          )}
+    <DataProvider>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Router basename="/dist">
+          <div className="App">
+            {!isAuthenticated ? (
+              <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
+            ) : (
+              <>
+                {isFormsVisible && (
+                  <div className="DateForm">
+                    <DateForm
+                      startDate={startDate}
+                      endDate={endDate}
+                      setStartDate={setStartDate}
+                      setEndDate={setEndDate}
+                      handleSubmit={handleSubmit}
+                      loading={loading}
+                      fetchCedulas={fetchCedulas}
+                      setFetchCedulas={setFetchCedulas}
+                      fetchForense={fetchForense}
+                      setFetchForense={setFetchForense}
+                    />
+                    <FetchCedulas
+                      fetchCedulas={fetchCedulas}
+                      startDate={startDate}
+                      endDate={endDate}
+                      fetchId={fetchId}
+                      onFetchComplete={handleFetchComplete}
+                    />
+                    <FetchForense
+                      fetchForense={fetchForense}
+                      startDate={startDate}
+                      endDate={endDate}
+                      fetchId={fetchId}
+                      onFetchComplete={handleFetchComplete}
+                    />
+                    <Clustering type="personas_sin_identificar" />
+                    <GlobalTimeGraph onDateSelect={handleDateSelect} />
+                  </div>
+                )}
 
-          <div className="ComponentToggles">
-            {Object.entries(visibleComponents).map(([key, value]) => (
-              <label key={key}>
-                <input
-                  type="checkbox"
-                  checked={value}
-                  onChange={() => toggleComponent(key)}
+                <div className="ComponentToggles">
+                  {Object.entries(visibleComponents).map(([key, value]) => (
+                    <label key={key}>
+                      <input
+                        type="checkbox"
+                        checked={value}
+                        onChange={() => toggleComponent(key)}
+                      />
+                      {key.charAt(0).toUpperCase() + key.slice(1)}
+                    </label>
+                  ))}
+                </div>
+
+                <div className="MobileContainer">
+                  <div className="MapForms">
+
+                      <TimelineSlider />
+                      <LayoutForm />
+                      {visibleComponents.filterForm && <FilterForm />}
+                      {visibleComponents.currentState && <CurrentState />}
+                      {visibleComponents.violenceCases && <ViolenceCases />}
+                      {visibleComponents.timeGraph && <TimeGraph />}
+                      {visibleComponents.crossRef && <CrossRef />}
+                  </div>
+                </div>
+                <div className="Map">
+                  <MapComponent />
+                </div>
+              </>
+            )}
+          </div>
+          <Routes>
+            <Route
+              path="/notebook/:id"
+              element={
+                <Notebook
+                  startDate={startDate}
+                  endDate={endDate}
+                  setStartDate={setStartDate} // Pass setStartDate as a prop
+                  setEndDate={setEndDate}     // Pass setEndDate as a prop
                 />
-                {key.charAt(0).toUpperCase() + key.slice(1)}
-              </label>
-            ))}
-          </div>
-
-          <div className='MobileContainer'>
-            <div className="MapForms">
-              <Suspense fallback={<div>Loading...</div>}>
-                <TimelineSlider />
-                <LayoutForm />
-                {visibleComponents.filterForm && <FilterForm />}
-                {visibleComponents.currentState && <CurrentState />}
-                {visibleComponents.violenceCases && <ViolenceCases />}
-                {visibleComponents.timeGraph && <TimeGraph />}
-                {visibleComponents.crossRef && <CrossRef />}
-              </Suspense>
-            </div>
-          </div>
-          <div className="Map">
-            <MapComponent />
-          </div>
-        </>
-      )}
-    </div>
-  );
-};
-
-const App = () => {
-  return (
-    <Router basename="/dist"> {/* Set the base path to /dist */}
-      <AppContent /> {/* Keep the background layer */}
-      <Routes>
-        <Route path="/notebook/:id" element={<Notebook />} /> {/* Route for Notebook */}
-        <Route path="/" element={<Notebook />} /> {/* Default route */}
-      </Routes>
-    </Router>
+              }
+            />
+            <Route path="/" element={<Notebook />} />
+          </Routes>
+        </Router>
+      </Suspense>
+    </DataProvider>
   );
 };
 
