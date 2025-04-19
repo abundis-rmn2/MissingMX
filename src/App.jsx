@@ -26,7 +26,6 @@ const App = () => {
   const [isFormsVisible, setIsFormsVisible] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Get data from context
   const {
     startDate,
     setStartDate,
@@ -36,7 +35,7 @@ const App = () => {
     setLoading,
     visibleComponents,
     setVisibleComponents
-  } = useData();
+  } = useData(); // Use DataContext for shared state
 
   useEffect(() => {
     console.log('App received visibleComponents:', visibleComponents);
@@ -63,8 +62,8 @@ const App = () => {
   }, []);
 
   const handleDateSelect = (start, end) => {
-    setStartDate(start);
-    setEndDate(end);
+    setStartDate(start); // Update via DataContext
+    setEndDate(end);     // Update via DataContext
     setFetchId(prev => prev + 1);
   };
 
@@ -114,10 +113,6 @@ const App = () => {
                 {isFormsVisible && (
                   <div className="DateForm">
                     <DateForm
-                      startDate={startDate}
-                      endDate={endDate}
-                      setStartDate={setStartDate}
-                      setEndDate={setEndDate}
                       handleSubmit={handleSubmit}
                       loading={loading}
                       fetchCedulas={fetchCedulas}
@@ -127,15 +122,11 @@ const App = () => {
                     />
                     <FetchCedulas
                       fetchCedulas={fetchCedulas}
-                      startDate={startDate}
-                      endDate={endDate}
                       fetchId={fetchId}
                       onFetchComplete={handleFetchComplete}
                     />
                     <FetchForense
                       fetchForense={fetchForense}
-                      startDate={startDate}
-                      endDate={endDate}
                       fetchId={fetchId}
                       onFetchComplete={handleFetchComplete}
                     />
@@ -179,12 +170,7 @@ const App = () => {
             <Route
               path="/notebook/:id"
               element={
-                <Notebook
-                  startDate={startDate}
-                  endDate={endDate}
-                  setStartDate={setStartDate} // Pass setStartDate as a prop
-                  setEndDate={setEndDate}     // Pass setEndDate as a prop
-                />
+                <Notebook />
               }
             />
             <Route path="/" element={<Notebook />} />

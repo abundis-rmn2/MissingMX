@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useData } from '../context/DataContext';
 
-const FetchCedulas = ({ fetchCedulas, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setFetchedRecords, setNewDataFetched, loading, setLoading, updateLayerData, sexoLayout, forenseRecords, setTimelineData, mergeRecords, COLORS, map } = useData();
+const FetchCedulas = ({ fetchCedulas, fetchId, onFetchComplete }) => {
+  const { startDate, endDate, setFetchedRecords, setNewDataFetched, loading, setLoading, updateLayerData, sexoLayout, forenseRecords, setTimelineData, mergeRecords, COLORS, map } = useData();
 
   useEffect(() => {
     if (fetchCedulas && fetchId) {

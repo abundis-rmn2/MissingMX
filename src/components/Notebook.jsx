@@ -3,17 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import '../styles/Notebook.css';
 
-const Notebook = ({ startDate, endDate, setStartDate, setEndDate }) => { // Use props for startDate and endDate
-  const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState('');
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [notebookList, setNotebookList] = useState([]);
-
-  const { id } = useParams();
-  const navigate = useNavigate();
-
+const Notebook = () => {
   const {
+    startDate,
+    endDate,
+    setStartDate,
+    setEndDate,
     selectedDate,
     daysRange,
     selectedSexo,
@@ -36,6 +31,15 @@ const Notebook = ({ startDate, endDate, setStartDate, setEndDate }) => { // Use 
     visibleComponents,
     setVisibleComponents
   } = useData();
+
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState('');
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [notebookList, setNotebookList] = useState([]);
+
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const savedNotes = localStorage.getItem('datades-notebook');
@@ -76,8 +80,8 @@ const Notebook = ({ startDate, endDate, setStartDate, setEndDate }) => { // Use 
         mapType,
         colorScheme,
         visibleComponents: visibleComponents ? { ...visibleComponents } : null,
-        startDate, // Use startDate from props
-        endDate    // Use endDate from props
+        startDate,
+        endDate
       }
     };
 
@@ -154,7 +158,6 @@ const Notebook = ({ startDate, endDate, setStartDate, setEndDate }) => { // Use 
       });
     }
 
-    // Restore startDate and endDate using props
     if (savedState.startDate) {
       setStartDate(savedState.startDate);
     }
@@ -182,8 +185,8 @@ const Notebook = ({ startDate, endDate, setStartDate, setEndDate }) => { // Use 
       const payload = {
         notes,
         name,
-        startDate: startDate || '', // Use startDate from props
-        endDate: endDate || ''     // Use endDate from props
+        startDate: startDate || '',
+        endDate: endDate || ''
       };
 
       console.log('Saving payload:', payload);
@@ -219,12 +222,12 @@ const Notebook = ({ startDate, endDate, setStartDate, setEndDate }) => { // Use 
 
       if (data.startDate) {
         console.log("Notebook: Updating startDate in DataContext:", data.startDate);
-        setStartDate(data.startDate); // Update startDate in DataContext
+        setStartDate(data.startDate);
       }
 
       if (data.endDate) {
         console.log("Notebook: Updating endDate in DataContext:", data.endDate);
-        setEndDate(data.endDate); // Update endDate in DataContext
+        setEndDate(data.endDate);
       }
     } catch (error) {
       console.error('Notebook: Error loading notes from backend:', error);
