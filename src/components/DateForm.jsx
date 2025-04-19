@@ -11,6 +11,10 @@ const DateForm = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, s
     e.preventDefault();
     setStartDate(localStartDate); // Update via DataContext
     setEndDate(localEndDate);     // Update via DataContext
+    console.log('DateForm: Updated startDate and endDate:', {
+      startDate: localStartDate,
+      endDate: localEndDate,
+    });
     setIsModalMode(false);
     handleSubmit(e);
   };

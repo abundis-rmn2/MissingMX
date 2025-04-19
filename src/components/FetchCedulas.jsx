@@ -7,7 +7,10 @@ const FetchCedulas = ({ fetchCedulas, fetchId, onFetchComplete }) => {
 
   useEffect(() => {
     if (fetchCedulas && fetchId) {
-      console.log('Fetching Cedulas data');
+      console.log('FetchCedulas: Using startDate and endDate for fetching:', {
+        startDate,
+        endDate,
+      });
       fetchData(startDate, endDate);
     }
   }, [fetchId]);

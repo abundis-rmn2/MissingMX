@@ -23,7 +23,7 @@ export const DataProvider = ({ children }) => {
   const [selectedCondicion, setSelectedCondicion] = useState(['CON VIDA', 'SIN VIDA', 'NO APLICA']);
   const [edadRange, setEdadRange] = useState([0, 100]);
   const [sumScoreRange, setsumScoreRange] = useState([0.5, 20]);
-  const [timeScale, setTimeScale] = useState('daily');
+  const [timeScale, setTimeScale] = useState('monthly'); // Set default to "monthly"
   const [mapType, setMapType] = useState('point');
   const [colorScheme, setColorScheme] = useState('sexo');
   const [visibleComponents, setVisibleComponents] = useState({
@@ -58,6 +58,16 @@ export const DataProvider = ({ children }) => {
   useEffect(() => {
     console.log('DataContext: endDate updated:', endDate);
   }, [endDate]);
+
+  useEffect(() => {
+    console.log('DataProvider initialized with context values:', {
+      startDate,
+      endDate,
+      visibleComponents,
+      mapType,
+      colorScheme,
+    });
+  }, [startDate, endDate, visibleComponents, mapType, colorScheme]);
 
   const COLORS = Object.fromEntries(
     ["MUJER", "HOMBRE", "CON_VIDA", "SIN_VIDA", "NO_APLICA", "UNKNOWN"].map((key) => {

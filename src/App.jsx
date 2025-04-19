@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { DataProvider, useData } from './context/DataContext';
+import { useData } from './context/DataContext'; // Remove DataProvider import
 import FetchCedulas from './components/FetchCedulas';
 import FetchForense from './components/FetchForense';
 import MapComponent from './components/MapComponent';
@@ -34,7 +34,9 @@ const App = () => {
     loading,
     setLoading,
     visibleComponents,
-    setVisibleComponents
+    setVisibleComponents,
+    mapType,
+    colorScheme,
   } = useData(); // Use DataContext for shared state
 
   useEffect(() => {
@@ -61,7 +63,18 @@ const App = () => {
     }
   }, []);
 
+  useEffect(() => {
+    console.log('App: Context values from useData():', {
+      startDate,
+      endDate,
+      visibleComponents,
+      mapType,
+      colorScheme,
+    });
+  }, [startDate, endDate, visibleComponents, mapType, colorScheme]);
+
   const handleDateSelect = (start, end) => {
+    console.log('Date selected in GlobalTimeGraph:', { start, end });
     setStartDate(start); // Update via DataContext
     setEndDate(end);     // Update via DataContext
     setFetchId(prev => prev + 1);
@@ -88,12 +101,12 @@ const App = () => {
 
   const toggleComponent = (component) => {
     console.log('Toggling component:', component);
-    console.log('Current state:', visibleComponents);
+    console.log('Current state before toggle:', visibleComponents);
 
     if (typeof setVisibleComponents === 'function') {
       setVisibleComponents(prev => {
         const updated = { ...prev, [component]: !prev[component] };
-        console.log('New visibility state:', updated);
+        console.log('New visibility state after toggle:', updated);
         return updated;
       });
     } else {
@@ -102,82 +115,80 @@ const App = () => {
   };
 
   return (
-    <DataProvider>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Router basename="/dist">
-          <div className="App">
-            {!isAuthenticated ? (
-              <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
-            ) : (
-              <>
-                {isFormsVisible && (
-                  <div className="DateForm">
-                    <DateForm
-                      handleSubmit={handleSubmit}
-                      loading={loading}
-                      fetchCedulas={fetchCedulas}
-                      setFetchCedulas={setFetchCedulas}
-                      fetchForense={fetchForense}
-                      setFetchForense={setFetchForense}
-                    />
-                    <FetchCedulas
-                      fetchCedulas={fetchCedulas}
-                      fetchId={fetchId}
-                      onFetchComplete={handleFetchComplete}
-                    />
-                    <FetchForense
-                      fetchForense={fetchForense}
-                      fetchId={fetchId}
-                      onFetchComplete={handleFetchComplete}
-                    />
-                    <Clustering type="personas_sin_identificar" />
-                    <GlobalTimeGraph onDateSelect={handleDateSelect} />
-                  </div>
-                )}
-
-                <div className="ComponentToggles">
-                  {Object.entries(visibleComponents).map(([key, value]) => (
-                    <label key={key}>
-                      <input
-                        type="checkbox"
-                        checked={value}
-                        onChange={() => toggleComponent(key)}
-                      />
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
-                    </label>
-                  ))}
+    <Suspense fallback={<div>Loading...</div>}>
+      <Router basename="/dist">
+        <div className="App">
+          {!isAuthenticated ? (
+            <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
+          ) : (
+            <>
+              {isFormsVisible && (
+                <div className="DateForm">
+                  <DateForm
+                    handleSubmit={handleSubmit}
+                    loading={loading}
+                    fetchCedulas={fetchCedulas}
+                    setFetchCedulas={setFetchCedulas}
+                    fetchForense={fetchForense}
+                    setFetchForense={setFetchForense}
+                  />
+                  <FetchCedulas
+                    fetchCedulas={fetchCedulas}
+                    fetchId={fetchId}
+                    onFetchComplete={handleFetchComplete}
+                  />
+                  <FetchForense
+                    fetchForense={fetchForense}
+                    fetchId={fetchId}
+                    onFetchComplete={handleFetchComplete}
+                  />
+                  <Clustering type="personas_sin_identificar" />
+                  <GlobalTimeGraph onDateSelect={handleDateSelect} />
                 </div>
+              )}
 
-                <div className="MobileContainer">
-                  <div className="MapForms">
+              <div className="ComponentToggles">
+                {Object.entries(visibleComponents).map(([key, value]) => (
+                  <label key={key}>
+                    <input
+                      type="checkbox"
+                      checked={value}
+                      onChange={() => toggleComponent(key)}
+                    />
+                    {key.charAt(0).toUpperCase() + key.slice(1)}
+                  </label>
+                ))}
+              </div>
 
-                      <TimelineSlider />
-                      <LayoutForm />
-                      {visibleComponents.filterForm && <FilterForm />}
-                      {visibleComponents.currentState && <CurrentState />}
-                      {visibleComponents.violenceCases && <ViolenceCases />}
-                      {visibleComponents.timeGraph && <TimeGraph />}
-                      {visibleComponents.crossRef && <CrossRef />}
-                  </div>
+              <div className="MobileContainer">
+                <div className="MapForms">
+
+                    <TimelineSlider />
+                    <LayoutForm />
+                    {visibleComponents.filterForm && <FilterForm />}
+                    {visibleComponents.currentState && <CurrentState />}
+                    {visibleComponents.violenceCases && <ViolenceCases />}
+                    {visibleComponents.timeGraph && <TimeGraph />}
+                    {visibleComponents.crossRef && <CrossRef />}
                 </div>
-                <div className="Map">
-                  <MapComponent />
-                </div>
-              </>
-            )}
-          </div>
-          <Routes>
-            <Route
-              path="/notebook/:id"
-              element={
-                <Notebook />
-              }
-            />
-            <Route path="/" element={<Notebook />} />
-          </Routes>
-        </Router>
-      </Suspense>
-    </DataProvider>
+              </div>
+              <div className="Map">
+                <MapComponent />
+              </div>
+            </>
+          )}
+        </div>
+        <Routes>
+          <Route
+            path="/notebook/:id"
+            element={
+              <Notebook />
+            }
+          />
+          <Route path="/" element={<Notebook />} />
+        </Routes>
+      </Router>
+    </Suspense>
   );
 };
 

@@ -10,6 +10,7 @@ const Notebook = () => {
     setStartDate,
     setEndDate,
     selectedDate,
+    setSelectedDate,
     daysRange,
     selectedSexo,
     setSelectedSexo,
@@ -22,7 +23,6 @@ const Notebook = () => {
     timeScale,
     setTimeScale,
     map,
-    setSelectedDate,
     setDaysRange,
     mapType,
     setMapType,
@@ -31,6 +31,14 @@ const Notebook = () => {
     visibleComponents,
     setVisibleComponents
   } = useData();
+
+  useEffect(() => {
+    console.log('Notebook: Context values from useData():', {
+      startDate,
+      endDate,
+      visibleComponents,
+    });
+  }, [startDate, endDate, visibleComponents]);
 
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('');
@@ -228,6 +236,16 @@ const Notebook = () => {
       if (data.endDate) {
         console.log("Notebook: Updating endDate in DataContext:", data.endDate);
         setEndDate(data.endDate);
+      }
+
+      if (data.selectedDate) {
+        console.log("Notebook: Updating selectedDate in DataContext:", data.selectedDate);
+        setSelectedDate(new Date(data.selectedDate));
+      }
+
+      if (data.timeScale) {
+        console.log("Notebook: Updating timeScale in DataContext:", data.timeScale);
+        setTimeScale(data.timeScale);
       }
     } catch (error) {
       console.error('Notebook: Error loading notes from backend:', error);
