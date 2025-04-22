@@ -180,7 +180,7 @@ const App = () => {
         </div>
         <Routes>
           <Route
-            path="/notebook/:id"
+            path="/cuaderno/:id"
             element={
               <Notebook />
             }
