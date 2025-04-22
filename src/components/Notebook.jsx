@@ -273,7 +273,7 @@ const Notebook = () => {
 
   const selectNotebook = (notebook) => {
     setIsModalOpen(false);
-    navigate(`/notebook/${notebook}`);
+    navigate(`/cuaderno/${notebook}`);
   };
 
   useEffect(() => {
@@ -294,13 +294,17 @@ const Notebook = () => {
               rows={3}
             />
             <div className="notebook-buttons">
+              <div className="notebook-actual">
               <button onClick={addNote}>Note + State</button>
               <button onClick={addTextOnlyNote}>Note</button>
+              </div>
+              <div className='notebook-actions'>
               <button onClick={saveNotesToBackend}>Save to Backend</button>
               <button onClick={() => loadNotesFromBackend(prompt('Enter Notebook ID:'))}>
                 Load from Backend
               </button>
               <button onClick={listNotebooks}>List Notebooks</button>
+              </div>
             </div>
           </div>
 
@@ -352,7 +356,7 @@ const Notebook = () => {
             <ul>
               {notebookList.map((notebook) => (
                 <li key={notebook}>
-                  <button onClick={() => selectNotebook(notebook)}>{notebook}</button>
+                  <a href={`/dist/cuaderno/${notebook}`}>{notebook}</a>
                 </li>
               ))}
             </ul>
