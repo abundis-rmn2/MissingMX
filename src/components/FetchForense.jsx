@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 import { useData } from '../context/DataContext';
 
-const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComplete }) => {
-  const { setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateLayerData, fetchedRecords, setTimelineData, mergeRecords, COLORS, clusteringLayout} = useData();
+const FetchForense = ({ fetchForense, fetchId, onFetchComplete }) => {
+  const { startDate, endDate, setForenseRecords, setNewForenseDataFetched, loading, setLoading, updateLayerData, fetchedRecords, setTimelineData, mergeRecords, COLORS, clusteringLayout, map } = useData();
 
   const LOCATIONS = {
     'San PedroTlaquepaque': [20.6253, -103.3123],
@@ -20,7 +20,7 @@ const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComple
   useEffect(() => {
     if (fetchForense && fetchId) {
       console.log('Fetching Forense data');
-      fetchData(startDate, endDate);
+      fetchData(startDate, endDate); // Use from DataContext
     }
   }, [fetchId]);
 
@@ -69,8 +69,13 @@ const FetchForense = ({ fetchForense, startDate, endDate, fetchId, onFetchComple
 
       setForenseRecords(geojsonData);
       setNewForenseDataFetched(true);
-      //mergeRecords(fetchedRecords, geojsonData);
-      updateLayerData('forenseLayer', geojsonData, clusteringLayout);
+
+      if (map && map.isStyleLoaded()) {
+        updateLayerData('forenseLayer', geojsonData, clusteringLayout);
+      } else {
+        console.error('Map is not initialized or style is not loaded');
+      }
+
       console.log('Fetched Forense records:', formattedRecordsForense);
     } catch (error) {
       console.error("Error fetching Forense data:", error);

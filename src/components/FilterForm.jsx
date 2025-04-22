@@ -34,7 +34,14 @@ const FilterForm = () => {
   const applyFilters = () => {
     if (!map || !filtersInitialized.current) return;
 
-    console.log('Applying filters...');
+    console.log('Applying filters with the following parameters:', {
+      selectedDate,
+      daysRange,
+      selectedSexo,
+      selectedCondicion,
+      edadRange,
+      sumScoreRange,
+    });
     filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
   };
 

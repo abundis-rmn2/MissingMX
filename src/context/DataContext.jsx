@@ -23,8 +23,51 @@ export const DataProvider = ({ children }) => {
   const [selectedCondicion, setSelectedCondicion] = useState(['CON VIDA', 'SIN VIDA', 'NO APLICA']);
   const [edadRange, setEdadRange] = useState([0, 100]);
   const [sumScoreRange, setsumScoreRange] = useState([0.5, 20]);
-  const [timeScale, setTimeScale] = useState('daily');
-  
+  const [timeScale, setTimeScale] = useState('monthly'); // Set default to "monthly"
+  const [mapType, setMapType] = useState('point');
+  const [colorScheme, setColorScheme] = useState('sexo');
+  const [visibleComponents, setVisibleComponents] = useState({
+    filterForm: true,
+    currentState: false,
+    violenceCases: true,
+    timeGraph: false,
+    crossRef: false,
+  });
+  const [startDate, setStartDate] = useState('2023-01-01'); // Default start date
+  const [endDate, setEndDate] = useState('2024-01-01'); // Default end date
+
+  useEffect(() => {
+    console.log('DataContext state initialized:', { 
+      mapType, setMapType, 
+      colorScheme, setColorScheme,
+      visibleComponents
+    });
+  }, []);
+
+  useEffect(() => {
+    console.log('DataContext initialized with:', {
+      visibleComponents,
+      setVisibleComponents: typeof setVisibleComponents === 'function' ? 'function' : typeof setVisibleComponents
+    });
+  }, [visibleComponents]);
+
+  useEffect(() => {
+    console.log('DataContext: startDate updated:', startDate);
+  }, [startDate]);
+
+  useEffect(() => {
+    console.log('DataContext: endDate updated:', endDate);
+  }, [endDate]);
+
+  useEffect(() => {
+    console.log('DataProvider initialized with context values:', {
+      startDate,
+      endDate,
+      visibleComponents,
+      mapType,
+      colorScheme,
+    });
+  }, [startDate, endDate, visibleComponents, mapType, colorScheme]);
 
   const COLORS = Object.fromEntries(
     ["MUJER", "HOMBRE", "CON_VIDA", "SIN_VIDA", "NO_APLICA", "UNKNOWN"].map((key) => {
@@ -50,70 +93,96 @@ export const DataProvider = ({ children }) => {
   const POINT_RADIUS = 30;
 
   const addTooltip = (layerId) => {
-    if (!map) return;
-
-    let popup = new maplibregl.Popup({
-      closeButton: false,
-      closeOnClick: false
+    if (!map || !map.getLayer(layerId)) {
+      console.error('Map not initialized or layer not found');
+      return;
+    }
+  
+    const popup = new maplibregl.Popup({
+      closeButton: true,
+      closeOnClick: false,
+      className: 'custom-popup',
+      maxWidth: '400px',
+      offset: [0, 200] // Ajusta este valor según necesites
     });
 
-    map.on('mouseenter', layerId, (e) => {
-      const coordinates = e.features[0].geometry.coordinates.slice();
-      const properties = e.features[0].properties;
-      const tooltipContent = `
-        <b>Record ID: ${properties.id || properties.ID}</b><br>
-        Marker Type: ${properties.tipo_marcador}<br>
-        ${properties.fecha_desaparicion ? `Disappearance Date: ${properties.fecha_desaparicion}<br>` : ''}
-        ${properties.sexo ? `Sex: ${properties.sexo}<br>` : ''}
-        ${properties.edad_momento_desaparicion ? `Age at Disappearance: ${properties.edad_momento_desaparicion}<br>` : ''}
-        ${properties.condicion_localizacion ? `Location Condition: ${properties.condicion_localizacion}<br>` : ''}
-        ${properties.sum_score ? `Sum Score: ${properties.sum_score}<br>` : ''}
-        ${properties.descripcion_desaparicion ? `Disappearance Description: ${properties.descripcion_desaparicion}<br>` : ''}
-        ${properties.Fecha_Ingreso ? `Ingress Date: ${properties.Fecha_Ingreso}<br>` : ''}
-        ${properties.Probable_nombre ? `Probable Name: ${properties.Probable_nombre}<br>` : ''}
-        ${properties.Edad ? `Age: ${properties.Edad}<br>` : ''}
-        ${properties.Tatuajes ? `Tattoos: ${properties.Tatuajes}<br>` : ''}
-        ${properties.Indumentarias ? `Clothing: ${properties.Indumentarias}<br>` : ''}
-        ${properties.Senas_Particulares ? `Distinctive Signs: ${properties.Senas_Particulares}<br>` : ''}
-        ${properties.Delegacion_IJCF ? `Delegation: ${properties.Delegacion_IJCF}<br>` : ''}
+    // Shared function to generate popup content
+    const generatePopupContent = (properties) => {
+      return `
+        <div>
+          ${properties.ruta_foto ? `<p style="text-align:center;"><img src="${properties.ruta_foto}" alt="Foto" style="max-width: 128px; height: auto;"></p>` : ''}
+          ${properties.nombre_completo ? `<p>Nombre: ${properties.nombre_completo}</p>` : '<p>Sin nombre especificado</p>'}
+          ${properties.fecha_desaparicion ? `<p>Fecha desaparición: ${properties.fecha_desaparicion}</p>` : '<p>Fecha desconocida</p>'}
+          ${properties.sexo ? `<p>Sexo: ${properties.sexo}</p>` : '<p>Sexo no especificado</p>'}
+          ${properties.edad_momento_desaparicion ? `<p>Edad al momento desaparecer: ${properties.edad_momento_desaparicion}</p>` : '<p>Edad desconocida</p>'}
+          ${properties.condicion_localizacion ? `<p>Condición localización: ${properties.condicion_localizacion}</p>` : '<p>Condición no especificada</p>'}
+          ${properties.descripcion_desaparicion ? `<p>Descripción desaparición: ${properties.descripcion_desaparicion}</p>` : '<p>Sin descripción disponible</p>'}
+        </div>
       `;
+    };
+  
+    // Show popup on hover
+    
+    map.on('mouseenter', layerId, (e) => {
+      if (!e.features || e.features.length === 0) return;
+      
+      map.getCanvas().style.cursor = 'pointer';
+      /*
+      const feature = e.features[0];
+      const coordinates = feature.geometry.coordinates.slice();
+      const properties = feature.properties;
+      
       popup
         .setLngLat(coordinates)
-        .setHTML(tooltipContent)
+        .setHTML(generatePopupContent(properties))
         .addTo(map);
+        */
     });
-
+  
+    // Remove pointer cursor on mouseleave but don't remove popup
     map.on('mouseleave', layerId, () => {
       map.getCanvas().style.cursor = '';
-      popup.remove();
     });
-
-    map.on('mouseenter', layerId, () => {
-      map.getCanvas().style.cursor = 'pointer';
-    });
-
+    
+  
     map.on('click', layerId, (e) => {
-      const features = map.queryRenderedFeatures(e.point, {
-        layers: [layerId]
+      if (!e.features || e.features.length === 0) return;
+  
+      const feature = e.features[0];
+      const coordinates = feature.geometry.coordinates.slice();
+      const properties = feature.properties;
+  
+      // Calcular nueva posición del mapa para centrar el feature
+      const centerOffset = map.getCenter().lng - coordinates[0];
+      const centerOffsetlat = map.getCenter().lat - coordinates[1];
+      const newCenter = [
+        coordinates[0] + centerOffset * 0.2, // Ajuste horizontal
+        coordinates[1] - (1 / Math.pow(2, map.getZoom() - 1))  // Ajuste vertical (~200px)
+      ];
+  
+      // Mover el mapa suavemente
+      map.easeTo({
+        center: newCenter,
+        duration: 500,
+        essential: true
       });
-
-      if (features.length) {
-        const feature = features[0];
-        if (feature.properties.tipo_marcador === 'cluster') {
-          const originalLayers = JSON.parse(feature.properties.originalLayers);
-          //console.log('Cluster clicked:', originalLayers);
-          // Display the original layers in a popup or sidebar
-        } else {
-          //console.log('Feature clicked:', feature);
-          // Display the feature details in a popup or sidebar
-        }
+  
+      // Mostrar popup en la posición original
+      popup
+        .setLngLat(coordinates)
+        .setHTML(generatePopupContent(properties))
+        .addTo(map);
+    });
+  
+    // Close popup when clicking elsewhere on the map
+    map.on('click', (e) => {
+      if (!map.queryRenderedFeatures(e.point, { layers: [layerId] }).length) {
+        popup.remove();
       }
     });
   };
-
   const updateLayerData = (layerId, data, layoutConfig) => {
-    if (!map) {
-      console.error("Map is not initialized");
+    if (!map || !map.isStyleLoaded()) {
       return;
     }
   
@@ -435,7 +504,12 @@ export const DataProvider = ({ children }) => {
     selectedCondicion, setSelectedCondicion,
     edadRange, setEdadRange,
     sumScoreRange, setsumScoreRange,
-    timeScale, setTimeScale
+    timeScale, setTimeScale,
+    mapType, setMapType,
+    colorScheme, setColorScheme,
+    visibleComponents, setVisibleComponents,
+    startDate, setStartDate,
+    endDate, setEndDate
   };
 
   return (

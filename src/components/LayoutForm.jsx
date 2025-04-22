@@ -1,7 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useData } from '../context/DataContext';
 
 const LayoutForm = () => {
+  // Use local state as fallback if context values aren't available
+  const [localMapType, setLocalMapType] = useState('point');
+  const [localColorScheme, setLocalColorScheme] = useState('sexo');
+  
+  const dataContext = useData();
+  
+  // Debug what's coming from context
+  useEffect(() => {
+    console.log('LayoutForm received context:', {
+      mapType: dataContext.mapType,
+      setMapType: dataContext.setMapType,
+      colorScheme: dataContext.colorScheme,
+      setColorScheme: dataContext.setColorScheme
+    });
+  }, [dataContext]);
+  
+  // Destructure with defaults from local state
   const {
     map,
     fetchedRecords,
@@ -15,11 +32,12 @@ const LayoutForm = () => {
     selectedCondicion,
     edadRange,
     sumScoreRange,
-    filterMarkersByDate
-  } = useData();
-
-  const [mapType, setMapType] = useState('point');
-  const [colorScheme, setColorScheme] = useState('sexo');
+    filterMarkersByDate,
+    mapType = localMapType,
+    setMapType = setLocalMapType,
+    colorScheme = localColorScheme,
+    setColorScheme = setLocalColorScheme
+  } = dataContext;
 
   const getHeatmapLayoutForCategory = (category) => {
     let baseColor = COLORS.UNKNOWN;
@@ -195,12 +213,34 @@ const LayoutForm = () => {
   }, [mapType, colorScheme, selectedSexo, selectedCondicion, edadRange, sumScoreRange,]);
 
   const handleMapTypeChange = (e) => {
-    setMapType(e.target.value);
+    const newValue = e.target.value;
+    console.log('Changing map type to:', newValue);
+    
+    // Safely update using function reference
+    if (typeof setMapType === 'function') {
+      setMapType(newValue);
+    } else {
+      console.error('setMapType is not available, using local state');
+      setLocalMapType(newValue);
+    }
   };
 
   const handleColorSchemeChange = (e) => {
-    setColorScheme(e.target.value);
+    const newValue = e.target.value;
+    console.log('Changing color scheme to:', newValue);
+    
+    // Safely update using function reference
+    if (typeof setColorScheme === 'function') {
+      setColorScheme(newValue);
+    } else {
+      console.error('setColorScheme is not available, using local state');
+      setLocalColorScheme(newValue);
+    }
   };
+
+  // Use either context value or local state
+  const effectiveMapType = mapType || localMapType;
+  const effectiveColorScheme = colorScheme || localColorScheme;
 
   return (
     <div>
@@ -211,7 +251,7 @@ const LayoutForm = () => {
             type="radio"
             name="mapType"
             value="point"
-            checked={mapType === 'point'}
+            checked={effectiveMapType === 'point'}
             onChange={handleMapTypeChange}
           />
           Puntos
@@ -221,7 +261,7 @@ const LayoutForm = () => {
             type="radio"
             name="mapType"
             value="heatmap"
-            checked={mapType === 'heatmap'}
+            checked={effectiveMapType === 'heatmap'}
             onChange={handleMapTypeChange}
           />
           Heatmap
@@ -235,7 +275,7 @@ const LayoutForm = () => {
             type="radio"
             name="colorScheme"
             value="sexo"
-            checked={colorScheme === 'sexo'}
+            checked={effectiveColorScheme === 'sexo'}
             onChange={handleColorSchemeChange}
           />
           Sexo
@@ -245,7 +285,7 @@ const LayoutForm = () => {
             type="radio"
             name="colorScheme"
             value="condicionLocalizacion"
-            checked={colorScheme === 'condicionLocalizacion'}
+            checked={effectiveColorScheme === 'condicionLocalizacion'}
             onChange={handleColorSchemeChange}
           />
           Condición de Localización

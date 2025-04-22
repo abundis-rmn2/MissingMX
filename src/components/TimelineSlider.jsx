@@ -28,6 +28,8 @@ const TimelineSlider = () => {
         return 14;
       case 'monthly':
         return 30;
+      case 'yearly':
+          return 365;
       default:
         return 1;
     }

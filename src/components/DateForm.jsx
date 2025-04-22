@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { useData } from '../context/DataContext';
 
-const DateForm = ({ startDate, endDate, setStartDate, setEndDate, handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, setFetchForense }) => {
-  const { loading } = useData();
+const DateForm = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, setFetchForense }) => {
+  const { startDate, endDate, setStartDate, setEndDate, loading } = useData(); // Use DataContext
   const [localStartDate, setLocalStartDate] = useState(startDate);
   const [localEndDate, setLocalEndDate] = useState(endDate);
   const [isModalMode, setIsModalMode] = useState(true);
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    setStartDate(localStartDate);
-    setEndDate(localEndDate);
+    setStartDate(localStartDate); // Update via DataContext
+    setEndDate(localEndDate);     // Update via DataContext
+    console.log('DateForm: Updated startDate and endDate:', {
+      startDate: localStartDate,
+      endDate: localEndDate,
+    });
     setIsModalMode(false);
     handleSubmit(e);
   };
