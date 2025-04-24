@@ -7,9 +7,13 @@ import { Cross2Icon } from '@radix-ui/react-icons';
 import { useNotebook } from '../utils/notebook';
 import NotebookNotes from './NotebookNotes';
 import NotebookLoad from './NotebookLoad';
+// Este componente obtiene el estado global y funciones desde useData (contexto global).
+// Pasa estos datos y funciones como props a GlobalTimeGraphData.jsx para depuración o visualización.
+// No comunica directamente con GlobalTimeGraph.jsx, pero ambos usan el mismo contexto y utilidades.
+import GlobalTimeGraphData from './GlobalTimeGraphData';
 
 const Notebook = () => {
-  const dataContext = useData();
+  const dataContext = useData(); // Obtiene el estado global y funciones
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -34,26 +38,26 @@ const Notebook = () => {
 
   return (
     <>
-      {!isPanelOpen && (
-        <Button
-          variant="solid"
-          style={{
-            position: 'fixed',
-            top: 80,
-            right: 0,
-            zIndex: 2000,
-            borderRadius: '8px 0 0 8px',
-            border: '1px solid #ccc',
-            borderRight: 'none',
-            background: '#fff',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-            padding: '8px 16px',
-          }}
-          onClick={() => setIsPanelOpen(true)}
-        >
-          Notebook
-        </Button>
-      )}
+      <Button
+        variant="solid"
+        style={{
+          position: 'fixed',
+          top: 80,
+          right: 0,
+          zIndex: 2000,
+          borderRadius: '8px 0 0 8px',
+          border: '1px solid #ccc',
+          borderRight: 'none',
+          background: '#fff',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          padding: '8px 16px',
+          transition: 'right 0.2s',
+          right: isPanelOpen ? 380 : 0, // move button when panel is open
+        }}
+        onClick={() => setIsPanelOpen(!isPanelOpen)}
+      >
+        {isPanelOpen ? 'Close Notebook' : 'Notebook'}
+      </Button>
 
       {isPanelOpen && (
         <div
@@ -71,6 +75,7 @@ const Notebook = () => {
             flexDirection: 'column',
             borderLeft: '1px solid #eee',
             padding: 0,
+            transition: 'right 0.2s',
           }}
         >
           <Box
@@ -94,6 +99,22 @@ const Notebook = () => {
           </Box>
 
           <Box style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+            {/* 
+              GlobalTimeGraphData recibe como props los datos y funciones globales 
+              (map, COLORS, selectedDate, timeScale, setSelectedDate, setTimeScale, etc.)
+              Esto permite que GlobalTimeGraphData acceda y muestre (por consola) la misma información
+              que usa GlobalTimeGraph.jsx, pero sin renderizar el gráfico.
+            */}
+            <GlobalTimeGraphData
+              map={dataContext.map}
+              COLORS={dataContext.COLORS}
+              selectedDate={dataContext.selectedDate}
+              timeScale={dataContext.timeScale}
+              setSelectedDate={dataContext.setSelectedDate}
+              setTimeScale={dataContext.setTimeScale}
+              newDataFetched={dataContext.newDataFetched}
+              newForenseDataFetched={dataContext.newForenseDataFetched}
+            />
             <NotebookNotes
               newNote={newNote}
               setNewNote={setNewNote}

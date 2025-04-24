@@ -48,7 +48,7 @@ const App = () => {
   const [notebookList, setNotebookList] = useState([]);
 
   // Debug-enabled listNotebooks for Tab 5
-  const listNotebooksTab5 = async () => {
+  const listNotebooksApp = async () => {
     console.log('Tab5: listNotebooks called');
     try {
       const response = await fetch(`https://datades.abundis.com.mx/api/list.php`);
@@ -163,7 +163,7 @@ const App = () => {
                   </label>
                 ))}
               </div>
-              {/* Fax-toolbar header */}
+              {/* Tab Header */}
               <header
                 style={{
                   width: "100%",
@@ -206,94 +206,98 @@ const App = () => {
                           transition: "border-top 0.2s, color 0.2s",
                         }}
                       >
-                        {`Tab ${idx + 1}`}
+                        {`L`}
                       </Tabs.Trigger>
                     ))}
                   </Tabs.List>
                 </Tabs.Root>
               </header>
-
-              {/* Persistent tab contents, only one visible at a time */}
-              <div
-                style={{
-                  top: 0,
-                  marginTop: 49,
-                  position: "absolute",
-                  zIndex: 99,
-                  width: "100%",
-                  background: "#fff",
-                }}
-              >
+              {/* Tab Content */}
                 <div
-                  style={{ display: toolbarTab === "tab1" ? "block" : "none" }}
+                  style={{
+                    top: 0,
+                    marginTop: 49,
+                    position: "absolute",
+                    zIndex: 99,
+                    width: "100%",
+                    background: "#fff",
+                  }}
                 >
-                  {isFormsVisible && (
-                    <div className="DateForm">
-                      <DateFormCompact
-                        handleSubmit={handleSubmit}
-                        loading={loading}
-                        fetchCedulas={fetchCedulas}
-                        setFetchCedulas={setFetchCedulas}
-                        fetchForense={fetchForense}
-                        setFetchForense={setFetchForense}
-                      />
-                      <FetchCedulas
-                        fetchCedulas={fetchCedulas}
-                        fetchId={fetchId}
-                        onFetchComplete={handleFetchComplete}
-                      />
-                      <FetchForense
-                        fetchForense={fetchForense}
-                        fetchId={fetchId}
-                        onFetchComplete={handleFetchComplete}
-                      />
-                      <Clustering type="personas_sin_identificar" />
-                      <GlobalTimeGraph onDateSelect={handleDateSelect} />
+              {/* Tab 1 */}
+                  <div
+                    style={{ display: toolbarTab === "tab1" ? "block" : "none" }}
+                  >
+                    {isFormsVisible && (
+                      <div className="DateForm">
+                        <DateFormCompact
+                          handleSubmit={handleSubmit}
+                          loading={loading}
+                          fetchCedulas={fetchCedulas}
+                          setFetchCedulas={setFetchCedulas}
+                          fetchForense={fetchForense}
+                          setFetchForense={setFetchForense}
+                        />
+                        <FetchCedulas
+                          fetchCedulas={fetchCedulas}
+                          fetchId={fetchId}
+                          onFetchComplete={handleFetchComplete}
+                        />
+                        <FetchForense
+                          fetchForense={fetchForense}
+                          fetchId={fetchId}
+                          onFetchComplete={handleFetchComplete}
+                        />
+                        <TimelineSlider />
+                        <Clustering type="personas_sin_identificar" />
+                        <GlobalTimeGraph onDateSelect={handleDateSelect} />
+                        
+                      </div>
+                    )}
+                  </div>
+              {/* Tab 2 */}
+                  <div
+                    style={{ display: toolbarTab === "tab2" ? "block" : "none" }}
+                  >
+                    <div style={{ padding: 16 }}>
+        
+                      <LayoutForm />
                     </div>
-                  )}
-                </div>
-                <div
-                  style={{ display: toolbarTab === "tab2" ? "block" : "none" }}
-                >
-                  {/* Replace with your real content for Tab 2 */}
-                  <div style={{ padding: 16 }}>
-                    <TimelineSlider />
-                    <LayoutForm />
+                  </div>
+              {/* Tab 3 */}
+                  <div
+                    style={{ display: toolbarTab === "tab3" ? "block" : "none" }}
+                  >
+                    <div style={{ padding: 16 }}>
+                      {visibleComponents.filterForm && <FilterForm />}
+                    </div>
+                  </div>
+              {/* Tab 4 */}
+                  <div
+                    style={{ display: toolbarTab === "tab4" ? "block" : "none" }}
+                  >
+                    {/* Replace with your real content for Tab 4 */}
+                    <div style={{ padding: 16 }}>
+                      {visibleComponents.currentState && <CurrentState />}
+                      {/*visibleComponents.violenceCases && <ViolenceCases />*/}
+                    </div>
+                  </div>
+              {/* Tab 5 */}
+                  <div
+                    style={{ display: toolbarTab === "tab5" ? "block" : "none" }}
+                  >
+                    {/* NotebookLoad actions in Tab 5 */}
+                    <div style={{ padding: 16 }}>
+                      <NotebookLoad
+                        saveNotesToBackend={() => { console.log('Tab5: saveNotesToBackend called'); }}
+                        loadNotesFromBackend={() => { console.log('Tab5: loadNotesFromBackend called'); }}
+                        listNotebooks={listNotebooksApp}
+                        isModalOpen={isNotebookModalOpen}
+                        setIsModalOpen={setIsNotebookModalOpen}
+                        notebookList={notebookList}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div
-                  style={{ display: toolbarTab === "tab3" ? "block" : "none" }}
-                >
-                  {/* Replace with your real content for Tab 3 */}
-                  <div style={{ padding: 16 }}>
-                    {visibleComponents.filterForm && <FilterForm />}
-                  </div>
-                </div>
-                <div
-                  style={{ display: toolbarTab === "tab4" ? "block" : "none" }}
-                >
-                  {/* Replace with your real content for Tab 4 */}
-                  <div style={{ padding: 16 }}>
-                    {visibleComponents.currentState && <CurrentState />}
-                    {/*visibleComponents.violenceCases && <ViolenceCases />*/}
-                  </div>
-                </div>
-                <div
-                  style={{ display: toolbarTab === "tab5" ? "block" : "none" }}
-                >
-                  {/* NotebookLoad actions in Tab 5 */}
-                  <div style={{ padding: 16 }}>
-                    <NotebookLoad
-                      saveNotesToBackend={() => { console.log('Tab5: saveNotesToBackend called'); }}
-                      loadNotesFromBackend={() => { console.log('Tab5: loadNotesFromBackend called'); }}
-                      listNotebooks={listNotebooksTab5}
-                      isModalOpen={isNotebookModalOpen}
-                      setIsModalOpen={setIsNotebookModalOpen}
-                      notebookList={notebookList}
-                    />
-                  </div>
-                </div>
-              </div>
 
               <InitialModal
                 handleSubmit={handleSubmit}
@@ -303,8 +307,7 @@ const App = () => {
                 fetchForense={fetchForense}
                 setFetchForense={setFetchForense}
               />
-
-              <div className="MobileContainer"></div>
+              
               <div className="Map">
                 <MapComponent />
               </div>
