@@ -11,6 +11,7 @@ import Clustering from './components/Clustering';
 import Notebook from './components/Notebook';
 import PasswordCheck from './components/PasswordCheck';
 import { Tabs } from '@radix-ui/themes'; // Import Tabs from @radix-ui/themes
+import NotebookLoad from './components/NotebookLoad'; // Import NotebookLoad
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -41,6 +42,31 @@ const App = () => {
     mapType,
     colorScheme,
   } = useData(); // Use DataContext for shared state
+
+  // State for NotebookLoad modal in Tab 5
+  const [isNotebookModalOpen, setIsNotebookModalOpen] = useState(false);
+  const [notebookList, setNotebookList] = useState([]);
+
+  // Debug-enabled listNotebooks for Tab 5
+  const listNotebooksTab5 = async () => {
+    console.log('Tab5: listNotebooks called');
+    try {
+      const response = await fetch(`https://datades.abundis.com.mx/api/list.php`);
+      if (!response.ok) throw new Error('Failed to fetch notebooks');
+      const data = await response.json();
+      console.log('Tab5: listNotebooks response', data);
+      if (data.success) {
+        setNotebookList(data.notebooks);
+        setIsNotebookModalOpen(true);
+        console.log('Tab5: Modal should open now');
+      } else {
+        alert('No notebooks found.');
+      }
+    } catch (error) {
+      alert('Error fetching notebooks.');
+      console.error('Tab5: Error fetching notebooks:', error);
+    }
+  };
 
   useEffect(() => {
     console.log('App received visibleComponents:', visibleComponents);
@@ -125,7 +151,7 @@ const App = () => {
             <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
           ) : (
             <>
-                          <div className="ComponentToggles">
+              <div className="ComponentToggles">
                 {Object.entries(visibleComponents).map(([key, value]) => (
                   <label key={key}>
                     <input
@@ -159,7 +185,7 @@ const App = () => {
                       background: "transparent",
                     }}
                   >
-                    {["tab1", "tab2", "tab3", "tab4"].map((tab, idx) => (
+                    {["tab1", "tab2", "tab3", "tab4", "tab5"].map((tab, idx) => (
                       <Tabs.Trigger
                         key={tab}
                         value={tab}
@@ -241,15 +267,30 @@ const App = () => {
                   {/* Replace with your real content for Tab 3 */}
                   <div style={{ padding: 16 }}>
                     {visibleComponents.filterForm && <FilterForm />}
-                </div>
+                  </div>
                 </div>
                 <div
                   style={{ display: toolbarTab === "tab4" ? "block" : "none" }}
                 >
                   {/* Replace with your real content for Tab 4 */}
                   <div style={{ padding: 16 }}>
-                  {visibleComponents.currentState && <CurrentState />}
-                  {/*visibleComponents.violenceCases && <ViolenceCases />*/}
+                    {visibleComponents.currentState && <CurrentState />}
+                    {/*visibleComponents.violenceCases && <ViolenceCases />*/}
+                  </div>
+                </div>
+                <div
+                  style={{ display: toolbarTab === "tab5" ? "block" : "none" }}
+                >
+                  {/* NotebookLoad actions in Tab 5 */}
+                  <div style={{ padding: 16 }}>
+                    <NotebookLoad
+                      saveNotesToBackend={() => { console.log('Tab5: saveNotesToBackend called'); }}
+                      loadNotesFromBackend={() => { console.log('Tab5: loadNotesFromBackend called'); }}
+                      listNotebooks={listNotebooksTab5}
+                      isModalOpen={isNotebookModalOpen}
+                      setIsModalOpen={setIsNotebookModalOpen}
+                      notebookList={notebookList}
+                    />
                   </div>
                 </div>
               </div>
@@ -263,11 +304,7 @@ const App = () => {
                 setFetchForense={setFetchForense}
               />
 
-
-
-              <div className="MobileContainer">
-
-              </div>
+              <div className="MobileContainer"></div>
               <div className="Map">
                 <MapComponent />
               </div>

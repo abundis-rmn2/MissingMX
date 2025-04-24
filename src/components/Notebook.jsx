@@ -1,370 +1,214 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useData } from '../context/DataContext';
 import '../styles/Notebook.css';
+import { Button, IconButton, Heading, Box } from '@radix-ui/themes';
+import { Cross2Icon } from '@radix-ui/react-icons';
+import { useNotebook } from '../utils/notebook';
+import NotebookNotes from './NotebookNotes';
+import NotebookLoad from './NotebookLoad';
 
 const Notebook = () => {
-  const {
-    startDate,
-    endDate,
-    setStartDate,
-    setEndDate,
-    selectedDate,
-    setSelectedDate,
-    daysRange,
-    selectedSexo,
-    setSelectedSexo,
-    selectedCondicion,
-    setSelectedCondicion,
-    edadRange,
-    setEdadRange,
-    sumScoreRange,
-    setsumScoreRange,
-    timeScale,
-    setTimeScale,
-    map,
-    setDaysRange,
-    mapType,
-    setMapType,
-    colorScheme,
-    setColorScheme,
-    visibleComponents,
-    setVisibleComponents
-  } = useData();
-
-  useEffect(() => {
-    console.log('Notebook: Context values from useData():', {
-      startDate,
-      endDate,
-      visibleComponents,
-    });
-  }, [startDate, endDate, visibleComponents]);
-
-  const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState('');
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [notebookList, setNotebookList] = useState([]);
-
+  const dataContext = useData();
   const { id } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const savedNotes = localStorage.getItem('datades-notebook');
-    if (savedNotes) {
-      try {
-        setNotes(JSON.parse(savedNotes));
-      } catch (e) {
-        console.error('Error loading notes from localStorage:', e);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('datades-notebook', JSON.stringify(notes));
-  }, [notes]);
-
-  const captureCurrentState = () => {
-    console.log('Capturing current state with startDate and endDate:', { startDate, endDate });
-
-    const timestamp = new Date().toISOString();
-
-    const mapState = map ? {
-      center: map.getCenter(),
-      zoom: map.getZoom()
-    } : null;
-
-    const stateSnapshot = {
-      timestamp,
-      state: {
-        selectedDate: selectedDate ? selectedDate.toISOString() : null,
-        daysRange,
-        selectedSexo: [...selectedSexo],
-        selectedCondicion: [...selectedCondicion],
-        edadRange: [...edadRange],
-        sumScoreRange: [...sumScoreRange],
-        timeScale,
-        mapState,
-        mapType,
-        colorScheme,
-        visibleComponents: visibleComponents ? { ...visibleComponents } : null,
-        startDate,
-        endDate
-      }
-    };
-
-    console.log('Created state snapshot:', stateSnapshot);
-    return stateSnapshot;
-  };
-
-  const addNote = () => {
-    if (!newNote.trim()) return;
-
-    const stateSnapshot = captureCurrentState();
-
-    const newNoteEntry = {
-      id: Date.now(),
-      text: newNote,
-      ...stateSnapshot
-    };
-
-    setNotes([newNoteEntry, ...notes]);
-    setNewNote('');
-  };
-
-  const addTextOnlyNote = () => {
-    if (!newNote.trim()) return;
-
-    const newNoteEntry = {
-      id: Date.now(),
-      text: newNote,
-      timestamp: new Date().toISOString(),
-      state: null
-    };
-
-    setNotes([newNoteEntry, ...notes]);
-    setNewNote('');
-  };
-
-  const restoreState = (savedState) => {
-    if (!savedState) return;
-
-    console.log('Restoring state:', savedState);
-
-    if (savedState.selectedDate) {
-      setSelectedDate(new Date(savedState.selectedDate));
-    }
-    setDaysRange(savedState.daysRange);
-
-    setSelectedSexo(savedState.selectedSexo);
-    setSelectedCondicion(savedState.selectedCondicion);
-    setEdadRange(savedState.edadRange);
-    setsumScoreRange(savedState.sumScoreRange);
-    setTimeScale(savedState.timeScale);
-
-    if (savedState.mapType) {
-      setMapType(savedState.mapType);
-    }
-    if (savedState.colorScheme) {
-      setColorScheme(savedState.colorScheme);
-    }
-
-    if (savedState.visibleComponents && typeof setVisibleComponents === 'function') {
-      console.log('Restoring visibleComponents:', savedState.visibleComponents);
-      setVisibleComponents(savedState.visibleComponents);
-    } else {
-      console.error('Cannot restore visibleComponents:', {
-        saved: savedState.visibleComponents,
-        setter: typeof setVisibleComponents
-      });
-    }
-
-    if (savedState.mapState && map) {
-      map.flyTo({
-        center: [savedState.mapState.center.lng, savedState.mapState.center.lat],
-        zoom: savedState.mapState.zoom
-      });
-    }
-
-    if (savedState.startDate) {
-      setStartDate(savedState.startDate);
-    }
-    if (savedState.endDate) {
-      setEndDate(savedState.endDate);
-    }
-  };
-
-  const deleteNote = (id) => {
-    setNotes(notes.filter(note => note.id !== id));
-  };
-
-  const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleString();
-  };
-
-  const saveNotesToBackend = async () => {
-    try {
-      const name = prompt('Enter a name for the notebook:');
-      if (!name) {
-        alert('Notebook name is required to save.');
-        return;
-      }
-      
-      const payload = {
-        notes,
-        name,
-        startDate: startDate || '',
-        endDate: endDate || ''
-      };
-
-      console.log('Saving payload:', payload);
-
-      alert('Saving notes to the backend...');
-      const response = await fetch(`https://datades.abundis.com.mx/api/save.php`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save notes to backend');
-      }
-
-      alert('Notes saved successfully!');
-    } catch (error) {
-      alert('Error saving notes to backend.');
-      console.error('Error saving notes to backend:', error);
-    }
-  };
-
-  const loadNotesFromBackend = async (notebookId) => {
-    try {
-      const response = await fetch(`https://datades.abundis.com.mx/api/load.php?id=${notebookId}`);
-      if (!response.ok) {
-        throw new Error('Failed to load notes from backend');
-      }
-      const data = await response.json();
-      setNotes(data.notes || []);
-
-      console.log("Notebook: Loaded notebook data:", data);
-
-      if (data.startDate) {
-        console.log("Notebook: Updating startDate in DataContext:", data.startDate);
-        setStartDate(data.startDate);
-      }
-
-      if (data.endDate) {
-        console.log("Notebook: Updating endDate in DataContext:", data.endDate);
-        setEndDate(data.endDate);
-      }
-
-      if (data.selectedDate) {
-        console.log("Notebook: Updating selectedDate in DataContext:", data.selectedDate);
-        setSelectedDate(new Date(data.selectedDate));
-      }
-
-      if (data.timeScale) {
-        console.log("Notebook: Updating timeScale in DataContext:", data.timeScale);
-        setTimeScale(data.timeScale);
-      }
-    } catch (error) {
-      console.error('Notebook: Error loading notes from backend:', error);
-    }
-  };
-
-  const listNotebooks = async () => {
-    try {
-      const response = await fetch(`https://datades.abundis.com.mx/api/list.php`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch notebooks');
-      }
-      const data = await response.json();
-      if (data.success) {
-        setNotebookList(data.notebooks);
-        setIsModalOpen(true);
-      } else {
-        alert('No notebooks found.');
-      }
-    } catch (error) {
-      alert('Error fetching notebooks.');
-      console.error('Error fetching notebooks:', error);
-    }
-  };
-
-  const selectNotebook = (notebook) => {
-    setIsModalOpen(false);
-    navigate(`/cuaderno/${notebook}`);
-  };
-
-  useEffect(() => {
-    if (id) {
-      loadNotesFromBackend(id);
-    }
-  }, [id]);
+  const {
+    notes,
+    newNote,
+    isPanelOpen,
+    isModalOpen,
+    notebookList,
+    setIsPanelOpen,
+    setNewNote,
+    addNote,
+    addTextOnlyNote,
+    saveNotesToBackend,
+    loadNotesFromBackend,
+    listNotebooks,
+    deleteNote,
+    restoreState,
+    formatTimestamp,
+    setIsModalOpen,
+  } = useNotebook(dataContext, id, navigate);
 
   return (
-    <div className={`notebook ${isExpanded ? 'expanded' : 'collapsed'}`}>
-      {isExpanded && (
-        <div className="notebook-content">
-          <div className="notebook-input">
-            <textarea
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              placeholder="Add a note..."
-              rows={3}
+    <>
+      {!isPanelOpen && (
+        <Button
+          variant="solid"
+          style={{
+            position: 'fixed',
+            top: 80,
+            right: 0,
+            zIndex: 2000,
+            borderRadius: '8px 0 0 8px',
+            border: '1px solid #ccc',
+            borderRight: 'none',
+            background: '#fff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+            padding: '8px 16px',
+          }}
+          onClick={() => setIsPanelOpen(true)}
+        >
+          Notebook
+        </Button>
+      )}
+
+      {isPanelOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            right: 0,
+            height: '100vh',
+            width: 380,
+            maxWidth: '90vw',
+            background: '#fff',
+            boxShadow: '-2px 0 12px rgba(0,0,0,0.12)',
+            zIndex: 3000,
+            display: 'flex',
+            flexDirection: 'column',
+            borderLeft: '1px solid #eee',
+            padding: 0,
+          }}
+        >
+          <Box
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '16px 20px 8px 20px',
+              borderBottom: '1px solid #eee',
+              background: '#fafbfc',
+            }}
+          >
+            <Heading size="4">Notebook</Heading>
+            <IconButton
+              variant="ghost"
+              onClick={() => setIsPanelOpen(false)}
+              aria-label="Close notebook"
+            >
+              <Cross2Icon />
+            </IconButton>
+          </Box>
+
+          <Box style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
+            <NotebookNotes
+              newNote={newNote}
+              setNewNote={setNewNote}
+              addNote={addNote}
+              addTextOnlyNote={addTextOnlyNote}
             />
-            <div className="notebook-buttons">
-              <div className="notebook-actual">
-              <button onClick={addNote}>Note + State</button>
-              <button onClick={addTextOnlyNote}>Note</button>
-              </div>
-              <div className='notebook-actions'>
-              <button onClick={saveNotesToBackend}>Save to Backend</button>
-              <button onClick={() => loadNotesFromBackend(prompt('Enter Notebook ID:'))}>
-                Load from Backend
-              </button>
-              <button onClick={listNotebooks}>List Notebooks</button>
-              </div>
-            </div>
-          </div>
-
-          <div className="notebook-entries">
-            {notes.length === 0 ? (
-              <p className="no-notes">No notes yet. Add one to get started!</p>
-            ) : (
-              notes.map(note => (
-                <div key={note.id} className="notebook-entry">
-                  <div className="note-text">{note.text}</div>
-                  <div className="note-meta">
-                    <span className="note-timestamp">
-                      {formatTimestamp(note.timestamp)}
-                    </span>
-                    <div className="note-actions">
-                      {note.state && (
-                        <button
-                          className="restore-button"
-                          onClick={() => restoreState(note.state)}
-                          title="Restore this state"
+            <NotebookLoad
+              saveNotesToBackend={saveNotesToBackend}
+              loadNotesFromBackend={loadNotesFromBackend}
+              listNotebooks={listNotebooks}
+            />
+            <Box>
+              {notes.length === 0 ? (
+                <Box color="gray" mb="2">No notes yet. Add one to get started!</Box>
+              ) : (
+                notes.map(note => (
+                  <Box
+                    key={note.id}
+                    style={{
+                      border: '1px solid #eee',
+                      borderRadius: 6,
+                      padding: 10,
+                      marginBottom: 10,
+                      background: '#fafbfc',
+                    }}
+                  >
+                    <Box mb="1" style={{ whiteSpace: 'pre-wrap' }}>{note.text}</Box>
+                    <Box
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        fontSize: 12,
+                        color: '#888',
+                      }}
+                    >
+                      <span>{formatTimestamp(note.timestamp)}</span>
+                      <Box style={{ display: 'flex', gap: 6 }}>
+                        {note.state && (
+                          <Button
+                            size="1"
+                            variant="soft"
+                            onClick={() => restoreState(note.state)}
+                            title="Restore this state"
+                          >
+                            ⟲
+                          </Button>
+                        )}
+                        <Button
+                          size="1"
+                          variant="ghost"
+                          color="red"
+                          onClick={() => deleteNote(note.id)}
+                          title="Delete this note"
                         >
-                          ⟲ Restore
-                        </button>
-                      )}
-                      <button
-                        className="delete-button"
-                        onClick={() => deleteNote(note.id)}
-                        title="Delete this note"
+                          🗑️
+                        </Button>
+                      </Box>
+                    </Box>
+                  </Box>
+                ))
+              )}
+            </Box>
+          </Box>
+
+          {isModalOpen && (
+            <Box
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(0,0,0,0.18)',
+                zIndex: 4000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Box
+                style={{
+                  background: '#fff',
+                  borderRadius: 8,
+                  padding: 24,
+                  minWidth: 320,
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+                }}
+              >
+                <Heading size="4" mb="3">Select a Notebook</Heading>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                  {notebookList.map((notebook) => (
+                    <li key={notebook} style={{ marginBottom: 8 }}>
+                      <a
+                        href={`/dist/cuaderno/${notebook}`}
+                        style={{
+                          color: '#007bff',
+                          textDecoration: 'underline',
+                          cursor: 'pointer',
+                        }}
                       >
-                        🗑️
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+                        {notebook}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <Button mt="3" onClick={() => setIsModalOpen(false)}>
+                  Close
+                </Button>
+              </Box>
+            </Box>
+          )}
         </div>
       )}
-
-      <div className="notebook-header" onClick={() => setIsExpanded(!isExpanded)}>
-        <h3>Notebook {isExpanded ? '▼' : '▲'}</h3>
-      </div>
-
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>Select a Notebook</h3>
-            <ul>
-              {notebookList.map((notebook) => (
-                <li key={notebook}>
-                  <a href={`/dist/cuaderno/${notebook}`}>{notebook}</a>
-                </li>
-              ))}
-            </ul>
-            <button onClick={() => setIsModalOpen(false)}>Close</button>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 };
 
