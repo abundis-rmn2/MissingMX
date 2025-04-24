@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useData } from '../context/DataContext';
 import { useDateForm } from '../utils/dateForm';
 
-const DateForm = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, setFetchForense }) => {
+const DateFormModal = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, setFetchForense }) => {
   const { startDate, endDate, setStartDate, setEndDate, loading } = useData();
   const {
     localStartDate,
     setLocalStartDate,
     localEndDate,
     setLocalEndDate,
-    isModalMode,
-    setIsModalMode,
     handleFormSubmit
   } = useDateForm({
     startDate,
@@ -21,8 +19,8 @@ const DateForm = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, s
   });
 
   return (
-    <div className={`date-form-container ${isModalMode ? 'modal' : 'compact'}`}>
-      <form onSubmit={handleFormSubmit} className={isModalMode ? 'modal-form' : 'compact-form'}>
+    <div className="date-form-container modal">
+      <form onSubmit={handleFormSubmit} className="modal-form">
         <div className="form-content">
           <div className="date-inputs">
             <label>
@@ -71,4 +69,4 @@ const DateForm = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, s
   );
 };
 
-export default DateForm;
+export default DateFormModal;
