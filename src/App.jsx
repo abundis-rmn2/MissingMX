@@ -10,6 +10,7 @@ import DateFormCompact from './components/DateFormCompact';
 import Clustering from './components/Clustering';
 import Notebook from './components/Notebook';
 import PasswordCheck from './components/PasswordCheck';
+import { Tabs } from '@radix-ui/themes'; // Import Tabs from @radix-ui/themes
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -26,6 +27,7 @@ const App = () => {
   const [fetchId, setFetchId] = useState(0);
   const [isFormsVisible, setIsFormsVisible] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [toolbarTab, setToolbarTab] = useState('tab1'); // State for toolbar tabs
 
   const {
     startDate,
@@ -118,45 +120,12 @@ const App = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Router basename="/dist">
-        <div className="App">
+        <div className="App" id="app">
           {!isAuthenticated ? (
             <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
           ) : (
             <>
-                <InitialModal
-                    handleSubmit={handleSubmit}
-                    loading={loading}
-                    fetchCedulas={fetchCedulas}
-                    setFetchCedulas={setFetchCedulas}
-                    fetchForense={fetchForense}
-                    setFetchForense={setFetchForense}
-                  />
-              {isFormsVisible && (
-                <div className="DateForm">
-                  <DateFormCompact
-                    handleSubmit={handleSubmit}
-                    loading={loading}
-                    fetchCedulas={fetchCedulas}
-                    setFetchCedulas={setFetchCedulas}
-                    fetchForense={fetchForense}
-                    setFetchForense={setFetchForense}
-                  />
-                  <FetchCedulas
-                    fetchCedulas={fetchCedulas}
-                    fetchId={fetchId}
-                    onFetchComplete={handleFetchComplete}
-                  />
-                  <FetchForense
-                    fetchForense={fetchForense}
-                    fetchId={fetchId}
-                    onFetchComplete={handleFetchComplete}
-                  />
-                  <Clustering type="personas_sin_identificar" />
-                  <GlobalTimeGraph onDateSelect={handleDateSelect} />
-                </div>
-              )}
-
-              <div className="ComponentToggles">
+                          <div className="ComponentToggles">
                 {Object.entries(visibleComponents).map(([key, value]) => (
                   <label key={key}>
                     <input
@@ -168,18 +137,136 @@ const App = () => {
                   </label>
                 ))}
               </div>
+              {/* Fax-toolbar header */}
+              <header
+                style={{
+                  width: "100%",
+                  background: "rgb(245, 245, 245)",
+                  borderBottom: "1px solid rgb(221, 221, 221)",
+                  marginBottom: 16,
+                  position: "absolute",
+                  zIndex: 9999,
+                  top: 0,
+                }}
+              >
+                <Tabs.Root value={toolbarTab} onValueChange={setToolbarTab}>
+                  <Tabs.List
+                    style={{
+                      display: "flex",
+                      borderBottom: "1px solid #ccc",
+                      padding: 0,
+                      margin: 0,
+                      background: "transparent",
+                    }}
+                  >
+                    {["tab1", "tab2", "tab3", "tab4"].map((tab, idx) => (
+                      <Tabs.Trigger
+                        key={tab}
+                        value={tab}
+                        style={{
+                          flex: 1,
+                          padding: "12px 0",
+                          border: "none",
+                          borderTop:
+                            toolbarTab === tab
+                              ? "3px solid #007bff"
+                              : "3px solid transparent",
+                          borderBottom: "none",
+                          background: "none",
+                          outline: "none",
+                          fontWeight: toolbarTab === tab ? "bold" : "normal",
+                          color: toolbarTab === tab ? "#007bff" : "#333",
+                          cursor: "pointer",
+                          transition: "border-top 0.2s, color 0.2s",
+                        }}
+                      >
+                        {`Tab ${idx + 1}`}
+                      </Tabs.Trigger>
+                    ))}
+                  </Tabs.List>
+                </Tabs.Root>
+              </header>
 
-              <div className="MobileContainer">
-                <div className="MapForms">
-
+              {/* Persistent tab contents, only one visible at a time */}
+              <div
+                style={{
+                  top: 0,
+                  marginTop: 49,
+                  position: "absolute",
+                  zIndex: 99,
+                  width: "100%",
+                  background: "#fff",
+                }}
+              >
+                <div
+                  style={{ display: toolbarTab === "tab1" ? "block" : "none" }}
+                >
+                  {isFormsVisible && (
+                    <div className="DateForm">
+                      <DateFormCompact
+                        handleSubmit={handleSubmit}
+                        loading={loading}
+                        fetchCedulas={fetchCedulas}
+                        setFetchCedulas={setFetchCedulas}
+                        fetchForense={fetchForense}
+                        setFetchForense={setFetchForense}
+                      />
+                      <FetchCedulas
+                        fetchCedulas={fetchCedulas}
+                        fetchId={fetchId}
+                        onFetchComplete={handleFetchComplete}
+                      />
+                      <FetchForense
+                        fetchForense={fetchForense}
+                        fetchId={fetchId}
+                        onFetchComplete={handleFetchComplete}
+                      />
+                      <Clustering type="personas_sin_identificar" />
+                      <GlobalTimeGraph onDateSelect={handleDateSelect} />
+                    </div>
+                  )}
+                </div>
+                <div
+                  style={{ display: toolbarTab === "tab2" ? "block" : "none" }}
+                >
+                  {/* Replace with your real content for Tab 2 */}
+                  <div style={{ padding: 16 }}>
                     <TimelineSlider />
                     <LayoutForm />
-                    {visibleComponents.filterForm && <FilterForm />}
-                    {visibleComponents.currentState && <CurrentState />}
-                    {visibleComponents.violenceCases && <ViolenceCases />}
-                    {visibleComponents.timeGraph && <TimeGraph />}
-                    {visibleComponents.crossRef && <CrossRef />}
+                  </div>
                 </div>
+                <div
+                  style={{ display: toolbarTab === "tab3" ? "block" : "none" }}
+                >
+                  {/* Replace with your real content for Tab 3 */}
+                  <div style={{ padding: 16 }}>
+                    {visibleComponents.filterForm && <FilterForm />}
+                </div>
+                </div>
+                <div
+                  style={{ display: toolbarTab === "tab4" ? "block" : "none" }}
+                >
+                  {/* Replace with your real content for Tab 4 */}
+                  <div style={{ padding: 16 }}>
+                  {visibleComponents.currentState && <CurrentState />}
+                  {/*visibleComponents.violenceCases && <ViolenceCases />*/}
+                  </div>
+                </div>
+              </div>
+
+              <InitialModal
+                handleSubmit={handleSubmit}
+                loading={loading}
+                fetchCedulas={fetchCedulas}
+                setFetchCedulas={setFetchCedulas}
+                fetchForense={fetchForense}
+                setFetchForense={setFetchForense}
+              />
+
+
+
+              <div className="MobileContainer">
+
               </div>
               <div className="Map">
                 <MapComponent />
@@ -188,12 +275,7 @@ const App = () => {
           )}
         </div>
         <Routes>
-          <Route
-            path="/cuaderno/:id"
-            element={
-              <Notebook />
-            }
-          />
+          <Route path="/cuaderno/:id" element={<Notebook />} />
           <Route path="/" element={<Notebook />} />
         </Routes>
       </Router>
