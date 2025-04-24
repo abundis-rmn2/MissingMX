@@ -5,7 +5,7 @@ import FetchCedulas from './components/FetchCedulas';
 import FetchForense from './components/FetchForense';
 import MapComponent from './components/MapComponent';
 import CurrentState from './context/currrentState';
-import DateFormCompact from './components/DateFormCompact';
+import DateForm from './components/DateForm';
 import Clustering from './components/Clustering';
 import Notebook from './components/Notebook';
 import PasswordCheck from './components/PasswordCheck';
@@ -124,7 +124,7 @@ const App = () => {
             <>
               {isFormsVisible && (
                 <div className="DateForm">
-                  <DateFormCompact
+                  <DateForm
                     handleSubmit={handleSubmit}
                     loading={loading}
                     fetchCedulas={fetchCedulas}
