@@ -1,3 +1,4 @@
+// Deprecated: This component is deprecated and will be removed in the next major release.
 import React from 'react';
 import DateFormModal from './DateFormModal';
 import DateFormCompact from './DateFormCompact';
@@ -32,4 +33,4 @@ const DateForm = ({
   );
 };
 
-export default DateForm;
+//export default DateForm;

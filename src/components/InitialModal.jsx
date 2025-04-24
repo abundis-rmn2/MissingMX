@@ -3,7 +3,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useData } from '../context/DataContext';
 import { useDateForm } from '../utils/dateForm';
 
-const DateFormModal = ({
+const InitialModal = ({
   handleSubmit,
   fetchCedulas,
   setFetchCedulas,
@@ -115,9 +115,6 @@ const DateFormModal = ({
                 <button type="submit" disabled={loading}>
                   {loading ? 'Loading...' : 'Fetch Data'}
                 </button>
-                <Dialog.Close asChild>
-                  <button type="button" style={{ marginLeft: 8 }}>Close</button>
-                </Dialog.Close>
               </div>
             </div>
           </form>
@@ -127,4 +124,4 @@ const DateFormModal = ({
   );
 };
 
-export default DateFormModal;
+export default InitialModal;
