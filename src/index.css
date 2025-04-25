@@ -430,10 +430,12 @@ button:disabled {
   margin-top: 15px;
 }
 
-.current-state  {
+.current-state {
   padding: 0.5rem;
   border: 1px solid #e2e2e2;
   margin-top: 1rem;
+  height: 350px;
+  overflow-y: overlay;
 }
 
 .custom-popup p {

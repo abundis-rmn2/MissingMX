@@ -12,6 +12,7 @@ import Notebook from './components/Notebook';
 import PasswordCheck from './components/PasswordCheck';
 import { Tabs } from '@radix-ui/themes'; // Import Tabs from @radix-ui/themes
 import NotebookLoad from './components/NotebookLoad'; // Import NotebookLoad
+import FilteredStats from './components/FilteredStats'; // Import FilteredStats
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -277,8 +278,8 @@ const App = () => {
                   >
                     {/* Replace with your real content for Tab 4 */}
                     <div style={{ padding: 16 }}>
-                      {visibleComponents.currentState && <CurrentState />}
-                      {/*visibleComponents.violenceCases && <ViolenceCases />*/}
+                      {visibleComponents.currentState && <FilteredStats />}
+                      {visibleComponents.violenceCases && <ViolenceCases />}
                     </div>
                   </div>
               {/* Tab 5 */}
