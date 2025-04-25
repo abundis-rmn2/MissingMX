@@ -455,3 +455,7 @@ button:disabled {
   overflow-x: scroll;
   overflow: overlay;
 }
+
+.rt-TabsTriggerInnerHidden, .rt-BaseTabListTriggerInnerHidden {
+  display: none !important;
+}

@@ -1,3 +1,1 @@
-import FilteredStats from '../components/FilteredStats';
-
-export default FilteredStats;
+// Deprecated, use the current state instead
