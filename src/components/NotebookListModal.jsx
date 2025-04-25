@@ -8,7 +8,6 @@ const NotebookListModal = ({
   notebookList,
 }) => (
   <>
-    <Button size="1" onClick={listNotebooks}>List Notebooks</Button>
     {isModalOpen && (
       <Box
         style={{

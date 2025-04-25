@@ -1,6 +1,8 @@
 import React from 'react';
-import { Button, Box, Heading } from '@radix-ui/themes';
+import { Button, Box } from '@radix-ui/themes';
 import NotebookListModal from './NotebookListModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave, faFolderOpen, faList } from '@fortawesome/free-solid-svg-icons';
 
 const NotebookLoad = ({
   saveNotesToBackend,
@@ -11,10 +13,37 @@ const NotebookLoad = ({
   notebookList,
 }) => (
   <Box mb="3">
-    <Box mt="2" style={{ display: 'flex', gap: 8 }}>
-      <Button size="1" onClick={saveNotesToBackend}>Save to Backend</Button>
-      <Button size="1" onClick={() => loadNotesFromBackend(prompt('Enter Notebook ID:'))}>
-        Load from Backend
+    <Box
+      mt="2"
+      style={{
+        display: 'flex',
+        gap: 8,
+        width: '100%',
+      }}
+    >
+      <Button
+        size="1"
+        onClick={saveNotesToBackend}
+        style={{ flex: 1 }}
+      >
+        <FontAwesomeIcon icon={faSave} style={{ marginRight: 4 }} />
+        Guardar en servidor
+      </Button>
+      <Button
+        size="1"
+        onClick={() => loadNotesFromBackend(prompt('Ingrese el ID del cuaderno:'))}
+        style={{ flex: 1 }}
+      >
+        <FontAwesomeIcon icon={faFolderOpen} style={{ marginRight: 4 }} />
+        Cargar del servidor
+      </Button>
+      <Button
+        size="1"
+        onClick={listNotebooks}
+        style={{ flex: 1 }}
+      >
+        <FontAwesomeIcon icon={faList} style={{ marginRight: 4 }} />
+        Listar cuadernos
       </Button>
       <NotebookListModal
         listNotebooks={listNotebooks}

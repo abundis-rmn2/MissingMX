@@ -1,6 +1,9 @@
 import React from 'react';
 import { useData } from '../context/DataContext';
 import { useDateForm } from '../utils/dateForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt, faIdCard, faDna, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { Box, Heading } from '@radix-ui/themes';
 
 const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, setFetchForense }) => {
   const { startDate, endDate, setStartDate, setEndDate, loading } = useData();
@@ -19,12 +22,31 @@ const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchFor
   });
 
   return (
+    <>      
+    <Box
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'flex-start',
+      padding: '10px 20px 4px 20px',
+      borderBottom: '1px solid #eee',
+      background: '#fafbfc',
+      gap: 8,
+    }}
+  >
+    <FontAwesomeIcon icon={faDownload} style={{ fontSize: 28, color: '#007bff' }} />
+    <Heading size="1" style={{ margin: 0, fontSize: '1rem', lineHeight: '1.2' }}>
+      Rango de análisis
+    </Heading>
+  </Box>
+  <Box>
     <div className="date-form-container compact">
       <form onSubmit={handleFormSubmit} className="compact-form">
         <div className="form-content">
           <div className="date-inputs">
             <label>
-              Start Date:
+              <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+              Fecha inicio:
               <input
                 type="date"
                 value={localStartDate}
@@ -33,7 +55,8 @@ const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchFor
               />
             </label>
             <label>
-              End Date:
+              <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+              Fecha fin:
               <input
                 type="date"
                 value={localEndDate}
@@ -42,30 +65,16 @@ const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchFor
               />
             </label>
           </div>
-          <div className="checkbox-group">
-            <label>
-              <input
-                type="checkbox"
-                checked={fetchCedulas}
-                onChange={(e) => setFetchCedulas(e.target.checked)}
-              />
-              Fetch Cedulas
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={fetchForense}
-                onChange={(e) => setFetchForense(e.target.checked)}
-              />
-              Fetch Forense
-            </label>
-          </div>
+
           <button type="submit" disabled={loading}>
-            {loading ? 'Loading...' : 'Fetch Data'}
+            <FontAwesomeIcon icon={faDownload} style={{ marginRight: 6 }} />
+            {loading ? 'Cargando...' : 'Obtener datos'}
           </button>
         </div>
       </form>
     </div>
+    </Box>
+    </>
   );
 };
 

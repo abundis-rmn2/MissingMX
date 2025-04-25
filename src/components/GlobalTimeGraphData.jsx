@@ -51,10 +51,14 @@ const GlobalTimeGraphData = ({
   ]);
 
   return (
+    <>
+    {/*
     <div style={{ fontSize: 12, color: '#888', marginBottom: 10 }}>
       <strong>GlobalTimeGraphData Debug:</strong>
       <div>Check console for detailed output.</div>
     </div>
+    */}
+    </>
   );
 };
 
