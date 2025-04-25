@@ -1,88 +1,35 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useData } from '../context/DataContext';
+import {
+  useFilterFormHandlers,
+  useFilterFormEffects
+} from '../utils/filterForm';
 
 const FilterForm = () => {
+  const dataContext = useData();
+
+  // Obtén handlers y efectos desacoplados
   const {
-    map,
-    setActiveHeatmapCategories,
-    selectedDate,
-    daysRange,
-    filterMarkersByDate,
+    handleSexoChange,
+    handleCondicionChange,
+    handleEdadRangeChange,
+    handleSumScoreRangeChange
+  } = useFilterFormHandlers(dataContext);
+
+  useFilterFormEffects(dataContext);
+
+  // Desestructura los valores necesarios para renderizar
+  const {
     selectedSexo,
-    setSelectedSexo,
     selectedCondicion,
-    setSelectedCondicion,
     edadRange,
-    setEdadRange,
-    sumScoreRange,
-    setsumScoreRange,
-  } = useData();
+    sumScoreRange
+  } = dataContext;
 
-  // Track whether filters have been initialized after the time slider
-  const filtersInitialized = useRef(false);
-
-  useEffect(() => {
-    if (selectedDate && daysRange !== undefined) {
-      if (!filtersInitialized.current) {
-        console.log('Initializing filters after time slider is set...');
-        filtersInitialized.current = true;
-      }
-      applyFilters();
-    }
-  }, [selectedSexo, selectedCondicion, edadRange, sumScoreRange, selectedDate, daysRange, map]);
-
-  const applyFilters = () => {
-    if (!map || !filtersInitialized.current) return;
-
-    console.log('Applying filters with the following parameters:', {
-      selectedDate,
-      daysRange,
-      selectedSexo,
-      selectedCondicion,
-      edadRange,
-      sumScoreRange,
-    });
-    filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
-  };
-
-  const handleSexoChange = (e) => {
-    const { value, checked } = e.target;
-    setSelectedSexo((prev) => {
-      const updated = checked ? [...prev, value] : prev.filter((item) => item !== value);
-      console.log(`Sexo filter updated: ${updated}`);
-      return updated;
-    });
-  };
-
-  const handleCondicionChange = (e) => {
-    const { value, checked } = e.target;
-    setSelectedCondicion((prev) => {
-      const updated = checked ? [...prev, value] : prev.filter((item) => item !== value);
-      console.log(`Condición filter updated: ${updated}`);
-      return updated;
-    });
-  };
-
-  const handleEdadRangeChange = (e) => {
-    const { value, name } = e.target;
-    setEdadRange((prev) => {
-      const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
-      console.log(`Edad range updated: ${updated}`);
-      return updated;
-    });
-  };
-
-  const handleSumScoreRangeChange = (e) => {
-    const { value, name } = e.target;
-    setsumScoreRange((prev) => {
-      const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
-      console.log(`Sum Score range updated: ${updated}`);
-      return updated;
-    });
-  };
-
+  // Renderizado puro, sin lógica de eventos ni estado local
   return (
-    <div >
+    <div>
+      {/* Filtros de Sexo */}
       <fieldset>
         <legend>Sexo</legend>
         <label>
@@ -105,6 +52,7 @@ const FilterForm = () => {
         </label>
       </fieldset>
 
+      {/* Filtros de Condición de Localización */}
       <fieldset>
         <legend>Condición de Localización</legend>
         <label>
@@ -136,63 +84,69 @@ const FilterForm = () => {
         </label>
       </fieldset>
 
+      {/* Filtros de Edad */}
       <fieldset>
-  <legend>Edad de Desaparición</legend>
-  <label>
-    Min: 0
-    <input
-      type="range"
-      name="min"
-      value={edadRange[0]}
-      onChange={handleEdadRangeChange}
-      min="0"
-      max={edadRange[1]}
-    />
-  </label>
-  <br></br>
-  <label>
-    Max: 100
-    <input
-      type="range"
-      name="max"
-      value={edadRange[1]}
-      onChange={handleEdadRangeChange}
-      min={edadRange[0]}
-      max="100"
-    />
-  </label>
-  <hr></hr>
-  <div className='rangeLegend'>    <span>Selected Age Range: {edadRange[0]} - {edadRange[1]}</span></div>
-</fieldset>
+        <legend>Edad de Desaparición</legend>
+        <label>
+          Min: 0
+          <input
+            type="range"
+            name="min"
+            value={edadRange[0]}
+            onChange={handleEdadRangeChange}
+            min="0"
+            max={edadRange[1]}
+          />
+        </label>
+        <br />
+        <label>
+          Max: 100
+          <input
+            type="range"
+            name="max"
+            value={edadRange[1]}
+            onChange={handleEdadRangeChange}
+            min={edadRange[0]}
+            max="100"
+          />
+        </label>
+        <hr />
+        <div className='rangeLegend'>
+          <span>Selected Age Range: {edadRange[0]} - {edadRange[1]}</span>
+        </div>
+      </fieldset>
 
-<fieldset>
-  <legend>Score de Violencia</legend>
-  <label>
-   Min: 0.5
-    <input
-      type="range"
-      name="min"
-      value={sumScoreRange[0]}
-      onChange={handleSumScoreRangeChange}
-      min="0.5"
-      max={sumScoreRange[1]}
-    />
-  </label>
-  <br></br>
-  <label>
-    Max: 20
-    <input
-      type="range"
-      name="max"
-      value={sumScoreRange[1]}
-      onChange={handleSumScoreRangeChange}
-      min={sumScoreRange[0]}
-      max="20"
-    />
-  </label>
-  <hr></hr>
-  <div className='rangeLegend'>    <span>Selected Score Range: {sumScoreRange[0]} - {sumScoreRange[1]}</span></div>
-</fieldset>
+      {/* Filtros de Score de Violencia */}
+      <fieldset>
+        <legend>Score de Violencia</legend>
+        <label>
+          Min: 0.5
+          <input
+            type="range"
+            name="min"
+            value={sumScoreRange[0]}
+            onChange={handleSumScoreRangeChange}
+            min="0.5"
+            max={sumScoreRange[1]}
+          />
+        </label>
+        <br />
+        <label>
+          Max: 20
+          <input
+            type="range"
+            name="max"
+            value={sumScoreRange[1]}
+            onChange={handleSumScoreRangeChange}
+            min={sumScoreRange[0]}
+            max="20"
+          />
+        </label>
+        <hr />
+        <div className='rangeLegend'>
+          <span>Selected Score Range: {sumScoreRange[0]} - {sumScoreRange[1]}</span>
+        </div>
+      </fieldset>
     </div>
   );
 };
