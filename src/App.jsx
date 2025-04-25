@@ -16,7 +16,7 @@ import FilteredStats from './components/FilteredStats'; // Import FilteredStats
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
-const ViolenceCases = lazy(() => import('./components/ViolenceCases'));
+const SemanticGraph = lazy(() => import('./components/SemanticGraph'));
 const CrossRef = lazy(() => import('./components/CrossRef'));
 const FilterForm = lazy(() => import('./components/FilterForm'));
 const LayoutForm = lazy(() => import('./components/LayoutForm'));
@@ -279,7 +279,7 @@ const App = () => {
                     {/* Replace with your real content for Tab 4 */}
                     <div style={{ padding: 16 }}>
                       {visibleComponents.currentState && <FilteredStats />}
-                      {visibleComponents.violenceCases && <ViolenceCases />}
+                      {visibleComponents.violenceCases && <SemanticGraph />}
                     </div>
                   </div>
               {/* Tab 5 */}
