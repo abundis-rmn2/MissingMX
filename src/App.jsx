@@ -13,6 +13,7 @@ import TabsComponent from './components/TabsComponent'; // Import TabsComponent
 import NotebookLoad from './components/NotebookLoad'; // Import NotebookLoad
 import FilteredStats from './components/FilteredStats'; // Import FilteredStats
 import SideNotebook from './components/SideNotebook'; // Import SideNotebook
+import * as Tabs from '@radix-ui/react-tabs';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faThLarge, faFilter, faBarChart, faBook } from '@fortawesome/free-solid-svg-icons';
@@ -295,7 +296,11 @@ const App = () => {
                     }}
                   >
                     <div style={{ padding: 16 }}>
+<<<<<<< HEAD
                      <p>LayoutForm()</p>
+=======
+                     
+>>>>>>> ede09dd (Integrate Radix UI Tabs into App component; remove unused components for cleaner layout)
                     </div>
                   </div>
                   {/* Tab 3 */}
