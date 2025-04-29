@@ -296,11 +296,7 @@ const App = () => {
                     }}
                   >
                     <div style={{ padding: 16 }}>
-<<<<<<< HEAD
                      <p>LayoutForm()</p>
-=======
-                     
->>>>>>> ede09dd (Integrate Radix UI Tabs into App component; remove unused components for cleaner layout)
                     </div>
                   </div>
                   {/* Tab 3 */}
