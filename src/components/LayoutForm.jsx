@@ -6,6 +6,10 @@ import {
   getEffectiveMapType,
   getEffectiveColorScheme
 } from '../utils/layoutForm';
+// Ensure Font Awesome is included in your project
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDotCircle, faThermometerHalf, faVenusMars, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import * as Switch from '@radix-ui/react-switch';
 
 const LayoutForm = () => {
   const [localMapType, setLocalMapType] = useState('point');
@@ -27,51 +31,119 @@ const LayoutForm = () => {
   return (
     <div>
       <fieldset>
-        <legend>Tipo de visualización</legend>
-        <label>
-          <input
-            type="radio"
-            name="mapType"
-            value="point"
-            checked={effectiveMapType === 'point'}
-            onChange={handleMapTypeChange}
-          />
-          Puntos
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="mapType"
-            value="heatmap"
+        <legend style={{ cursor: 'pointer' }}>Tipo de visualización</legend>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label
+            htmlFor="mapTypeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <FontAwesomeIcon icon={faDotCircle} style={{ color: effectiveMapType === 'point' ? 'blue' : '#ccc' }} /> Puntos
+          </label>
+          <Switch.Root
+            id="mapTypeSwitch"
             checked={effectiveMapType === 'heatmap'}
-            onChange={handleMapTypeChange}
-          />
-          Heatmap
-        </label>
+            onCheckedChange={(checked) => handleMapTypeChange({ target: { value: checked ? 'heatmap' : 'point' } })}
+            style={{
+              width: '50px',
+              height: '25px',
+              backgroundColor: effectiveMapType === 'heatmap' ? 'red' : 'blue',
+              borderRadius: '9999px',
+              position: 'relative',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: effectiveMapType === 'heatmap' ? 'flex-end' : 'flex-start',
+              padding: '2px',
+            }}
+          >
+            <Switch.Thumb
+              style={{
+                width: '21px',
+                height: '21px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.2s',
+              }}
+            />
+          </Switch.Root>
+          <label
+            htmlFor="mapTypeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <FontAwesomeIcon icon={faThermometerHalf} style={{ color: effectiveMapType === 'heatmap' ? 'red' : '#ccc' }} /> Heatmap
+          </label>
+        </div>
       </fieldset>
 
       <fieldset>
-        <legend>Esquema de color</legend>
-        <label>
-          <input
-            type="radio"
-            name="colorScheme"
-            value="sexo"
-            checked={effectiveColorScheme === 'sexo'}
-            onChange={handleColorSchemeChange}
-          />
-          Sexo
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="colorScheme"
-            value="condicionLocalizacion"
+        <legend style={{ cursor: 'pointer' }}>Esquema de color</legend>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label
+            htmlFor="colorSchemeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <FontAwesomeIcon icon={faVenusMars} style={{ color: effectiveColorScheme === 'sexo' ? 'pink' : '#ccc' }} /> Sexo
+          </label>
+          <Switch.Root
+            id="colorSchemeSwitch"
             checked={effectiveColorScheme === 'condicionLocalizacion'}
-            onChange={handleColorSchemeChange}
-          />
-          Condición de Localización
-        </label>
+            onCheckedChange={(checked) =>
+              handleColorSchemeChange({ target: { value: checked ? 'condicionLocalizacion' : 'sexo' } })
+            }
+            style={{
+              width: '50px',
+              height: '25px',
+              backgroundColor: effectiveColorScheme === 'condicionLocalizacion' ? 'green' : 'pink',
+              borderRadius: '9999px',
+              position: 'relative',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: effectiveColorScheme === 'condicionLocalizacion' ? 'flex-end' : 'flex-start',
+              padding: '2px',
+            }}
+          >
+            <Switch.Thumb
+              style={{
+                width: '21px',
+                height: '21px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.2s',
+              }}
+            />
+          </Switch.Root>
+          <label
+            htmlFor="colorSchemeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <FontAwesomeIcon icon={faMapMarkerAlt} style={{ color: effectiveColorScheme === 'condicionLocalizacion' ? 'green' : '#ccc' }} /> Condición de Localización
+          </label>
+        </div>
       </fieldset>
     </div>
   );
