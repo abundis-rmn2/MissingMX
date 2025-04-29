@@ -1,47 +1,34 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useData } from '../context/DataContext';
-import { useDateForm } from '../utils/dateForm';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarAlt, faDownload } from '@fortawesome/free-solid-svg-icons';
 
 const DateFormModal = ({
   handleSubmit,
   fetchCedulas,
   setFetchCedulas,
   fetchForense,
-  setFetchForense
+  setFetchForense,
+  loading: loadingProp,
 }) => {
-  const { startDate, endDate, setStartDate, setEndDate, loading } = useData();
+  const { startDate, endDate, setStartDate, setEndDate, loading: loadingContext } = useData();
   const [open, setOpen] = useState(true);
+
+  // Always use loading from context unless explicitly passed as prop
+  const loading = loadingProp !== undefined ? loadingProp : loadingContext;
 
   // Wrap handleSubmit to close modal after fetch
   const handleSubmitAndClose = useCallback(
     async (e) => {
-      await handleSubmit(e);
+      e.preventDefault();
+      if (typeof handleSubmit === 'function') {
+        await handleSubmit(e);
+      }
       setOpen(false);
     },
     [handleSubmit]
   );
-
-  const {
-    localStartDate,
-    setLocalStartDate,
-    localEndDate,
-    setLocalEndDate,
-    handleFormSubmit
-  } = useDateForm({
-    startDate,
-    endDate,
-    setStartDate,
-    setEndDate,
-    handleSubmit: handleSubmitAndClose
-  });
-
-  // Open modal only on first mount
-  useEffect(() => {
-    if (!open) {
-      // Could set a flag in localStorage/sessionStorage if you want to persist across reloads
-    }
-  }, [open]);
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -51,7 +38,7 @@ const DateFormModal = ({
             background: 'rgba(0,0,0,0.15)',
             position: 'fixed',
             inset: 0,
-            zIndex: 1000
+            zIndex: 1000,
           }}
         />
         <Dialog.Content
@@ -65,30 +52,32 @@ const DateFormModal = ({
             transform: 'translate(-50%, -50%)',
             padding: 24,
             minWidth: 320,
-            zIndex: 1001
+            zIndex: 1001,
           }}
         >
           <Dialog.Title style={{ fontWeight: 600, fontSize: 20, marginBottom: 16 }}>
-            Select Date Range
+            Rango de análisis
           </Dialog.Title>
-          <form onSubmit={handleFormSubmit} className="modal-form">
+          <form onSubmit={handleSubmitAndClose} className="modal-form">
             <div className="form-content">
               <div className="date-inputs" style={{ marginBottom: 12 }}>
                 <label>
-                  Start Date:
+                  <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+                  Fecha inicio:
                   <input
                     type="date"
-                    value={localStartDate}
-                    onChange={(e) => setLocalStartDate(e.target.value)}
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
                     required
                   />
                 </label>
                 <label>
-                  End Date:
+                  <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+                  Fecha fin:
                   <input
                     type="date"
-                    value={localEndDate}
-                    onChange={(e) => setLocalEndDate(e.target.value)}
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
                     required
                   />
                 </label>
@@ -113,10 +102,13 @@ const DateFormModal = ({
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button type="submit" disabled={loading}>
-                  {loading ? 'Loading...' : 'Fetch Data'}
+                  <FontAwesomeIcon icon={faDownload} style={{ marginRight: 6 }} />
+                  {loading ? 'Cargando...' : 'Obtener datos'}
                 </button>
                 <Dialog.Close asChild>
-                  <button type="button" style={{ marginLeft: 8 }}>Close</button>
+                  <button type="button" style={{ marginLeft: 8 }}>
+                    Cerrar
+                  </button>
                 </Dialog.Close>
               </div>
             </div>
