@@ -464,3 +464,13 @@ button:disabled {
 .rt-TabsTriggerInnerHidden, .rt-BaseTabListTriggerInnerHidden {
   display: none !important;
 }
+
+.FormsContainer{
+  flex-direction: column;
+  display: flex
+;
+  justify-content: center;
+  align-content: space-around;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}

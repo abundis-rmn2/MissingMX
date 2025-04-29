@@ -55,7 +55,7 @@ export function useTimelineSlider() {
       intervalRef.current = setInterval(() => {
         setSelectedDate(prevDate => {
           const newDate = new Date(prevDate);
-          newDate.setDate(newDate.getDate() + 1);
+          newDate.setDate(newDate.getDate() + daysRange); // Avanzar según daysRange
           return newDate;
         });
       }, velocity);
@@ -69,7 +69,7 @@ export function useTimelineSlider() {
         intervalRef.current = null;
       }
     };
-  }, [isPlaying, velocity, setSelectedDate]);
+  }, [isPlaying, velocity, daysRange, setSelectedDate]);
 
   useEffect(() => {
     if (selectedDate) {
@@ -80,7 +80,7 @@ export function useTimelineSlider() {
   const playForward = () => {
     if (!selectedDate) return;
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 1);
+    newDate.setDate(newDate.getDate() + daysRange); // Avanzar según daysRange
     const maxDate = new Date(Math.max(
       ...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))
     ));
@@ -90,13 +90,19 @@ export function useTimelineSlider() {
 
   const stepForward = () => {
     if (!selectedDate) return;
-    playForward();
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + daysRange); // Avanzar según daysRange
+    const maxDate = new Date(Math.max(
+      ...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))
+    ));
+    if (newDate > maxDate) return;
+    setSelectedDate(newDate);
   };
 
   const stepBackward = () => {
     if (!selectedDate) return;
     const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - 1);
+    newDate.setDate(newDate.getDate() - daysRange); // Retroceder según daysRange
     const minDate = new Date(Math.min(
       ...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))
     ));
