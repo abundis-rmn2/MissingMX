@@ -121,11 +121,11 @@ export function CustomTooltip({ active, payload, label }) {
         border: '1px solid #ccc'
       }}>
         <p><strong>{label}</strong></p>
-        <p>Men: {data.HOMBRE}</p>
-        <p>Women: {data.MUJER}</p>
-        <p>Found Alive: {data['CON VIDA']}</p>
-        <p>Found Deceased: {data['SIN VIDA']}</p>
-        <p>Not Applicable: {data['NO APLICA']}</p>
+        <p>Hombre: {data.HOMBRE}</p>
+        <p>Mujer: {data.MUJER}</p>
+        <p>Con vida: {data['CON VIDA']}</p>
+        <p>Sin vida: {data['SIN VIDA']}</p>
+        <p>Desaparecidos: {data['NO APLICA']}</p>
       </div>
     );
   }
