@@ -78,8 +78,8 @@ const InitialModal = ({
                   Start Date:
                   <input
                     type="date"
-                    value={localStartDate}
-                    onChange={(e) => setLocalStartDate(e.target.value)}
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
                     required
                   />
                 </label>
@@ -87,8 +87,8 @@ const InitialModal = ({
                   End Date:
                   <input
                     type="date"
-                    value={localEndDate}
-                    onChange={(e) => setLocalEndDate(e.target.value)}
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
                     required
                   />
                 </label>
