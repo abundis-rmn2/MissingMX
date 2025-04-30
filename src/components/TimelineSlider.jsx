@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTimelineSlider } from '../utils/timeLineSlider';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faArrowRight, faPlay, faPause, faPersonWalking, faPersonRunning, faFlag, faFlagCheckered, faCircleDot, faCircleCheck, faArrowCircleRight, faStop } from '@fortawesome/free-solid-svg-icons';
+import { ArrowLeft, ArrowRight, Play, Pause, Turtle, Rabbit, ArrowRightCircle, Square } from 'lucide-react';
 
 const TimelineSlider = () => {
   const {
@@ -18,6 +17,12 @@ const TimelineSlider = () => {
     timelineData,
     daysRange,
   } = useTimelineSlider();
+
+  useEffect(() => {
+    if (selectedDate && maxDate && selectedDate.getTime() >= maxDate.getTime() && isPlaying) {
+      togglePlayPause();
+    }
+  }, [selectedDate, maxDate, isPlaying, togglePlayPause]);
 
   if (!Array.isArray(timelineData) || timelineData.length === 0) {
     return <p>Loading timeline...</p>;
@@ -62,7 +67,7 @@ const TimelineSlider = () => {
                 : ""
             }`}
           >
-            <FontAwesomeIcon icon={faArrowLeft} size="lg" />
+            <ArrowLeft size={20} />
           </button>
           <button
             onClick={togglePlayPause}
@@ -80,7 +85,7 @@ const TimelineSlider = () => {
 - Fecha de inicio: ${selectedDate ? selectedDate.toISOString().slice(0, 10) : ""}
 - Rango de selección: ${selectedDate ? selectedDate.toISOString().slice(0, 10) : ""} a ${selectedDate ? new Date(selectedDate.getTime() + daysRange * 86400000).toISOString().slice(0, 10) : ""}`}
           >
-            <FontAwesomeIcon icon={isPlaying ? faPause : faPlay} size="lg" />
+            {isPlaying ? <Pause size={20} /> : <Play size={20} />}
           </button>
           <button
             onClick={() => stepForward(daysRange)}
@@ -104,7 +109,7 @@ const TimelineSlider = () => {
                 : ""
             }`}
           >
-            <FontAwesomeIcon icon={faArrowRight} size="lg" />
+            <ArrowRight size={20} />
           </button>
         </div>
       </div>
@@ -117,8 +122,8 @@ const TimelineSlider = () => {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <FontAwesomeIcon
-            icon={faArrowCircleRight}
+          <ArrowRightCircle
+            size={20}
             title={minDate ? minDate.toISOString().slice(0, 10) : ""}
           />
           <input
@@ -129,14 +134,14 @@ const TimelineSlider = () => {
             onChange={(e) => handleDateChange(new Date(Number(e.target.value)))}
             style={{ width: 150 }}
           />
-          <FontAwesomeIcon
-            icon={faStop}
+          <Square
+            size={20}
             title={maxDate ? maxDate.toISOString().slice(0, 10) : ""}
           />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-          <FontAwesomeIcon
-            icon={faPersonWalking}
+          <Turtle
+            size={20}
             title="Velocidad mínima: 2000ms"
           />
           <input
@@ -148,8 +153,8 @@ const TimelineSlider = () => {
             onChange={(e) => setVelocity(Number(e.target.value))}
             style={{ width: 150 }}
           />
-          <FontAwesomeIcon
-            icon={faPersonRunning}
+          <Rabbit
+            size={20}
             title="Velocidad máxima: 100ms"
           />
         </div>

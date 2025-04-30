@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Box } from '@radix-ui/themes';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faProjectDiagram, faStickyNote } from '@fortawesome/free-solid-svg-icons'; // faProjectDiagram is graph/network
+import { Network, StickyNote } from 'lucide-react'; // Replace FontAwesome with Lucide
 
 const NotebookNotes = ({
   newNote,
@@ -38,7 +37,7 @@ const NotebookNotes = ({
         onClick={addNote}
         style={{ flex: 1 }}
       >
-        <FontAwesomeIcon icon={faProjectDiagram} style={{ marginRight: 4 }} />
+        <Network style={{ marginRight: 4 }} /> {/* Use Lucide icon */}
         Estado de Visualización
       </Button>
       <Button
@@ -46,7 +45,7 @@ const NotebookNotes = ({
         onClick={addTextOnlyNote}
         style={{ flex: 1 }}
       >
-        <FontAwesomeIcon icon={faStickyNote} style={{ marginRight: 4 }} />
+        <StickyNote style={{ marginRight: 4 }} /> {/* Use Lucide icon */}
         Nota de Texto
       </Button>
     </Box>

@@ -7,8 +7,7 @@ import { useNotebook } from '../utils/notebook';
 import NotebookNotes from './NotebookNotes';
 import NotebookLoad from './NotebookLoad';
 import GlobalTimeGraphData from './GlobalTimeGraphData';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons'; // icono de mapa/bandera
+import { MapPin } from 'lucide-react'; // Replace FontAwesome with Lucide
 
 const Notebook = () => {
   const dataContext = useData();
@@ -45,7 +44,7 @@ const Notebook = () => {
           gap: 8,
         }}
       >
-        <FontAwesomeIcon icon={faMapMarkedAlt} style={{ fontSize: 28, color: '#007bff' }} />
+        <MapPin style={{ fontSize: 28, color: '#007bff' }} /> {/* Use Lucide icon */}
         <Heading size="1" style={{ margin: 0, fontSize: '1rem', lineHeight: '1.2' }}>
           Bitácora de navegación
         </Heading>

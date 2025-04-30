@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useData } from '../context/DataContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { Calendar, Download } from 'lucide-react'; // Replace FontAwesome import with Lucide
 
 const DateFormModal = ({
   handleSubmit,
@@ -62,7 +61,7 @@ const DateFormModal = ({
             <div className="form-content">
               <div className="date-inputs" style={{ marginBottom: 12 }}>
                 <label>
-                  <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+                  <Calendar style={{ marginRight: 6 }} /> {/* Use Lucide icon */}
                   Fecha inicio:
                   <input
                     type="date"
@@ -72,7 +71,7 @@ const DateFormModal = ({
                   />
                 </label>
                 <label>
-                  <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+                  <Calendar style={{ marginRight: 6 }} /> {/* Use Lucide icon */}
                   Fecha fin:
                   <input
                     type="date"
@@ -102,7 +101,7 @@ const DateFormModal = ({
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button type="submit" disabled={loading}>
-                  <FontAwesomeIcon icon={faDownload} style={{ marginRight: 6 }} />
+                  <Download style={{ marginRight: 6 }} /> {/* Use Lucide icon */}
                   {loading ? 'Cargando...' : 'Obtener datos'}
                 </button>
                 <Dialog.Close asChild>

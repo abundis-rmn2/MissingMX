@@ -15,8 +15,7 @@ import FilteredStats from './components/FilteredStats'; // Import FilteredStats
 import SideNotebook from './components/SideNotebook'; // Import SideNotebook
 import * as Tabs from '@radix-ui/react-tabs';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faThLarge, faFilter, faBarChart, faBook } from '@fortawesome/free-solid-svg-icons';
+import { Calendar, LayoutDashboard, Filter, BarChart2, BookOpen } from 'lucide-react'; // Replace FontAwesome with Lucide
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -28,11 +27,11 @@ const TimeGraph = lazy(() => import('./components/TimeGraph'));
 const GlobalTimeGraph = lazy(() => import('./components/GlobalTimeGraph'));
 
 const tabDefs = [
-  { key: "tab1", icon: faCalendar, label: "Fechas" },
-  { key: "tab2", icon: faThLarge, label: "Layout" },
-  { key: "tab3", icon: faFilter, label: "Filtros" },
-  { key: "tab4", icon: faBarChart, label: "Estadísticas" },
-  { key: "tab5", icon: faBook, label: "Cuadernos" },
+  { key: "tab1", icon: <Calendar />, label: "Fechas" },
+  { key: "tab2", icon: <LayoutDashboard />, label: "Layout" },
+  { key: "tab3", icon: <Filter />, label: "Filtros" },
+  { key: "tab4", icon: <BarChart2 />, label: "Estadísticas" },
+  { key: "tab5", icon: <BookOpen />, label: "Cuadernos" },
 ];
 
 const App = () => {
@@ -173,9 +172,9 @@ const App = () => {
             ) : (
               <>
                 <div className="TimelineSlider">
-                <div className="FormsContainer">
-                    <TimelineSlider />
-                    <LayoutForm />
+                  <div className="FormsContainer">
+                      <TimelineSlider />
+                      <LayoutForm />
                   </div>
                   <Clustering type="personas_sin_identificar" />
                   <GlobalTimeGraph 
@@ -242,7 +241,7 @@ const App = () => {
                             gap: 2,
                           }}
                         >
-                          <FontAwesomeIcon icon={tab.icon} />
+                          {tab.icon}
                           <span style={{ fontSize: 12 }}>{tab.label}</span>
                         </Tabs.Trigger>
                       ))}

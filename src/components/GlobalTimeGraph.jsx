@@ -6,8 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, ReferenceArea } from 'recharts';
 import { useData } from '../context/DataContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons'; // Importar el ícono de calendario
+import { Calendar } from 'lucide-react'; // Replace FontAwesome import with Lucide
 import {
   processMapData,         // Función para procesar datos del mapa según timeScale
   calculateDateRange,      // Función para calcular el rango de fechas
@@ -71,7 +70,7 @@ const GlobalTimeGraph = () => {
     >
       <div className="GlobalTimeLine" style={{ marginBottom: "20px" }}>
         <div
-          clasName="SelectTimeLineRange"
+          className="SelectTimeLineRange"
           style={{
             display: "flex",
             alignItems: "center",
@@ -84,10 +83,7 @@ const GlobalTimeGraph = () => {
             justifyContent: "flex-end",
           }}
         >
-          <FontAwesomeIcon
-            icon={faCalendarAlt}
-            style={{ marginRight: "10px", color: "#555" }}
-          />
+          <Calendar style={{ marginRight: "10px", color: "#555" }} /> {/* Use Lucide icon */}
           <span style={{ fontWeight: "bold", color: "#333" }}>
             Selecciona el formato de la línea de tiempo
           </span>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Box, Heading } from '@radix-ui/themes';
+import { X } from 'lucide-react'; // Replace FontAwesome import with Lucide
 
 const NotebookListModal = ({
   listNotebooks,
@@ -50,7 +51,7 @@ const NotebookListModal = ({
             ))}
           </ul>
           <Button mt="3" onClick={() => setIsModalOpen(false)}>
-            Close
+            <X /> Close {/* Use Lucide icon */}
           </Button>
         </Box>
       </Box>

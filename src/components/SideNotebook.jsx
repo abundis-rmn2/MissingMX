@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import Notebook from './Notebook';
 import DateFormCompact from './DateFormCompact';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkedAlt } from '@fortawesome/free-solid-svg-icons';
+import { MapPin } from 'lucide-react'; // Replace FontAwesome with Lucide
 
 const PANEL_WIDTH = 500;
 
@@ -41,7 +40,7 @@ const SideNotebook = ({
           gap: 6,
         }}
       >
-        <FontAwesomeIcon icon={faMapMarkedAlt} style={{ fontSize: 18 }} />
+        <MapPin style={{ fontSize: 18 }} /> {/* Use Lucide icon */}
         <span style={{ fontWeight: 500, letterSpacing: 1 }}>
           Bitácora de navegación
         </span>

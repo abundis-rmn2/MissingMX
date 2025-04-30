@@ -1,7 +1,6 @@
 import React from 'react';
 import { useData } from '../context/DataContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarAlt, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { Calendar, Download } from 'lucide-react'; // Replace FontAwesome with Lucide
 import { Box, Heading } from '@radix-ui/themes';
 
 const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchForense, setFetchForense, loading: loadingProp }) => {
@@ -30,7 +29,7 @@ const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchFor
         gap: 8,
       }}
     >
-      <FontAwesomeIcon icon={faDownload} style={{ fontSize: 28, color: '#007bff' }} />
+      <Download style={{ fontSize: 28, color: '#007bff' }} /> {/* Use Lucide icon */}
       <Heading size="1" style={{ margin: 0, fontSize: '1rem', lineHeight: '1.2' }}>
         Rango de análisis
       </Heading>
@@ -41,7 +40,7 @@ const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchFor
           <div className="form-content">
             <div className="date-inputs">
               <label>
-                <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+                <Calendar style={{ marginRight: 6 }} /> {/* Use Lucide icon */}
                 Fecha inicio:
                 <input
                   type="date"
@@ -51,7 +50,7 @@ const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchFor
                 />
               </label>
               <label>
-                <FontAwesomeIcon icon={faCalendarAlt} style={{ marginRight: 6 }} />
+                <Calendar style={{ marginRight: 6 }} /> {/* Use Lucide icon */}
                 Fecha fin:
                 <input
                   type="date"
@@ -63,7 +62,7 @@ const DateFormCompact = ({ handleSubmit, fetchCedulas, setFetchCedulas, fetchFor
             </div>
 
             <button type="submit" disabled={loading}>
-              <FontAwesomeIcon icon={faDownload} style={{ marginRight: 6 }} />
+              <Download style={{ marginRight: 6 }} /> {/* Use Lucide icon */}
               {loading ? 'Cargando...' : 'Obtener datos'}
             </button>
           </div>

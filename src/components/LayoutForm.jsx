@@ -6,9 +6,7 @@ import {
   getEffectiveMapType,
   getEffectiveColorScheme
 } from '../utils/layoutForm';
-// Ensure Font Awesome is included in your project
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDotCircle, faThermometerHalf, faVenusMars, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { Circle, Thermometer, Venus, MapPin } from 'lucide-react'; // Replace FontAwesome with Lucide
 import * as Switch from '@radix-ui/react-switch';
 
 const LayoutForm = () => {
@@ -42,7 +40,7 @@ const LayoutForm = () => {
               cursor: 'pointer',
             }}
           >
-            <FontAwesomeIcon icon={faDotCircle} style={{ color: effectiveMapType === 'point' ? 'blue' : '#ccc' }} /> Puntos
+            <Circle style={{ color: effectiveMapType === 'point' ? 'blue' : '#ccc' }} /> Puntos
           </label>
           <Switch.Root
             id="mapTypeSwitch"
@@ -82,7 +80,7 @@ const LayoutForm = () => {
               cursor: 'pointer',
             }}
           >
-            <FontAwesomeIcon icon={faThermometerHalf} style={{ color: effectiveMapType === 'heatmap' ? 'red' : '#ccc' }} /> Heatmap
+            <Thermometer style={{ color: effectiveMapType === 'heatmap' ? 'red' : '#ccc' }} /> Heatmap
           </label>
         </div>
       </fieldset>
@@ -99,7 +97,7 @@ const LayoutForm = () => {
               cursor: 'pointer',
             }}
           >
-            <FontAwesomeIcon icon={faVenusMars} style={{ color: effectiveColorScheme === 'sexo' ? 'pink' : '#ccc' }} /> Sexo
+            <Venus style={{ color: effectiveColorScheme === 'sexo' ? 'pink' : '#ccc' }} /> Sexo
           </label>
           <Switch.Root
             id="colorSchemeSwitch"
@@ -141,7 +139,7 @@ const LayoutForm = () => {
               cursor: 'pointer',
             }}
           >
-            <FontAwesomeIcon icon={faMapMarkerAlt} style={{ color: effectiveColorScheme === 'condicionLocalizacion' ? 'green' : '#ccc' }} /> Condición de Localización
+            <MapPin style={{ color: effectiveColorScheme === 'condicionLocalizacion' ? 'green' : '#ccc' }} /> Condición de Localización
           </label>
         </div>
       </fieldset>

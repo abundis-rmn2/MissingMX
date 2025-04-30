@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, Box } from '@radix-ui/themes';
 import NotebookListModal from './NotebookListModal';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faFolderOpen, faList } from '@fortawesome/free-solid-svg-icons';
+import { Save, FolderOpen, List } from 'lucide-react'; // Replace FontAwesome with Lucide
 
 const NotebookLoad = ({
   saveNotesToBackend,
@@ -26,7 +25,7 @@ const NotebookLoad = ({
         onClick={saveNotesToBackend}
         style={{ flex: 1 }}
       >
-        <FontAwesomeIcon icon={faSave} style={{ marginRight: 4 }} />
+        <Save style={{ marginRight: 4 }} /> {/* Use Lucide icon */}
         Guardar en servidor
       </Button>
       <Button
@@ -34,7 +33,7 @@ const NotebookLoad = ({
         onClick={() => loadNotesFromBackend(prompt('Ingrese el ID del cuaderno:'))}
         style={{ flex: 1 }}
       >
-        <FontAwesomeIcon icon={faFolderOpen} style={{ marginRight: 4 }} />
+        <FolderOpen style={{ marginRight: 4 }} /> {/* Use Lucide icon */}
         Cargar del servidor
       </Button>
       <Button
@@ -42,7 +41,7 @@ const NotebookLoad = ({
         onClick={listNotebooks}
         style={{ flex: 1 }}
       >
-        <FontAwesomeIcon icon={faList} style={{ marginRight: 4 }} />
+        <List style={{ marginRight: 4 }} /> {/* Use Lucide icon */}
         Listar cuadernos
       </Button>
       <NotebookListModal
