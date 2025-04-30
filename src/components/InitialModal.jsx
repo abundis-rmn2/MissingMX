@@ -13,35 +13,24 @@ const InitialModal = ({
   const { startDate, endDate, setStartDate, setEndDate, loading } = useData();
   const [open, setOpen] = useState(true);
 
-  // Wrap handleSubmit to close modal after fetch
-  const handleSubmitAndClose = useCallback(
-    async (e) => {
-      await handleSubmit(e);
-      setOpen(false);
-    },
-    [handleSubmit]
-  );
+  // Initialize local dates with context values or defaults
+  const [localStartDate, setLocalStartDate] = useState(startDate || '');
+  const [localEndDate, setLocalEndDate] = useState(endDate || '');
 
-  const {
-    localStartDate,
-    setLocalStartDate,
-    localEndDate,
-    setLocalEndDate,
-    handleFormSubmit
-  } = useDateForm({
-    startDate,
-    endDate,
-    setStartDate,
-    setEndDate,
-    handleSubmit: handleSubmitAndClose
-  });
-
-  // Open modal only on first mount
+  // Sync local state with context when context changes
   useEffect(() => {
-    if (!open) {
-      // Could set a flag in localStorage/sessionStorage if you want to persist across reloads
-    }
-  }, [open]);
+    if (startDate) setLocalStartDate(startDate);
+    if (endDate) setLocalEndDate(endDate);
+  }, [startDate, endDate]);
+
+  const handleFormSubmit = useCallback(async (e) => {
+    e.preventDefault();
+    // Update context before submitting
+    setStartDate(localStartDate);
+    setEndDate(localEndDate);
+    await handleSubmit(e);
+    setOpen(false);
+  }, [localStartDate, localEndDate, setStartDate, setEndDate, handleSubmit]);
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
