@@ -80,34 +80,40 @@ export function calculateDateRange(selectedDate, timeScale) {
 
   const startDate = new Date(selectedDate);
   const endDate = new Date(selectedDate);
+  let daysRange = 5; // Default value
 
   switch (timeScale) {
     case 'weekly':
+      daysRange = 7;
       startDate.setDate(startDate.getDate() - startDate.getDay());
-      endDate.setDate(startDate.getDate() + 7);
+      endDate.setDate(startDate.getDate() + daysRange);
       break;
-    case 'bi-weekly': {
-      const daysIntoBiWeek = Math.floor((startDate.getDate() - 1));
-      startDate.setDate(1 + daysIntoBiWeek);
-      endDate.setDate(startDate.getDate() + 14);
+    case 'bi-weekly':
+      daysRange = 14;
+      startDate.setDate(1 + Math.floor((startDate.getDate() - 1)));
+      endDate.setDate(startDate.getDate() + daysRange);
       break;
-    }
     case 'monthly':
+      daysRange = 30;
       startDate.setDate(1);
       endDate.setMonth(endDate.getMonth() + 1, 0);
       break;
     case 'yearly':
+      daysRange = 365;
       startDate.setMonth(0, 1);
       endDate.setMonth(11, 31);
       break;
+    case 'daily':
     default:
-      // daily
+      daysRange = 1;
+      endDate.setDate(startDate.getDate() + daysRange);
       break;
   }
 
   return {
     start: startDate.toISOString().split('T')[0],
     end: endDate.toISOString().split('T')[0],
+    daysRange
   };
 }
 
@@ -136,9 +142,11 @@ export function handleTimeScaleChange(e, setTimeScale) {
   setTimeScale(e.target.value);
 }
 
-export function handleDateClick(e, setSelectedDate) {
+export function handleDateClick(e, setSelectedDate, setDaysRange, timeScale) {
   if (e && e.activeLabel) {
     const clickedDate = new Date(e.activeLabel);
+    const { daysRange } = calculateDateRange(clickedDate, timeScale);
     setSelectedDate(clickedDate);
+    setDaysRange(daysRange);
   }
 }

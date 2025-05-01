@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import TimelineSlider from './TimelineSlider';
 import LayoutForm from './LayoutForm';
 import Clustering from './Clustering';
@@ -9,13 +9,13 @@ import { Timer } from 'lucide-react';
 const PANEL_HEIGHT = 300;
 
 const BottomTimelinePanel = () => {
-  const [open, setOpen] = useState(true);
   const {
     startDate,
     setStartDate,
     endDate,
     setEndDate,
-    setLoading,
+    timelinePanelOpen,
+    setTimelinePanelOpen,
   } = useData();
 
   const handleDateSelect = (start, end) => {
@@ -26,13 +26,28 @@ const BottomTimelinePanel = () => {
 
   return (
     <>
-    <TimelineSlider />
+      <div className= {timelinePanelOpen ? '' : 'TimelineSliderOpen'}
+        style={{
+          display: timelinePanelOpen ? "none" : "block",
+          position: "fixed",
+          bottom: 0,
+          left: 5,
+          zIndex: 99,
+          background: "#fff",
+          boxShadow: "0 -2px 12px rgba(0,0,0,0.12)",
+          borderTop: "1px solid #eee",
+          borderRadius: "8px 8px 0 0",
+          padding: "8px 16px",
+        }}
+      >
+        <TimelineSlider />
+      </div>
       <button
-        onClick={() => setOpen(!open)}
+        onClick={() => setTimelinePanelOpen(!timelinePanelOpen)}
         style={{
           position: "fixed",
-          bottom: open ? PANEL_HEIGHT  : 0,
-          left: "10%",
+          bottom: timelinePanelOpen ? PANEL_HEIGHT : 0,
+          left: 410,
           transform: "translateX(-50%)",
           zIndex: 9990,
           background: "#007bff",
@@ -51,30 +66,33 @@ const BottomTimelinePanel = () => {
       >
         <Timer size={18} />
         <span style={{ fontWeight: 500, letterSpacing: 1 }}>
-          Línea del tiempo
+          Línea del tiempo / Visualización
         </span>
       </button>
 
-      <div className="TimelineSlider" style={{
-        position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: open ? PANEL_HEIGHT : 0,
-        background: "#fff",
-        boxShadow: "0 -2px 12px rgba(0,0,0,0.12)",
-        borderTop: "1px solid #eee",
-        transition: "height 0.1s ease",
-        overflow: "hidden",
-        zIndex: 9989,
-      }}>
+      <div
+        className="TimelineSlider"
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: timelinePanelOpen ? PANEL_HEIGHT : 0,
+          background: "#fff",
+          boxShadow: "0 -2px 12px rgba(0,0,0,0.12)",
+          borderTop: "1px solid #eee",
+          transition: "height 0.1s ease",
+          overflow: "hidden",
+          zIndex: 9989,
+        }}
+      >
         <div className="FormsContainer">
           <TimelineSlider />
           <LayoutForm />
         </div>
         <Clustering type="personas_sin_identificar" />
-        <GlobalTimeGraph 
-          className="GlobalTimeGraph" 
+        <GlobalTimeGraph
+          className="GlobalTimeGraph"
           onDateSelect={handleDateSelect}
         />
       </div>

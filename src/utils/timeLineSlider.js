@@ -1,136 +1,78 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useEffect } from 'react';
 import { useData } from '../context/DataContext';
 
-export function useTimelineSlider() {
-  const { 
-    timelineData, 
-    filterMarkersByDate, 
-    selectedDate, 
-    setSelectedDate, 
-    daysRange, 
-    setDaysRange,
-    selectedSexo,
-    selectedCondicion,
-    edadRange,
-    sumScoreRange,
-    timeScale
+export const useTimelineSlider = () => {
+  const {
+    selectedDate,
+    setSelectedDate,
+    daysRange,
+    timelineData,
+    isTimelinePlaying,
+    setIsTimelinePlaying,
+    timelineVelocity,
+    setTimelineVelocity,
   } = useData();
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [velocity, setVelocity] = useState(500);
-  const intervalRef = useRef(null);
+  const minDate = timelineData.length > 0 
+    ? new Date(Math.min(...timelineData.map(d => d.timestamp)))
+    : null;
 
-  const getDaysRange = (date, scale) => {
-    switch(scale) {
-      case 'weekly': return 7;
-      case 'bi-weekly': return 14;
-      case 'monthly': return 30;
-      case 'yearly': return 365;
-      default: return 1;
-    }
+  const maxDate = timelineData.length > 0
+    ? new Date(Math.max(...timelineData.map(d => d.timestamp)))
+    : null;
+
+  const stepBackward = (days) => {
+    setSelectedDate(prev => {
+      if (!prev) return prev;
+      const newDate = new Date(prev.getTime() - days * 86400000);
+      return newDate < minDate ? minDate : newDate;
+    });
   };
 
-  const handleDateChange = useCallback((date) => {
-    if (!date) return;
-    setSelectedDate(date);
-    filterMarkersByDate(date, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
-  }, [filterMarkersByDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange, setSelectedDate]);
-
-  useEffect(() => {
-    if (timelineData.length > 0 && !selectedDate) {
-      const initialDate = new Date(Math.min(...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))));
-      handleDateChange(initialDate);
-      setDaysRange(getDaysRange(initialDate, timeScale));
-    }
-  }, [timelineData, timeScale]);
-
-  useEffect(() => {
-    if (selectedDate) {
-      handleDateChange(selectedDate);
-    }
-  }, [selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange, handleDateChange]);
-
-  useEffect(() => {
-    if (isPlaying) {
-      intervalRef.current = setInterval(() => {
-        setSelectedDate(prevDate => {
-          const newDate = new Date(prevDate);
-          newDate.setDate(newDate.getDate() + daysRange); // Avanzar según daysRange
-          return newDate;
-        });
-      }, velocity);
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
+  const stepForward = (days) => {
+    setSelectedDate(prev => {
+      if (!prev) return prev;
+      const newDate = new Date(prev.getTime() + days * 86400000);
+      // Si llegamos al final, pausar la reproducción
+      if (newDate >= maxDate) {
+        setIsTimelinePlaying(false);
+        return maxDate;
       }
-    };
-  }, [isPlaying, velocity, daysRange, setSelectedDate]);
+      return newDate;
+    });
+  };
+
+  const togglePlayPause = () => {
+    setIsTimelinePlaying(prev => !prev);
+  };
 
   useEffect(() => {
-    if (selectedDate) {
-      setDaysRange(getDaysRange(selectedDate, timeScale));
+    let interval;
+    if (isTimelinePlaying) {
+      interval = setInterval(() => {
+        stepForward(daysRange);
+      }, timelineVelocity);
     }
-  }, [timeScale, selectedDate, setDaysRange]);
-
-  const playForward = () => {
-    if (!selectedDate) return;
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + daysRange); // Avanzar según daysRange
-    const maxDate = new Date(Math.max(
-      ...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))
-    ));
-    if (newDate > maxDate) return;
-    setSelectedDate(newDate);
-  };
-
-  const stepForward = () => {
-    if (!selectedDate) return;
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + daysRange); // Avanzar según daysRange
-    const maxDate = new Date(Math.max(
-      ...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))
-    ));
-    if (newDate > maxDate) return;
-    setSelectedDate(newDate);
-  };
-
-  const stepBackward = () => {
-    if (!selectedDate) return;
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - daysRange); // Retroceder según daysRange
-    const minDate = new Date(Math.min(
-      ...timelineData.map(d => parseInt(d.timestamp)).filter(t => !isNaN(t))
-    ));
-    if (newDate < minDate) return;
-    setSelectedDate(newDate);
-  };
-
-  const togglePlayPause = () => setIsPlaying(prev => !prev);
-
-  const timestamps = timelineData
-    .map(d => parseInt(d.timestamp))
-    .filter(timestamp => !isNaN(timestamp));
-  const minDate = timestamps.length ? new Date(Math.min(...timestamps)) : null;
-  const maxDate = timestamps.length ? new Date(Math.max(...timestamps)) : null;
+    // Si llegamos al final, limpiar el intervalo
+    if (selectedDate && maxDate && selectedDate >= maxDate) {
+      clearInterval(interval);
+      setIsTimelinePlaying(false);
+    }
+    return () => clearInterval(interval);
+  }, [isTimelinePlaying, timelineVelocity, daysRange, selectedDate, maxDate]);
 
   return {
-    isPlaying,
+    isPlaying: isTimelinePlaying,
     selectedDate,
     minDate,
     maxDate,
-    velocity,
-    setVelocity,
+    velocity: timelineVelocity,
+    setVelocity: setTimelineVelocity,
     stepBackward,
     stepForward,
     togglePlayPause,
-    handleDateChange,
+    handleDateChange: setSelectedDate,
     timelineData,
     daysRange,
-    setDaysRange,
   };
-}
+};

@@ -15,7 +15,7 @@ import {
   handleDateClick          // Handler para seleccionar fecha en el gráfico
 } from '../utils/globalTimeGraph.jsx';
 
-const GlobalTimeGraph = () => {
+const GlobalTimeGraph = ({ onDateSelect }) => {
   // Obtiene estados y setters globales desde el contexto
   const {
     map,
@@ -24,6 +24,7 @@ const GlobalTimeGraph = () => {
     timeScale,
     setSelectedDate,
     setTimeScale,
+    setDaysRange,
     newDataFetched,
     newForenseDataFetched,
   } = useData();
@@ -59,6 +60,10 @@ const GlobalTimeGraph = () => {
   }
 
   const dateRange = calculateDateRange(selectedDate, timeScale);
+
+  const handleClick = (e) => {
+    handleDateClick(e, setSelectedDate, setDaysRange, timeScale);
+  };
 
   return (
     <div
@@ -149,7 +154,7 @@ const GlobalTimeGraph = () => {
           <LineChart
             data={processedData}
             margin={{ top: 5, right: 30, left: 10, bottom: 5 }}
-            onClick={(e) => handleDateClick(e, setSelectedDate)}
+            onClick={handleClick}
           >
             <XAxis dataKey="date" />
             <YAxis />

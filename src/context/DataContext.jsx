@@ -17,7 +17,7 @@ export const DataProvider = ({ children }) => {
   const [newForenseDataFetched, setNewForenseDataFetched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [daysRange, setDaysRange] = useState(5); // Default to 5 days range
+  const [daysRange, setDaysRange] = useState(30); // Default to 5 days range
   const [activeHeatmapCategories, setActiveHeatmapCategories] = useState([]); // Add this line
   const [selectedSexo, setSelectedSexo] = useState(['HOMBRE', 'MUJER']);
   const [selectedCondicion, setSelectedCondicion] = useState(['CON VIDA', 'SIN VIDA', 'NO APLICA']);
@@ -35,6 +35,9 @@ export const DataProvider = ({ children }) => {
   });
   const [startDate, setStartDate] = useState('2023-01-01'); // Default start date
   const [endDate, setEndDate] = useState('2024-01-01'); // Default end date
+  const [timelinePanelOpen, setTimelinePanelOpen] = useState(true);
+  const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
+  const [timelineVelocity, setTimelineVelocity] = useState(1000);
 
   useEffect(() => {
     console.log('DataContext state initialized:', { 
@@ -509,7 +512,12 @@ export const DataProvider = ({ children }) => {
     colorScheme, setColorScheme,
     visibleComponents, setVisibleComponents,
     startDate, setStartDate,
-    endDate, setEndDate
+    endDate, setEndDate,
+    timelinePanelOpen, setTimelinePanelOpen,
+    isTimelinePlaying,
+    setIsTimelinePlaying,
+    timelineVelocity,
+    setTimelineVelocity,
   };
 
   return (
