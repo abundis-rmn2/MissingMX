@@ -15,6 +15,7 @@ import FilteredStats from './components/FilteredStats'; // Import FilteredStats
 import SideNotebook from './components/SideNotebook'; // Import SideNotebook
 import BottomTimelinePanel from './components/BottomTimelinePanel'; // Import BottomTimelinePanel
 import HeaderPanel from './components/HeaderPanel'; // Import HeaderPanel
+import LeftSideBar from './components/LeftSideBar'; // Import LeftSideBar
 import * as Tabs from '@radix-ui/react-tabs';
 
 // Lazy load non-map components
@@ -164,6 +165,7 @@ const App = () => {
             ) : (
               <>
                 <BottomTimelinePanel />
+                <LeftSideBar />
                 <div className="ComponentToggles">
                   {Object.entries(visibleComponents).map(([key, value]) => (
                     <label key={key}>
@@ -176,7 +178,7 @@ const App = () => {
                     </label>
                   ))}
                 </div>
-                <HeaderPanel 
+                <HeaderPanel
                   toolbarTab={toolbarTab}
                   setToolbarTab={setToolbarTab}
                   handleSubmit={handleSubmit}

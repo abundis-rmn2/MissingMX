@@ -2,8 +2,6 @@ import React from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Calendar, LayoutDashboard, Filter, BarChart2, BookOpen } from 'lucide-react';
 import DateFormCompact from './DateFormCompact';
-import FilterForm from './FilterForm';
-import FilteredStats from './FilteredStats';
 import SemanticGraph from './SemanticGraph';
 import NotebookLoad from './NotebookLoad';
 import FetchCedulas from './FetchCedulas';
@@ -151,14 +149,14 @@ const HeaderPanel = ({
         {/* Tab 3 */}
         <div style={{ display: toolbarTab === "tab3" ? "block" : "none" }}>
           <div style={{ padding: 16 }}>
-            {visibleComponents.filterForm && <FilterForm />}
+            <p>Filter options are now in the left sidebar</p>
           </div>
         </div>
 
         {/* Tab 4 */}
         <div style={{ display: toolbarTab === "tab4" ? "block" : "none" }}>
           <div style={{ padding: 16 }}>
-            {visibleComponents.currentState && <FilteredStats />}
+            <p>Statistics are now in the left sidebar</p>
             {visibleComponents.violenceCases && <SemanticGraph />}
           </div>
         </div>
