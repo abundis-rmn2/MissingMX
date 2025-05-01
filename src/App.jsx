@@ -16,7 +16,9 @@ import SideNotebook from './components/SideNotebook'; // Import SideNotebook
 import BottomTimelinePanel from './components/BottomTimelinePanel'; // Import BottomTimelinePanel
 import HeaderPanel from './components/HeaderPanel'; // Import HeaderPanel
 import LeftSideBar from './components/LeftSideBar'; // Import LeftSideBar
+import HeaderCompact from './components/HeaderCompact'; // Import HeaderCompact
 import * as Tabs from '@radix-ui/react-tabs';
+import AppLayout from './components/AppLayout';
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
@@ -157,78 +159,55 @@ const App = () => {
           }
         `}
       </style>
+      <FetchCedulas
+        fetchCedulas={fetchCedulas}
+        fetchId={fetchId}
+        onFetchComplete={handleFetchComplete}
+      />
+      <FetchForense
+        fetchForense={fetchForense}
+        fetchId={fetchId}
+        onFetchComplete={handleFetchComplete}
+      />
+      <div className="Map">
+        <MapComponent />
+      </div>
+      <BottomTimelinePanel />
       <Suspense fallback={<div>Loading...</div>}>
         <Router basename="/dist">
-          <div className="App" id="app">
-            {!isAuthenticated ? (
-              <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
-            ) : (
-              <>
-                <FetchCedulas
-                  fetchCedulas={fetchCedulas}
-                  fetchId={fetchId}
-                  onFetchComplete={handleFetchComplete}
-                />
-                <FetchForense
-                  fetchForense={fetchForense}
-                  fetchId={fetchId}
-                  onFetchComplete={handleFetchComplete}
-                />
-       <div className="ComponentToggles">
-                  {Object.entries(visibleComponents).map(([key, value]) => (
-                    <label key={key}>
-                      <input
-                        type="checkbox"
-                        checked={value}
-                        onChange={() => toggleComponent(key)}
-                      />
-                      {key.charAt(0).toUpperCase() + key.slice(1)}
-                    </label>
-                  ))}
-                </div>
-                <InitialModal
-                  handleSubmit={handleSubmit}
-                  loading={loading}
-                  fetchCedulas={fetchCedulas}
-                  setFetchCedulas={setFetchCedulas}
-                  fetchForense={fetchForense}
-                  setFetchForense={setFetchForense}
-                />
-                <BottomTimelinePanel />
-                <LeftSideBar />
-                <div className="Map">
-                  <MapComponent />
-                </div>
-              </>
-            )}
-          </div>
           <Routes>
-            <Route
-              path="/cuaderno/:id"
-              element={
-                <SideNotebook
-                  handleSubmit={handleSubmit}
-                  loading={loading}
-                  fetchCedulas={fetchCedulas}
-                  setFetchCedulas={setFetchCedulas}
-                  fetchForense={fetchForense}
-                  setFetchForense={setFetchForense}
-                />
-              }
-            />
-            <Route
-              path="/"
-              element={
-                <SideNotebook
-                  handleSubmit={handleSubmit}
-                  loading={loading}
-                  fetchCedulas={fetchCedulas}
-                  setFetchCedulas={setFetchCedulas}
-                  fetchForense={fetchForense}
-                  setFetchForense={setFetchForense}
-                />
-              }
-            />
+            <Route path="/cuaderno/:id" element={
+              <AppLayout
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+                fetchCedulas={fetchCedulas}
+                fetchForense={fetchForense}
+                fetchId={fetchId}
+                handleFetchComplete={handleFetchComplete}
+                visibleComponents={visibleComponents}
+                toggleComponent={toggleComponent}
+                handleSubmit={handleSubmit}
+                loading={loading}
+                setFetchCedulas={setFetchCedulas}
+                setFetchForense={setFetchForense}
+              />
+            } />
+            <Route path="/" element={
+              <AppLayout
+                isAuthenticated={isAuthenticated}
+                setIsAuthenticated={setIsAuthenticated}
+                fetchCedulas={fetchCedulas}
+                fetchForense={fetchForense}
+                fetchId={fetchId}
+                handleFetchComplete={handleFetchComplete}
+                visibleComponents={visibleComponents}
+                toggleComponent={toggleComponent}
+                handleSubmit={handleSubmit}
+                loading={loading}
+                setFetchCedulas={setFetchCedulas}
+                setFetchForense={setFetchForense}
+              />
+            } />
           </Routes>
         </Router>
       </Suspense>

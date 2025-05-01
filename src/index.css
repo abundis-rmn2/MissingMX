@@ -278,7 +278,7 @@ button:disabled {
   padding: 0.5rem;
 }
 
-.ComponentToggles {
+.HeaderCompact {
   display: flex
 ;
   gap: 1rem;
@@ -286,11 +286,51 @@ button:disabled {
   flex-wrap: wrap;
   z-index: 9999;
   position: absolute;
-  bottom: 0;
+  top: 0;
   background: white;
   width: 100%;
   border-top: 1px solid gray;
 }
+.HeaderCompact {
+  display: flex
+;
+  gap: 1rem;
+  padding: 1rem;
+  flex-wrap: wrap;
+  z-index: 9999;
+  position: absolute;
+  top: 0;
+  background: white;
+  width: 100%;
+  border-top: 1px solid gray;
+}
+
+.header-info {
+  margin-right: 20px;
+  min-width: 150px;
+  font-weight: bold;
+}
+
+.notebook-id {
+  color: #2a6099;
+}
+
+.timestamp {
+  color: #666;
+}
+
+.toggle-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toggle-controls label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .ComponentToggles label {
   display: flex;
   align-items: center;
