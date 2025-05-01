@@ -96,7 +96,7 @@ const App = () => {
 
   useEffect(() => {
     if (window.location.hostname === 'localhost') {
-      setIsAuthenticated(true);
+      //setIsAuthenticated(true);
     }
   }, []);
 
@@ -160,60 +160,58 @@ const App = () => {
           }
         `}
       </style>
-      <FetchCedulas
-        fetchCedulas={fetchCedulas}
-        fetchId={fetchId}
-        onFetchComplete={handleFetchComplete}
-      />
-      <FetchForense
-        fetchForense={fetchForense}
-        fetchId={fetchId}
-        onFetchComplete={handleFetchComplete}
-      />
-      <div className="Map">
-        <MapComponent />
-      </div>
-      <BottomTimelinePanel />
-      <Suspense fallback={<div>Loading...</div>}>
-        <Router basename="/dist">
-          <Routes>
-            <Route path="/cuaderno/:id" element={
-              <AppLayout
-                isNotebookRoute={true}
-                isAuthenticated={isAuthenticated}
-                setIsAuthenticated={setIsAuthenticated}
-                fetchCedulas={fetchCedulas}
-                fetchForense={fetchForense}
-                fetchId={fetchId}
-                handleFetchComplete={handleFetchComplete}
-                visibleComponents={visibleComponents}
-                toggleComponent={toggleComponent}
-                handleSubmit={handleSubmit}
-                loading={loading}
-                setFetchCedulas={setFetchCedulas}
-                setFetchForense={setFetchForense}
-              />
-            } />
-            <Route path="/" element={
-              <AppLayout
-                isNotebookRoute={false}
-                isAuthenticated={isAuthenticated}
-                setIsAuthenticated={setIsAuthenticated}
-                fetchCedulas={fetchCedulas}
-                fetchForense={fetchForense}
-                fetchId={fetchId}
-                handleFetchComplete={handleFetchComplete}
-                visibleComponents={visibleComponents}
-                toggleComponent={toggleComponent}
-                handleSubmit={handleSubmit}
-                loading={loading}
-                setFetchCedulas={setFetchCedulas}
-                setFetchForense={setFetchForense}
-              />
-            } />
-          </Routes>
-        </Router>
-      </Suspense>
+      {!isAuthenticated ? (
+        <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
+      ) : (
+        <>
+          <FetchCedulas
+            fetchCedulas={fetchCedulas}
+            fetchId={fetchId}
+            onFetchComplete={handleFetchComplete}
+          />
+          <FetchForense
+            fetchForense={fetchForense}
+            fetchId={fetchId}
+            onFetchComplete={handleFetchComplete}
+          />
+          <div className="Map">
+            <MapComponent />
+          </div>
+          <BottomTimelinePanel />
+          <Suspense fallback={<div>Loading...</div>}>
+            <Router basename="/dist">
+              <Routes>
+                <Route path="/cuaderno/:id" element={
+                  <AppLayout
+                    isNotebookRoute={true}
+                    visibleComponents={visibleComponents}
+                    toggleComponent={toggleComponent}
+                    handleSubmit={handleSubmit}
+                    loading={loading}
+                    fetchCedulas={fetchCedulas}
+                    setFetchCedulas={setFetchCedulas}
+                    fetchForense={fetchForense}
+                    setFetchForense={setFetchForense}
+                  />
+                } />
+                <Route path="/" element={
+                  <AppLayout
+                    isNotebookRoute={false}
+                    visibleComponents={visibleComponents}
+                    toggleComponent={toggleComponent}
+                    handleSubmit={handleSubmit}
+                    loading={loading}
+                    fetchCedulas={fetchCedulas}
+                    setFetchCedulas={setFetchCedulas}
+                    fetchForense={fetchForense}
+                    setFetchForense={setFetchForense}
+                  />
+                } />
+              </Routes>
+            </Router>
+          </Suspense>
+        </>
+      )}
     </>
   );
 };

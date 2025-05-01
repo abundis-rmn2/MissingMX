@@ -1,33 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import PasswordForm from './PasswordForm';
+import React, { useState } from 'react';
+import * as Dialog from '@radix-ui/react-dialog';
+import { Lock, Key, AlertCircle } from 'lucide-react';
+import '../styles/PasswordCheck.css';
 
 const PasswordCheck = ({ onAuthenticated }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handlePasswordSubmit = (password) => {
-    fetch('https://datades.abundis.com.mx/dist/check_password.php', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ password }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          setIsAuthenticated(true);
-          onAuthenticated();
-        } else {
-          alert('Incorrect password');
-        }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      const response = await fetch('https://datades.abundis.com.mx/dist/check_password.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ password }),
       });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        onAuthenticated();
+      } else {
+        setError('La contraseña ingresada es incorrecta');
+        setPassword('');
+      }
+    } catch (err) {
+      setError('Error al verificar la contraseña');
+    }
   };
 
-  if (!isAuthenticated) {
-    return <PasswordForm onSubmit={handlePasswordSubmit} />;
-  }
+  return (
+    <Dialog.Root open={true}>
+      <Dialog.Overlay className="password-overlay" />
+      <Dialog.Content className="password-content">
+        <Dialog.Title className="password-title">
+          <Lock size={24} />
+          Acceso Restringido
+        </Dialog.Title>
+        
+        <p className="password-info">
+          Los datos contenidos en esta plataforma son sensibles. 
+          <br />
+          Si desea solicitar acceso, puede escribir a: 
+          <br /> 
+          <a href="mailto:accesos_cartografia@tejer.red">accesos_cartografia@tejer.red</a>
+        </p>
+        
+        <form onSubmit={handleSubmit} className="password-form">
+          <div className="input-wrapper">
+            <Key size={20} />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Ingrese la contraseña"
+              required
+              autoFocus
+            />
+          </div>
 
-  return null; // Render nothing if authenticated
+          {error && (
+            <div className="error-message">
+              <AlertCircle size={16} />
+              {error}
+            </div>
+          )}
+
+          <button type="submit" className="submit-button">
+            <Lock size={18} />
+            Verificar Acceso
+          </button>
+        </form>
+      </Dialog.Content>
+    </Dialog.Root>
+  );
 };
 
 export default PasswordCheck;
