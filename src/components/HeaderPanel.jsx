@@ -1,11 +1,32 @@
+{{ /*
+  not longer called
+  used like this if wanted 
+                  <HeaderPanel
+                  toolbarTab={toolbarTab}
+                  setToolbarTab={setToolbarTab}
+                  handleSubmit={handleSubmit}
+                  loading={loading}
+                  fetchCedulas={fetchCedulas}
+                  setFetchCedulas={setFetchCedulas}
+                  fetchForense={fetchForense}
+                  setFetchForense={setFetchForense}
+                  fetchId={fetchId}
+                  handleFetchComplete={handleFetchComplete}
+                  isFormsVisible={isFormsVisible}
+                  visibleComponents={visibleComponents}
+                  isNotebookModalOpen={isNotebookModalOpen}
+                  setIsNotebookModalOpen={setIsNotebookModalOpen}
+                  notebookList={notebookList}
+                  listNotebooksApp={listNotebooksApp}
+                />*/}}
+
+
 import React from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
 import { Calendar, LayoutDashboard, Filter, BarChart2, BookOpen } from 'lucide-react';
 import DateFormCompact from './DateFormCompact';
 import SemanticGraph from './SemanticGraph';
 import NotebookLoad from './NotebookLoad';
-import FetchCedulas from './FetchCedulas';
-import FetchForense from './FetchForense';
 import { useData } from '../context/DataContext';
 
 const tabDefs = [
@@ -124,16 +145,6 @@ const HeaderPanel = ({
                 endDate={endDate}
                 setStartDate={setStartDate}
                 setEndDate={setEndDate}
-              />
-              <FetchCedulas
-                fetchCedulas={fetchCedulas}
-                fetchId={fetchId}
-                onFetchComplete={handleFetchComplete}
-              />
-              <FetchForense
-                fetchForense={fetchForense}
-                fetchId={fetchId}
-                onFetchComplete={handleFetchComplete}
               />
             </div>
           )}

@@ -164,9 +164,17 @@ const App = () => {
               <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
             ) : (
               <>
-                <BottomTimelinePanel />
-                <LeftSideBar />
-                <div className="ComponentToggles">
+                <FetchCedulas
+                  fetchCedulas={fetchCedulas}
+                  fetchId={fetchId}
+                  onFetchComplete={handleFetchComplete}
+                />
+                <FetchForense
+                  fetchForense={fetchForense}
+                  fetchId={fetchId}
+                  onFetchComplete={handleFetchComplete}
+                />
+       <div className="ComponentToggles">
                   {Object.entries(visibleComponents).map(([key, value]) => (
                     <label key={key}>
                       <input
@@ -178,24 +186,6 @@ const App = () => {
                     </label>
                   ))}
                 </div>
-                <HeaderPanel
-                  toolbarTab={toolbarTab}
-                  setToolbarTab={setToolbarTab}
-                  handleSubmit={handleSubmit}
-                  loading={loading}
-                  fetchCedulas={fetchCedulas}
-                  setFetchCedulas={setFetchCedulas}
-                  fetchForense={fetchForense}
-                  setFetchForense={setFetchForense}
-                  fetchId={fetchId}
-                  handleFetchComplete={handleFetchComplete}
-                  isFormsVisible={isFormsVisible}
-                  visibleComponents={visibleComponents}
-                  isNotebookModalOpen={isNotebookModalOpen}
-                  setIsNotebookModalOpen={setIsNotebookModalOpen}
-                  notebookList={notebookList}
-                  listNotebooksApp={listNotebooksApp}
-                />
                 <InitialModal
                   handleSubmit={handleSubmit}
                   loading={loading}
@@ -204,6 +194,8 @@ const App = () => {
                   fetchForense={fetchForense}
                   setFetchForense={setFetchForense}
                 />
+                <BottomTimelinePanel />
+                <LeftSideBar />
                 <div className="Map">
                   <MapComponent />
                 </div>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useData } from '../context/DataContext';
 
 export const useTimelineSlider = () => {
@@ -13,13 +13,9 @@ export const useTimelineSlider = () => {
     setTimelineVelocity,
   } = useData();
 
-  const minDate = timelineData.length > 0 
-    ? new Date(Math.min(...timelineData.map(d => d.timestamp)))
-    : null;
-
-  const maxDate = timelineData.length > 0
-    ? new Date(Math.max(...timelineData.map(d => d.timestamp)))
-    : null;
+  // Add state for min and max dates
+  const [minDate, setMinDate] = useState(null);
+  const [maxDate, setMaxDate] = useState(null);
 
   const stepBackward = (days) => {
     setSelectedDate(prev => {
@@ -60,6 +56,23 @@ export const useTimelineSlider = () => {
     }
     return () => clearInterval(interval);
   }, [isTimelinePlaying, timelineVelocity, daysRange, selectedDate, maxDate]);
+
+  // Calculate initial min and max dates
+  useEffect(() => {
+    if (timelineData && timelineData.length > 0) {
+      const dates = timelineData.map(d => new Date(d.timestamp));
+      const min = new Date(Math.min(...dates));
+      const max = new Date(Math.max(...dates));
+      setMinDate(min);
+      setMaxDate(max);
+      
+      // If no date is selected, set it to the minimum date
+      if (!selectedDate) {
+        setSelectedDate(min);
+        console.log('TimelineSlider: Initial date set to:', min);
+      }
+    }
+  }, [timelineData, selectedDate, setSelectedDate]);
 
   return {
     isPlaying: isTimelinePlaying,

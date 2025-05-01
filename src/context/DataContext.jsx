@@ -38,6 +38,7 @@ export const DataProvider = ({ children }) => {
   const [timelinePanelOpen, setTimelinePanelOpen] = useState(true);
   const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
   const [timelineVelocity, setTimelineVelocity] = useState(1000);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     console.log('DataContext state initialized:', { 
@@ -518,6 +519,8 @@ export const DataProvider = ({ children }) => {
     setIsTimelinePlaying,
     timelineVelocity,
     setTimelineVelocity,
+    mapLoaded,
+    setMapLoaded,
   };
 
   return (

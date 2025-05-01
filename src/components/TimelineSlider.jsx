@@ -20,6 +20,14 @@ const TimelineSlider = () => {
     daysRange,
   } = useTimelineSlider();
 
+  // Add this useEffect to handle initial date selection
+  useEffect(() => {
+    if (timelineData && timelineData.length > 0 && !selectedDate && minDate) {
+      console.log('TimelineSlider: Setting initial date to:', minDate);
+      handleDateChange(minDate);
+    }
+  }, [timelineData, minDate, selectedDate, handleDateChange]);
+
   const formatDateToSpanish = (date) => {
     if (!date) return '';
     return date.toLocaleDateString('es-ES', {

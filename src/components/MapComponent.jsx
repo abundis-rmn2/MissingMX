@@ -4,7 +4,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 const MapComponent = () => {
-  const { map, setMap } = useData();
+  const { map, setMap, setMapLoaded } = useData();
   const mapContainer = useRef(null);
   const contextLostRef = useRef(false);
 
@@ -35,6 +35,12 @@ const MapComponent = () => {
         newMap.on('load', () => {
           setMap(newMap);
         });
+
+        newMap.on('style.load', () => {
+          setMap(newMap);
+          setMapLoaded(true); // Set mapLoaded to true when style is loaded
+          console.log('Map and style loaded successfully');
+        });
       } catch (error) {
         console.error("Error initializing map:", error);
       }
@@ -46,7 +52,7 @@ const MapComponent = () => {
         setMap(null);
       }
     };
-  }, [map, setMap]);
+  }, [map, setMap, setMapLoaded]);
 
   return (
     <div className="map-wrapper">
