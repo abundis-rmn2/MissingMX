@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TimelineSlider from './TimelineSlider';
 import LayoutForm from './LayoutForm';
 import Clustering from './Clustering';
@@ -14,9 +14,9 @@ const BottomTimelinePanel = () => {
     setStartDate,
     endDate,
     setEndDate,
-    timelinePanelOpen,
-    setTimelinePanelOpen,
   } = useData();
+  
+  const [open, setOpen] = useState(false);
 
   const handleDateSelect = (start, end) => {
     console.log('Date selected in GlobalTimeGraph:', { start, end });
@@ -26,9 +26,9 @@ const BottomTimelinePanel = () => {
 
   return (
     <>
-      <div className= {timelinePanelOpen ? '' : 'TimelineSliderOpen'}
+      <div className={open ? '' : 'TimelineSliderOpen'}
         style={{
-          display: timelinePanelOpen ? "none" : "block",
+          display: open ? "none" : "block",
           position: "fixed",
           bottom: 0,
           left: 5,
@@ -43,10 +43,10 @@ const BottomTimelinePanel = () => {
         <TimelineSlider />
       </div>
       <button
-        onClick={() => setTimelinePanelOpen(!timelinePanelOpen)}
+        onClick={() => setOpen(!open)}
         style={{
           position: "fixed",
-          bottom: timelinePanelOpen ? PANEL_HEIGHT : 0,
+          bottom: open ? PANEL_HEIGHT : 0,
           left: 410,
           transform: "translateX(-50%)",
           zIndex: 9,
@@ -77,7 +77,7 @@ const BottomTimelinePanel = () => {
           bottom: 0,
           left: 0,
           right: 0,
-          height: timelinePanelOpen ? PANEL_HEIGHT : 0,
+          height: open ? PANEL_HEIGHT : 0,
           background: "#fff",
           boxShadow: "0 -2px 12px rgba(0,0,0,0.12)",
           borderTop: "1px solid #eee",

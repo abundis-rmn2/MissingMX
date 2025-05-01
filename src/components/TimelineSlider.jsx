@@ -38,10 +38,10 @@ const TimelineSlider = () => {
   };
 
   if (!Array.isArray(timelineData) || timelineData.length === 0) {
-    return <p>Loading timeline...</p>;
+    return <p>Esperando datos de timeline...</p>;
   }
 
-  if (!minDate || !maxDate) return <p>No data available</p>;
+  if (!minDate || !maxDate) return <p>No se cargaron los datos.</p>;
 
   return (
     <div
@@ -57,7 +57,6 @@ const TimelineSlider = () => {
       <div>
         <span
           style={{
-            display: "block",
             textAlign: "center",
             marginBottom: "10px",
             color: "#666",
