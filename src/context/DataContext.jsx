@@ -362,7 +362,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const filterMarkersByDate = (selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange) => {
-    if (!map) return;
+    if (!map || !selectedDate) return;
   
     //console.log('Filtering markers by date...');
     //console.log('Selected Date:', selectedDate);

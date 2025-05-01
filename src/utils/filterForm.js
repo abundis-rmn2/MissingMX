@@ -1,4 +1,19 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+
+// Add debounce utility
+function useDebounce(callback, delay) {
+  const timeoutRef = useRef(null);
+
+  return useCallback((...args) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]);
+}
 
 // Handlers desacoplados para los filtros
 export function useFilterFormHandlers(dataContext) {
@@ -7,7 +22,8 @@ export function useFilterFormHandlers(dataContext) {
     setSelectedSexo,
     setSelectedCondicion,
     setEdadRange,
-    setsumScoreRange
+    setsumScoreRange,
+    filterMarkersByDate
   } = dataContext;
 
   // Handler para filtro de sexo
@@ -30,24 +46,46 @@ export function useFilterFormHandlers(dataContext) {
     });
   };
 
-  // Handler para rango de edad
-  const handleEdadRangeChange = (e) => {
-    const { value, name } = e.target;
-    setEdadRange((prev) => {
-      const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
-      console.log(`[FilterForm] Edad range updated:`, updated);
-      return updated;
-    });
+  // Debounced map update
+  const debouncedFilterUpdate = useDebounce((selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange) => {
+    if (!selectedDate) return;
+    filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
+  }, 1);
+
+  // Handler para rango de edad con actualización visual inmediata
+  const handleEdadRangeChange = (values) => {
+    console.log('[FilterForm] Handling edad range change:', values);
+    // Actualización visual inmediata
+    setEdadRange(values);
+    // Solo actualizar el mapa si hay una fecha seleccionada
+    if (dataContext.selectedDate) {
+      debouncedFilterUpdate(
+        dataContext.selectedDate,
+        dataContext.daysRange,
+        dataContext.selectedSexo,
+        dataContext.selectedCondicion,
+        values,
+        dataContext.sumScoreRange
+      );
+    }
   };
 
-  // Handler para rango de score
-  const handleSumScoreRangeChange = (e) => {
-    const { value, name } = e.target;
-    setsumScoreRange((prev) => {
-      const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
-      console.log(`[FilterForm] Sum Score range updated:`, updated);
-      return updated;
-    });
+  // Handler para rango de score con actualización visual inmediata
+  const handleSumScoreRangeChange = (values) => {
+    console.log('[FilterForm] Handling sum score change:', values);
+    // Actualización visual inmediata
+    setsumScoreRange(values);
+    // Solo actualizar el mapa si hay una fecha seleccionada
+    if (dataContext.selectedDate) {
+      debouncedFilterUpdate(
+        dataContext.selectedDate,
+        dataContext.daysRange,
+        dataContext.selectedSexo,
+        dataContext.selectedCondicion,
+        dataContext.edadRange,
+        values
+      );
+    }
   };
 
   return {

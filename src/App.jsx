@@ -19,6 +19,7 @@ import LeftSideBar from './components/LeftSideBar'; // Import LeftSideBar
 import HeaderCompact from './components/HeaderCompact'; // Import HeaderCompact
 import * as Tabs from '@radix-ui/react-tabs';
 import AppLayout from './components/AppLayout';
+import './styles/FilterForm.css'; // Import FilterForm styles
 
 // Lazy load non-map components
 const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
