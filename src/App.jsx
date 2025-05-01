@@ -172,6 +172,7 @@ const App = () => {
                     setFetchCedulas={setFetchCedulas}
                     fetchForense={fetchForense}
                     setFetchForense={setFetchForense}
+                    listNotebooksApp={listNotebooksApp}
                   />
                 } />
                 <Route path="/" element={
@@ -185,6 +186,7 @@ const App = () => {
                     setFetchCedulas={setFetchCedulas}
                     fetchForense={fetchForense}
                     setFetchForense={setFetchForense}
+                    listNotebooksApp={listNotebooksApp}
                   />
                 } />
               </Routes>

@@ -14,7 +14,8 @@ const AppLayout = ({
   setFetchCedulas,
   fetchForense,
   setFetchForense,
-  isNotebookRoute
+  isNotebookRoute,
+  listNotebooksApp
 }) => {
   return (
     <div className="panel">
@@ -30,6 +31,7 @@ const AppLayout = ({
         setFetchCedulas={setFetchCedulas}
         fetchForense={fetchForense}
         setFetchForense={setFetchForense}
+        listNotebooksApp={listNotebooksApp}
       />
       <LeftSideBar />
       <SideNotebook
