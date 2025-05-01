@@ -8,7 +8,8 @@ const InitialModal = ({
   fetchCedulas,
   setFetchCedulas,
   fetchForense,
-  setFetchForense
+  setFetchForense,
+  isNotebookRoute
 }) => {
   const { startDate, endDate, setStartDate, setEndDate, loading } = useData();
   const [open, setOpen] = useState(true);
@@ -22,6 +23,10 @@ const InitialModal = ({
     if (startDate) setLocalStartDate(startDate);
     if (endDate) setLocalEndDate(endDate);
   }, [startDate, endDate]);
+
+  useEffect(() => {
+    console.log(`Estás en modo: ${isNotebookRoute ? 'Edición de cuaderno' : 'Nuevo cuaderno'}`);
+  }, [isNotebookRoute]);
 
   const handleFormSubmit = useCallback(async (e) => {
     e.preventDefault();

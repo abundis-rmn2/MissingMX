@@ -178,6 +178,7 @@ const App = () => {
           <Routes>
             <Route path="/cuaderno/:id" element={
               <AppLayout
+                isNotebookRoute={true}
                 isAuthenticated={isAuthenticated}
                 setIsAuthenticated={setIsAuthenticated}
                 fetchCedulas={fetchCedulas}
@@ -194,6 +195,7 @@ const App = () => {
             } />
             <Route path="/" element={
               <AppLayout
+                isNotebookRoute={false}
                 isAuthenticated={isAuthenticated}
                 setIsAuthenticated={setIsAuthenticated}
                 fetchCedulas={fetchCedulas}
