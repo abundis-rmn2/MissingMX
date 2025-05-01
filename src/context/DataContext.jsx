@@ -28,10 +28,10 @@ export const DataProvider = ({ children }) => {
   const [colorScheme, setColorScheme] = useState('sexo');
   const [visibleComponents, setVisibleComponents] = useState({
     filterForm: true,
-    currentState: false,
-    violenceCases: true,
-    timeGraph: false,
-    crossRef: false,
+    currentState: true,
+    //violenceCases: true,
+    //timeGraph: false,
+    //crossRef: false,
   });
   const [startDate, setStartDate] = useState('2023-01-01'); // Default start date
   const [endDate, setEndDate] = useState('2024-01-01'); // Default end date

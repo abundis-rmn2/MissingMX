@@ -17,12 +17,22 @@ const HeaderCompact = ({ visibleComponents, toggleComponent }) => {
     <div className="HeaderCompact">
       <div className="header-info">
         {location.pathname.includes("/cuaderno/") ? (
-          <span className="notebook-id">Cuaderno ID: {id || 'no-id'}</span>
+          <span className="notebook-id">
+            Cuaderno ID: {id || 'sin-id'} 
+            <small style={{ marginLeft: '10px', color: '#666' }}>
+              (Puede navegar este cuaderno en la pestaña "Bitácora de navegación")
+            </small>
+          </span>
         ) : (
-          <span className="timestamp">{currentTimestamp}</span>
+          <span className="timestamp">
+            {currentTimestamp}
+            <small style={{ marginLeft: '10px', color: '#666' }}>
+              Modifique las fechas para analizar las fichas de búsqueda
+            </small>
+          </span>
         )}
       </div>
-      <div className="toggle-controls">
+      <div style={{display: 'none'}} className="toggle-controls">
         {Object.entries(visibleComponents).map(([key, value]) => (
           <label key={key}>
             <input

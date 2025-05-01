@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { useData } from '../context/DataContext';
 import { useDateForm } from '../utils/dateForm';
+import { MapPin, Download } from 'lucide-react';
 
 const InitialModal = ({
   handleSubmit,
@@ -58,18 +59,35 @@ const InitialModal = ({
             left: '50%',
             transform: 'translate(-50%, -50%)',
             padding: 24,
-            minWidth: 320,
+            width: '100%',
+            maxWidth: 700,
             zIndex: 1001
           }}
         >
-          <Dialog.Title style={{ fontWeight: 600, fontSize: 20, marginBottom: 16 }}>
-            Select Date Range
+          <Dialog.Title style={{ fontWeight: 600, fontSize: 22, marginBottom: 20 }}>
+            {isNotebookRoute ? 'Navegación de Datos' : 'Nueva Exploración'}
           </Dialog.Title>
-          <form onSubmit={handleFormSubmit} className="modal-form">
-            <div className="form-content">
+          
+          <div style={{ marginBottom: 24, color: '#333', fontSize: '16px', lineHeight: '1.4' }}>
+            {isNotebookRoute ? (
+              <p>
+                Para explorar este análisis existente, necesitará descargar los datos. 
+                Una vez cargados, haga clic en el botón <MapPin size={16} style={{verticalAlign: 'middle'}}/> 
+                <strong>"Bitácora de navegación"</strong> en el lateral derecho para visualizar el análisis completo.
+              </p>
+            ) : (
+              <p>
+                Inicie una nueva exploración de casos de personas desaparecidas seleccionando 
+                un período de tiempo. Los datos se mostrarán en el mapa para su análisis detallado.
+              </p>
+            )}
+          </div>
+
+          <form onSubmit={handleFormSubmit} className="">
+            <div className="">
               <div className="date-inputs" style={{ marginBottom: 12 }}>
                 <label>
-                  Start Date:
+                  Fecha de inicio:
                   <input
                     type="date"
                     value={localStartDate}
@@ -78,7 +96,7 @@ const InitialModal = ({
                   />
                 </label>
                 <label>
-                  End Date:
+                  Fecha final:
                   <input
                     type="date"
                     value={localEndDate}
@@ -94,7 +112,7 @@ const InitialModal = ({
                     checked={fetchCedulas}
                     onChange={(e) => setFetchCedulas(e.target.checked)}
                   />
-                  Fetch Cedulas
+                  Obtener Cédulas
                 </label>
                 <label>
                   <input
@@ -102,12 +120,22 @@ const InitialModal = ({
                     checked={fetchForense}
                     onChange={(e) => setFetchForense(e.target.checked)}
                   />
-                  Fetch Forense
+                  Obtener Forense
                 </label>
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button type="submit" disabled={loading}>
-                  {loading ? 'Loading...' : 'Fetch Data'}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '6px',
+                    padding: '8px 16px'
+                  }}
+                >
+                  <Download size={18} />
+                  {loading ? 'Cargando...' : 'Obtener Datos'}
                 </button>
               </div>
             </div>
