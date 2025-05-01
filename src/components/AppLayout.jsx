@@ -3,6 +3,7 @@ import InitialModal from './InitialModal';
 import LeftSideBar from './LeftSideBar';
 import HeaderCompact from './HeaderCompact';
 import SideNotebook from './SideNotebook';
+import BottomTimelinePanel from './BottomTimelinePanel';
 
 const AppLayout = ({
   visibleComponents,
@@ -16,7 +17,7 @@ const AppLayout = ({
   isNotebookRoute
 }) => {
   return (
-    <div className="App" id="app">
+    <div className="panel">
       <HeaderCompact 
         visibleComponents={visibleComponents}
         toggleComponent={toggleComponent}
@@ -39,6 +40,7 @@ const AppLayout = ({
         fetchForense={fetchForense}
         setFetchForense={setFetchForense}
       />
+      <BottomTimelinePanel />
     </div>
   );
 };

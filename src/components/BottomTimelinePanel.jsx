@@ -83,7 +83,7 @@ const BottomTimelinePanel = () => {
           borderTop: "1px solid #eee",
           transition: "height 0.1s ease",
           overflow: "hidden",
-          zIndex: 9989,
+          zIndex: 9,
         }}
       >
         <div className="FormsContainer">

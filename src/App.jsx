@@ -4,31 +4,10 @@ import { useData } from './context/DataContext'; // Remove DataProvider import
 import FetchCedulas from './components/FetchCedulas';
 import FetchForense from './components/FetchForense';
 import MapComponent from './components/MapComponent';
-import InitialModal from './components/InitialModal';
-import DateFormCompact from './components/DateFormCompact';
-import Clustering from './components/Clustering';
-import Notebook from './components/Notebook';
 import PasswordCheck from './components/PasswordCheck';
-import TabsComponent from './components/TabsComponent'; // Import TabsComponent
-import NotebookLoad from './components/NotebookLoad'; // Import NotebookLoad
-import FilteredStats from './components/FilteredStats'; // Import FilteredStats
-import SideNotebook from './components/SideNotebook'; // Import SideNotebook
-import BottomTimelinePanel from './components/BottomTimelinePanel'; // Import BottomTimelinePanel
-import HeaderPanel from './components/HeaderPanel'; // Import HeaderPanel
-import LeftSideBar from './components/LeftSideBar'; // Import LeftSideBar
-import HeaderCompact from './components/HeaderCompact'; // Import HeaderCompact
-import * as Tabs from '@radix-ui/react-tabs';
 import AppLayout from './components/AppLayout';
 import './styles/FilterForm.css'; // Import FilterForm styles
 
-// Lazy load non-map components
-const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
-const SemanticGraph = lazy(() => import('./components/SemanticGraph'));
-const CrossRef = lazy(() => import('./components/CrossRef'));
-const FilterForm = lazy(() => import('./components/FilterForm'));
-const LayoutForm = lazy(() => import('./components/LayoutForm'));
-const TimeGraph = lazy(() => import('./components/TimeGraph'));
-const GlobalTimeGraph = lazy(() => import('./components/GlobalTimeGraph'));
 
 const App = () => {
   const [fetchCedulas, setFetchCedulas] = useState(true);
@@ -96,7 +75,7 @@ const App = () => {
 
   useEffect(() => {
     if (window.location.hostname === 'localhost') {
-      //setIsAuthenticated(true);
+      setIsAuthenticated(true);
     }
   }, []);
 
@@ -164,6 +143,7 @@ const App = () => {
         <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
       ) : (
         <>
+          <div className="AbstractFetching">
           <FetchCedulas
             fetchCedulas={fetchCedulas}
             fetchId={fetchId}
@@ -174,10 +154,10 @@ const App = () => {
             fetchId={fetchId}
             onFetchComplete={handleFetchComplete}
           />
+          </div>
           <div className="Map">
             <MapComponent />
           </div>
-          <BottomTimelinePanel />
           <Suspense fallback={<div>Loading...</div>}>
             <Router basename="/dist">
               <Routes>

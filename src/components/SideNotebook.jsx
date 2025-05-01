@@ -22,9 +22,9 @@ const SideNotebook = ({
         onClick={() => setOpen(!open)}
         style={{
           position: "fixed",
-          top: 420,
+          top: 70,
           right: open ? PANEL_WIDTH + 40 : 40,
-          zIndex: 9990,
+          zIndex: 99,
           background: "#007bff",
           color: "#fff",
           border: "none",

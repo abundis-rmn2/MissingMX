@@ -39,11 +39,11 @@ const InitialModal = ({
   }, [localStartDate, localEndDate, setStartDate, setEndDate, handleSubmit]);
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root open={open} modal>
       <Dialog.Portal>
         <Dialog.Overlay
           style={{
-            background: 'rgba(0,0,0,0.15)',
+            background: 'rgba(0, 0, 0, 0.55)',
             position: 'fixed',
             inset: 0,
             zIndex: 1000
