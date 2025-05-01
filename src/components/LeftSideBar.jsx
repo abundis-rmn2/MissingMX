@@ -50,7 +50,7 @@ const LeftSideBar = () => {
       style={{
         position: 'absolute',
         left: 5,
-        top: 100,
+        top: 65,
         width: '400px',
         background: 'white',
         padding: '16px',

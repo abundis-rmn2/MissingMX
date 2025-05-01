@@ -49,7 +49,7 @@ const BottomTimelinePanel = () => {
           bottom: timelinePanelOpen ? PANEL_HEIGHT : 0,
           left: 410,
           transform: "translateX(-50%)",
-          zIndex: 9990,
+          zIndex: 9,
           background: "#007bff",
           color: "#fff",
           border: "none",
