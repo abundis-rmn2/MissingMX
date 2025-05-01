@@ -27,6 +27,8 @@ const GlobalTimeGraph = ({ onDateSelect }) => {
     setDaysRange,
     newDataFetched,
     newForenseDataFetched,
+    selectedSexo,          // Use these states instead of filters
+    selectedCondicion      // Use these states instead of filters
   } = useData();
 
   const [processedData, setProcessedData] = useState([]);
@@ -169,31 +171,41 @@ const GlobalTimeGraph = ({ onDateSelect }) => {
                 fill="rgba(0, 0, 255, 0.2)"
               />
             )}
-            <Line
-              type="monotone"
-              dataKey="HOMBRE"
-              stroke={COLORS.HOMBRE.opacity100}
-            />
-            <Line
-              type="monotone"
-              dataKey="MUJER"
-              stroke={COLORS.MUJER.opacity100}
-            />
-            <Line
-              type="monotone"
-              dataKey="CON VIDA"
-              stroke={COLORS.CON_VIDA.opacity100}
-            />
-            <Line
-              type="monotone"
-              dataKey="SIN VIDA"
-              stroke={COLORS.SIN_VIDA.opacity100}
-            />
-            <Line
-              type="monotone"
-              dataKey="NO APLICA"
-              stroke={COLORS.NO_APLICA.opacity100}
-            />
+            {selectedSexo.includes('HOMBRE') && (
+              <Line
+                type="monotone"
+                dataKey="HOMBRE"
+                stroke={COLORS.HOMBRE.opacity100}
+              />
+            )}
+            {selectedSexo.includes('MUJER') && (
+              <Line
+                type="monotone"
+                dataKey="MUJER"
+                stroke={COLORS.MUJER.opacity100}
+              />
+            )}
+            {selectedCondicion.includes('CON VIDA') && (
+              <Line
+                type="monotone"
+                dataKey="CON VIDA"
+                stroke={COLORS.CON_VIDA.opacity100}
+              />
+            )}
+            {selectedCondicion.includes('SIN VIDA') && (
+              <Line
+                type="monotone"
+                dataKey="SIN VIDA"
+                stroke={COLORS.SIN_VIDA.opacity100}
+              />
+            )}
+            {selectedCondicion.includes('NO APLICA') && (
+              <Line
+                type="monotone"
+                dataKey="NO APLICA"
+                stroke={COLORS.NO_APLICA.opacity100}
+              />
+            )}
           </LineChart>
         </ResponsiveContainer>
       )}
