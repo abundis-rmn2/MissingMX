@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import InitialModal from './InitialModal';
 import LeftSideBar from './LeftSideBar';
 import HeaderCompact from './HeaderCompact';
@@ -17,6 +17,16 @@ const AppLayout = ({
   isNotebookRoute,
   listNotebooksApp
 }) => {
+  const [activePanel, setActivePanel] = useState(null);
+
+  const handlePanelHover = (panelName) => {
+    setActivePanel(panelName);
+  };
+
+  const getPanelStyle = (panelName) => ({
+    zIndex: activePanel === panelName ? 10 : 1
+  });
+
   return (
     <div className="panel">
       <HeaderCompact 
@@ -33,7 +43,11 @@ const AppLayout = ({
         setFetchForense={setFetchForense}
         listNotebooksApp={listNotebooksApp}
       />
-      <LeftSideBar />
+      <LeftSideBar 
+        onMouseEnter={() => handlePanelHover('leftSidebar')}
+        onMouseLeave={() => handlePanelHover(null)}
+        style={getPanelStyle('leftSidebar')}
+      />
       <SideNotebook
         handleSubmit={handleSubmit}
         loading={loading}
@@ -41,8 +55,15 @@ const AppLayout = ({
         setFetchCedulas={setFetchCedulas}
         fetchForense={fetchForense}
         setFetchForense={setFetchForense}
+        onMouseEnter={() => handlePanelHover('sideNotebook')}
+        onMouseLeave={() => handlePanelHover(null)}
+        style={getPanelStyle('sideNotebook')}
       />
-      <BottomTimelinePanel />
+      <BottomTimelinePanel 
+        onMouseEnter={() => handlePanelHover('bottomTimeline')}
+        onMouseLeave={() => handlePanelHover(null)}
+        style={getPanelStyle('bottomTimeline')}
+      />
     </div>
   );
 };

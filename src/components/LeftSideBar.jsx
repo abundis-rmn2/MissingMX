@@ -5,6 +5,7 @@ import FilterForm from './FilterForm';
 import FilterFormWrapper from './FilterFormWrapper';
 import FilteredStats from './FilteredStats';
 import { useData } from '../context/DataContext';
+import { useZIndex } from '../utils/useZIndex';
 
 const accordionStyles = {
   trigger: {
@@ -44,9 +45,12 @@ const accordionStyles = {
 
 const LeftSideBar = () => {
   const { visibleComponents } = useData();
+  const { zIndex, handleClick } = useZIndex('left-sidebar');
 
   return (
     <div 
+      id="left-sidebar"
+      onClick={handleClick}
       style={{
         position: 'absolute',
         left: 5,
@@ -54,7 +58,7 @@ const LeftSideBar = () => {
         width: '400px',
         background: 'white',
         padding: '16px',
-        zIndex: 98,
+        zIndex: zIndex,
         maxHeight: 'calc(100vh - 100px)',
         overflowY: 'auto',
         borderRadius: '8px',

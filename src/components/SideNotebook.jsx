@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Notebook from './Notebook';
 import DateFormCompact from './DateFormCompact';
 import { MapPin } from 'lucide-react'; // Replace FontAwesome with Lucide
+import { useZIndex } from '../utils/useZIndex';
 
 const PANEL_WIDTH = 500;
 
@@ -14,17 +15,21 @@ const SideNotebook = ({
   setFetchForense,
 }) => {
   const [open, setOpen] = useState(false);
+  const { zIndex, handleClick } = useZIndex('side-notebook');
 
   return (
-    <>
+    <div 
+      id="side-notebook"
+      onClick={handleClick}
+    >
       {/* Rotated tab button */}
       <button
         onClick={() => setOpen(!open)}
         style={{
           position: "fixed",
           top: 70,
-          right: open ? PANEL_WIDTH + 40 : 40,
-          zIndex: 99,
+          right: open ? PANEL_WIDTH + 45 : 45,
+          zIndex: 8,
           background: "#007bff",
           color: "#fff",
           border: "none",
@@ -52,9 +57,9 @@ const SideNotebook = ({
           display: "flex",
           flexDirection: "column",
           position: "fixed",
-          top: 50,
+          top: 0,
           right: 0,
-          zIndex: 9999,
+          zIndex: zIndex,
           background: "#fff",
           boxShadow: "-2px 0 12px rgba(0,0,0,0.12)",
           borderLeft: "1px solid #eee",
@@ -91,7 +96,7 @@ const SideNotebook = ({
           </div>
         </>
       </div>
-    </>
+    </div>
   );
 };
 

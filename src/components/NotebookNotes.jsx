@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Box } from '@radix-ui/themes';
-import { Network, StickyNote } from 'lucide-react'; // Replace FontAwesome with Lucide
+import { Flag, StickyNote } from 'lucide-react'; // Cambiar Network por Flag
 
 const NotebookNotes = ({
   newNote,
@@ -37,15 +37,15 @@ const NotebookNotes = ({
         onClick={addNote}
         style={{ flex: 1 }}
       >
-        <Network style={{ marginRight: 4 }} /> {/* Use Lucide icon */}
-        Estado de Visualización
+        <Flag style={{ marginRight: 4 }} />
+        Marcar Navegación
       </Button>
       <Button
         size="1"
         onClick={addTextOnlyNote}
         style={{ flex: 1 }}
       >
-        <StickyNote style={{ marginRight: 4 }} /> {/* Use Lucide icon */}
+        <StickyNote style={{ marginRight: 4 }} />
         Nota de Texto
       </Button>
     </Box>

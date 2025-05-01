@@ -7,7 +7,7 @@ import { useNotebook } from '../utils/notebook';
 import NotebookNotes from './NotebookNotes';
 import NotebookLoad from './NotebookLoad';
 import GlobalTimeGraphData from './GlobalTimeGraphData';
-import { MapPin } from 'lucide-react'; // Replace FontAwesome with Lucide
+import { MapPin, ArrowLeft, Plus } from 'lucide-react'; // Cambiar Flag por ArrowLeft
 
 const Notebook = () => {
   const dataContext = useData();
@@ -68,7 +68,7 @@ const Notebook = () => {
         />
         <Box>
           {notes.length === 0 ? (
-            <Box color="gray" mb="2">No notes yet. Add one to get started!</Box>
+            <Box color="gray" mb="2">¡Aún no hay notas! Agrega una para comenzar.</Box>
           ) : (
             notes.map(note => (
               <Box
@@ -98,9 +98,10 @@ const Notebook = () => {
                         size="1"
                         variant="soft"
                         onClick={() => restoreState(note.state)}
-                        title="Restore this state"
+                        title="Añadir marcador en este estado"
                       >
-                        ⟲
+                        <ArrowLeft size={14} />
+                        Ir a marcador
                       </Button>
                     )}
                     <Button
@@ -108,7 +109,7 @@ const Notebook = () => {
                       variant="ghost"
                       color="red"
                       onClick={() => deleteNote(note.id)}
-                      title="Delete this note"
+                      title="Eliminar esta nota"
                     >
                       🗑️
                     </Button>

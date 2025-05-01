@@ -5,6 +5,7 @@ import Clustering from './Clustering';
 import GlobalTimeGraph from './GlobalTimeGraph';
 import { useData } from '../context/DataContext';
 import { Timer } from 'lucide-react';
+import { useZIndex } from '../utils/useZIndex';
 
 const PANEL_HEIGHT = 300;
 
@@ -17,6 +18,7 @@ const BottomTimelinePanel = () => {
   } = useData();
   
   const [open, setOpen] = useState(false);
+  const { zIndex, handleClick } = useZIndex('bottom-timeline');
 
   const handleDateSelect = (start, end) => {
     console.log('Date selected in GlobalTimeGraph:', { start, end });
@@ -25,14 +27,17 @@ const BottomTimelinePanel = () => {
   };
 
   return (
-    <>
+    <div 
+      id="bottom-timeline"
+      onClick={handleClick}
+    >
       <div className={open ? '' : 'TimelineSliderOpen'}
         style={{
           display: open ? "none" : "block",
           position: "fixed",
           bottom: 0,
           left: 5,
-          zIndex: 99,
+          zIndex: zIndex,
           background: "#fff",
           boxShadow: "0 -2px 12px rgba(0,0,0,0.12)",
           borderTop: "1px solid #eee",
@@ -49,7 +54,7 @@ const BottomTimelinePanel = () => {
           bottom: open ? PANEL_HEIGHT : 0,
           left: 410,
           transform: "translateX(-50%)",
-          zIndex: 9,
+          zIndex: zIndex,
           background: "#007bff",
           color: "#fff",
           border: "none",
@@ -83,7 +88,7 @@ const BottomTimelinePanel = () => {
           borderTop: "1px solid #eee",
           transition: "height 0.1s ease",
           overflow: "hidden",
-          zIndex: 9,
+          zIndex: zIndex,
         }}
       >
         <div className="FormsContainer">
@@ -96,7 +101,7 @@ const BottomTimelinePanel = () => {
           onDateSelect={handleDateSelect}
         />
       </div>
-    </>
+    </div>
   );
 };
 
