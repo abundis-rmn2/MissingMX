@@ -1,0 +1,66 @@
+/* Fieldset styling */
+fieldset {
+  border: 1px solid #ccc;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+legend {
+  font-weight: bold;
+  padding: 0 8px;
+}
+
+/* Slider styling */
+.SliderRoot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%; /* Full width */
+  height: 20px;
+  touch-action: none;
+  margin: 10px 0;
+}
+
+.SliderTrack {
+  position: relative;
+  flex-grow: 1;
+  background-color: #e5e5e5;
+  height: 3px;
+  border-radius: 9999px;
+}
+
+.SliderRange {
+  position: absolute;
+  background-color: #666;
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.SliderThumb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  border: 2px solid #666;
+  cursor: pointer;
+}
+
+.SliderThumb:hover {
+  background-color: #f5f5f5;
+}
+
+.SliderThumb:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Range legend styling */
+.rangeLegend {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}

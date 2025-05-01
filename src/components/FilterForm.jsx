@@ -1,198 +1,172 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useData } from '../context/DataContext';
+import {
+  useFilterFormHandlers
+} from '../utils/filterForm';
+import { 
+  UserRound, // for male
+  Heart,
+  Skull,
+  HelpCircle,
+  Users, // new - for sexo section
+  Search, // new - for condición section
+  Calendar, // new - for edad section
+  BarChart2 // new - for score section
+} from 'lucide-react';
+import * as Slider from '@radix-ui/react-slider';
+import '../styles/FilterForm.css';
 
 const FilterForm = () => {
+  const dataContext = useData();
+  const { COLORS } = dataContext;
+
   const {
-    map,
-    setActiveHeatmapCategories,
-    selectedDate,
-    daysRange,
-    filterMarkersByDate,
+    handleSexoChange,
+    handleCondicionChange,
+    handleEdadRangeChange,
+    handleSumScoreRangeChange
+  } = useFilterFormHandlers(dataContext);
+
+  const {
     selectedSexo,
-    setSelectedSexo,
     selectedCondicion,
-    setSelectedCondicion,
     edadRange,
-    setEdadRange,
-    sumScoreRange,
-    setsumScoreRange,
-  } = useData();
-
-  // Track whether filters have been initialized after the time slider
-  const filtersInitialized = useRef(false);
-
-  useEffect(() => {
-    if (selectedDate && daysRange !== undefined) {
-      if (!filtersInitialized.current) {
-        console.log('Initializing filters after time slider is set...');
-        filtersInitialized.current = true;
-      }
-      applyFilters();
-    }
-  }, [selectedSexo, selectedCondicion, edadRange, sumScoreRange, selectedDate, daysRange, map]);
-
-  const applyFilters = () => {
-    if (!map || !filtersInitialized.current) return;
-
-    console.log('Applying filters with the following parameters:', {
-      selectedDate,
-      daysRange,
-      selectedSexo,
-      selectedCondicion,
-      edadRange,
-      sumScoreRange,
-    });
-    filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange);
-  };
-
-  const handleSexoChange = (e) => {
-    const { value, checked } = e.target;
-    setSelectedSexo((prev) => {
-      const updated = checked ? [...prev, value] : prev.filter((item) => item !== value);
-      console.log(`Sexo filter updated: ${updated}`);
-      return updated;
-    });
-  };
-
-  const handleCondicionChange = (e) => {
-    const { value, checked } = e.target;
-    setSelectedCondicion((prev) => {
-      const updated = checked ? [...prev, value] : prev.filter((item) => item !== value);
-      console.log(`Condición filter updated: ${updated}`);
-      return updated;
-    });
-  };
-
-  const handleEdadRangeChange = (e) => {
-    const { value, name } = e.target;
-    setEdadRange((prev) => {
-      const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
-      console.log(`Edad range updated: ${updated}`);
-      return updated;
-    });
-  };
-
-  const handleSumScoreRangeChange = (e) => {
-    const { value, name } = e.target;
-    setsumScoreRange((prev) => {
-      const updated = name === 'min' ? [Number(value), prev[1]] : [prev[0], Number(value)];
-      console.log(`Sum Score range updated: ${updated}`);
-      return updated;
-    });
-  };
+    sumScoreRange
+  } = dataContext;
 
   return (
-    <div >
+    <div>
+      {/* Filtros de Sexo */}
       <fieldset>
-        <legend>Sexo</legend>
-        <label>
+        <legend style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Users size={16} color="#666666" />
+          Sexo
+        </legend>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <input
             type="checkbox"
             value="HOMBRE"
-            checked={selectedSexo.includes('HOMBRE')}
+            checked={selectedSexo.includes("HOMBRE")}
             onChange={handleSexoChange}
           />
+          <UserRound size={20} color={COLORS.HOMBRE.opacity100} />
           Hombre
         </label>
-        <label>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <input
             type="checkbox"
             value="MUJER"
-            checked={selectedSexo.includes('MUJER')}
+            checked={selectedSexo.includes("MUJER")}
             onChange={handleSexoChange}
           />
+          <UserRound size={20} color={COLORS.MUJER.opacity100} />
           Mujer
         </label>
       </fieldset>
 
+      {/* Filtros de Condición de Localización */}
       <fieldset>
-        <legend>Condición de Localización</legend>
-        <label>
+        <legend style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Search size={16} color="#666666" />
+          Condición de Localización
+        </legend>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <input
             type="checkbox"
             value="CON VIDA"
-            checked={selectedCondicion.includes('CON VIDA')}
+            checked={selectedCondicion.includes("CON VIDA")}
             onChange={handleCondicionChange}
+          />
+          <Heart
+            size={20}
+            color={COLORS.CON_VIDA.opacity100}
+            fill={COLORS.CON_VIDA.opacity100}
           />
           Con Vida
         </label>
-        <label>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <input
             type="checkbox"
             value="SIN VIDA"
-            checked={selectedCondicion.includes('SIN VIDA')}
+            checked={selectedCondicion.includes("SIN VIDA")}
             onChange={handleCondicionChange}
           />
+          <Skull size={20} color={COLORS.SIN_VIDA.opacity100} />
           Sin Vida
         </label>
-        <label>
+        <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <input
             type="checkbox"
             value="NO APLICA"
-            checked={selectedCondicion.includes('NO APLICA')}
+            checked={selectedCondicion.includes("NO APLICA")}
             onChange={handleCondicionChange}
           />
+          <HelpCircle size={20} color={COLORS.NO_APLICA.opacity100} />
           No Aplica
         </label>
       </fieldset>
 
+      {/* Filtros de Edad */}
       <fieldset>
-  <legend>Edad de Desaparición</legend>
-  <label>
-    Min: 0
-    <input
-      type="range"
-      name="min"
-      value={edadRange[0]}
-      onChange={handleEdadRangeChange}
-      min="0"
-      max={edadRange[1]}
-    />
-  </label>
-  <br></br>
-  <label>
-    Max: 100
-    <input
-      type="range"
-      name="max"
-      value={edadRange[1]}
-      onChange={handleEdadRangeChange}
-      min={edadRange[0]}
-      max="100"
-    />
-  </label>
-  <hr></hr>
-  <div className='rangeLegend'>    <span>Selected Age Range: {edadRange[0]} - {edadRange[1]}</span></div>
-</fieldset>
+        <legend style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Calendar size={16} color="#666666" />
+          Edad de Desaparición
+        </legend>
+        <div style={{ width: "100%" }}>
+          <Slider.Root
+            className="SliderRoot"
+            defaultValue={[0, 100]}
+            value={[edadRange[0], edadRange[1]]}
+            min={0}
+            max={100}
+            step={1}
+            minStepsBetweenThumbs={1}
+            onValueChange={handleEdadRangeChange}
+          >
+            <Slider.Track className="SliderTrack">
+              <Slider.Range className="SliderRange" />
+            </Slider.Track>
+            <Slider.Thumb className="SliderThumb" aria-label="Min age" />
+            <Slider.Thumb className="SliderThumb" aria-label="Max age" />
+          </Slider.Root>
+          <div className="rangeLegend">
+            <span>
+              Rango de edad: {edadRange[0]} - {edadRange[1]} years
+            </span>
+          </div>
+        </div>
+      </fieldset>
 
-<fieldset>
-  <legend>Score de Violencia</legend>
-  <label>
-   Min: 0.5
-    <input
-      type="range"
-      name="min"
-      value={sumScoreRange[0]}
-      onChange={handleSumScoreRangeChange}
-      min="0.5"
-      max={sumScoreRange[1]}
-    />
-  </label>
-  <br></br>
-  <label>
-    Max: 20
-    <input
-      type="range"
-      name="max"
-      value={sumScoreRange[1]}
-      onChange={handleSumScoreRangeChange}
-      min={sumScoreRange[0]}
-      max="20"
-    />
-  </label>
-  <hr></hr>
-  <div className='rangeLegend'>    <span>Selected Score Range: {sumScoreRange[0]} - {sumScoreRange[1]}</span></div>
-</fieldset>
+      {/* Filtros de Score de Violencia */}
+      <fieldset>
+        <legend style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <BarChart2 size={16} color="#666666" />
+          Score de Violencia
+        </legend>
+        <div style={{  width: "100%" }}>
+          <Slider.Root
+            className="SliderRoot"
+            defaultValue={[0.5, 20]}
+            value={[sumScoreRange[0], sumScoreRange[1]]}
+            min={0.5}
+            max={20}
+            step={0.5}
+            minStepsBetweenThumbs={1}
+            onValueChange={handleSumScoreRangeChange}
+          >
+            <Slider.Track className="SliderTrack">
+              <Slider.Range className="SliderRange" />
+            </Slider.Track>
+            <Slider.Thumb className="SliderThumb" aria-label="Min score" />
+            <Slider.Thumb className="SliderThumb" aria-label="Max score" />
+          </Slider.Root>
+          <div className="rangeLegend">
+            <span>
+              Rango de Score: {sumScoreRange[0]} - {sumScoreRange[1]}
+            </span>
+          </div>
+        </div>
+      </fieldset>
     </div>
   );
 };

@@ -1,295 +1,147 @@
 import React, { useEffect, useState } from 'react';
 import { useData } from '../context/DataContext';
+import {
+  useLayoutFormHandlers,
+  useLayoutFormEffects,
+  getEffectiveMapType,
+  getEffectiveColorScheme
+} from '../utils/layoutForm';
+import { Circle, Thermometer, Venus, MapPin } from 'lucide-react'; // Replace FontAwesome with Lucide
+import * as Switch from '@radix-ui/react-switch';
 
 const LayoutForm = () => {
-  // Use local state as fallback if context values aren't available
   const [localMapType, setLocalMapType] = useState('point');
   const [localColorScheme, setLocalColorScheme] = useState('sexo');
-  
   const dataContext = useData();
-  
-  // Debug what's coming from context
-  useEffect(() => {
-    console.log('LayoutForm received context:', {
-      mapType: dataContext.mapType,
-      setMapType: dataContext.setMapType,
-      colorScheme: dataContext.colorScheme,
-      setColorScheme: dataContext.setColorScheme
-    });
-  }, [dataContext]);
-  
-  // Destructure with defaults from local state
+
+  // Handlers and effects from utils
   const {
-    map,
-    fetchedRecords,
-    sexoLayout,
-    condicionLocalizacionLayout,
-    COLORS,
-    setActiveHeatmapCategories,
-    selectedDate,
-    daysRange,
-    selectedSexo,
-    selectedCondicion,
-    edadRange,
-    sumScoreRange,
-    filterMarkersByDate,
-    mapType = localMapType,
-    setMapType = setLocalMapType,
-    colorScheme = localColorScheme,
-    setColorScheme = setLocalColorScheme
-  } = dataContext;
+    handleMapTypeChange,
+    handleColorSchemeChange
+  } = useLayoutFormHandlers(dataContext, setLocalMapType, setLocalColorScheme);
 
-  const getHeatmapLayoutForCategory = (category) => {
-    let baseColor = COLORS.UNKNOWN;
-    if (category === 'HOMBRE') baseColor = COLORS.HOMBRE;
-    else if (category === 'MUJER') baseColor = COLORS.MUJER;
-    else if (category === 'CON VIDA') baseColor = COLORS.CON_VIDA;
-    else if (category === 'SIN VIDA') baseColor = COLORS.SIN_VIDA;
-    else if (category === 'NO APLICA') baseColor = COLORS.NO_APLICA;
+  useLayoutFormEffects(dataContext);
 
-    return {
-      'heatmap-weight': [
-        'interpolate',
-        ['linear'],
-        ['get', 'density'],
-        0, 0,
-        6, 1
-      ],
-      'heatmap-intensity': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        0, 1,
-        9, 3
-      ],
-      'heatmap-color': [
-        'interpolate',
-        ['linear'],
-        ['heatmap-density'],
-        0, 'rgba(0, 0, 0, 0)',
-        0.2, baseColor.opacity30,
-        0.4, baseColor.opacity30,
-        1, baseColor.opacity100
-      ],
-      'heatmap-radius': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        0, 12,
-        13, 28
-      ],
-      'heatmap-opacity': [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        3, 0.4,
-        9, 0.6,
-        13, 0.8
-      ]
-    };
-  };
-
-  const updateMapLayer = () => {
-    if (!map) return;
-
-    const sourceId = 'cedulaLayer';
-    const geojsonData = {
-      type: 'FeatureCollection',
-      features: fetchedRecords.features
-    };
-
-    if (mapType === 'point') {
-      const possibleHeatmapLayerIds = [
-        'cedulaLayer-HOMBRE',
-        'cedulaLayer-MUJER',
-        'cedulaLayer-CON VIDA',
-        'cedulaLayer-SIN VIDA',
-        'cedulaLayer-NO APLICA'
-      ];
-      possibleHeatmapLayerIds.forEach((layerId) => {
-        if (map.getLayer(layerId)) {
-          map.removeLayer(layerId);
-        }
-        if (map.getSource(layerId)) {
-          map.removeSource(layerId);
-        }
-      });
-
-      if (map.getLayer(sourceId)) {
-        map.getSource(sourceId).setData(geojsonData);
-        const layoutConfig = colorScheme === 'sexo' ? sexoLayout : condicionLocalizacionLayout;
-        Object.entries(layoutConfig).forEach(([key, value]) => {
-          map.setPaintProperty(sourceId, key, value);
-        });
-      } else {
-        if (!map.getSource(sourceId)) {
-          map.addSource(sourceId, { type: 'geojson', data: geojsonData });
-        }
-        const layoutConfig = colorScheme === 'sexo' ? sexoLayout : condicionLocalizacionLayout;
-        map.addLayer({
-          id: sourceId,
-          type: 'circle',
-          source: sourceId,
-          paint: layoutConfig
-        });
-      }
-      setActiveHeatmapCategories([]);
-    } else if (mapType === 'heatmap') {
-      if (map.getLayer(sourceId)) {
-        map.removeLayer(sourceId);
-      }
-
-      let activeCategories = [];
-      if (colorScheme === 'sexo') {
-        activeCategories = ['HOMBRE', 'MUJER'];
-      } else if (colorScheme === 'condicionLocalizacion') {
-        activeCategories = ['CON VIDA', 'SIN VIDA', 'NO APLICA'];
-      }
-
-      const allHeatmapLayerIds = [
-        'cedulaLayer-HOMBRE',
-        'cedulaLayer-MUJER',
-        'cedulaLayer-CON VIDA',
-        'cedulaLayer-SIN VIDA',
-        'cedulaLayer-NO APLICA'
-      ];
-      allHeatmapLayerIds.forEach((layerId) => {
-        const parts = layerId.split('-');
-        const category = parts[1];
-        if (!activeCategories.includes(category)) {
-          if (map.getLayer(layerId)) {
-            map.removeLayer(layerId);
-          }
-          if (map.getSource(layerId)) {
-            map.removeSource(layerId);
-          }
-        }
-      });
-
-      if (!map.getSource(sourceId)) {
-        map.addSource(sourceId, { type: 'geojson', data: geojsonData });
-      } else {
-        map.getSource(sourceId).setData(geojsonData);
-      }
-
-      activeCategories.forEach((category) => {
-        const layerId = `${sourceId}-${category}`;
-        let filter;
-        if (category === 'HOMBRE' || category === 'MUJER') {
-          filter = ['==', ['get', 'sexo'], category];
-        } else {
-          filter = ['==', ['get', 'condicion_localizacion'], category];
-        }
-        const layoutConfig = getHeatmapLayoutForCategory(category);
-        if (map.getLayer(layerId)) {
-          Object.entries(layoutConfig).forEach(([key, value]) => {
-            map.setPaintProperty(layerId, key, value);
-          });
-          map.setFilter(layerId, filter);
-        } else {
-          map.addLayer({
-            id: layerId,
-            type: 'heatmap',
-            source: sourceId,
-            paint: layoutConfig,
-            filter: filter
-          });
-        }
-      });
-      setActiveHeatmapCategories(activeCategories);
-    }
-    console.log(geojsonData);
-
-    // Trigger filter update after updating the map layer
-    if (selectedDate) {
-      filterMarkersByDate(selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange,);
-    } else {
-      console.warn('Selected date is null, skipping filter update.');
-    }
-  };
-
-  useEffect(() => {
-    updateMapLayer();
-  }, [mapType, colorScheme, selectedSexo, selectedCondicion, edadRange, sumScoreRange,]);
-
-  const handleMapTypeChange = (e) => {
-    const newValue = e.target.value;
-    console.log('Changing map type to:', newValue);
-    
-    // Safely update using function reference
-    if (typeof setMapType === 'function') {
-      setMapType(newValue);
-    } else {
-      console.error('setMapType is not available, using local state');
-      setLocalMapType(newValue);
-    }
-  };
-
-  const handleColorSchemeChange = (e) => {
-    const newValue = e.target.value;
-    console.log('Changing color scheme to:', newValue);
-    
-    // Safely update using function reference
-    if (typeof setColorScheme === 'function') {
-      setColorScheme(newValue);
-    } else {
-      console.error('setColorScheme is not available, using local state');
-      setLocalColorScheme(newValue);
-    }
-  };
-
-  // Use either context value or local state
-  const effectiveMapType = mapType || localMapType;
-  const effectiveColorScheme = colorScheme || localColorScheme;
+  // Use helpers to get effective values
+  const effectiveMapType = getEffectiveMapType(dataContext, localMapType);
+  const effectiveColorScheme = getEffectiveColorScheme(dataContext, localColorScheme);
 
   return (
     <div>
       <fieldset>
-        <legend>Tipo de visualización</legend>
-        <label>
-          <input
-            type="radio"
-            name="mapType"
-            value="point"
-            checked={effectiveMapType === 'point'}
-            onChange={handleMapTypeChange}
-          />
-          Puntos
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="mapType"
-            value="heatmap"
+        <legend style={{ cursor: 'pointer' }}>Tipo de visualización</legend>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label
+            htmlFor="mapTypeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <Circle style={{ color: effectiveMapType === 'point' ? 'blue' : '#ccc' }} /> Puntos
+          </label>
+          <Switch.Root
+            id="mapTypeSwitch"
             checked={effectiveMapType === 'heatmap'}
-            onChange={handleMapTypeChange}
-          />
-          Heatmap
-        </label>
+            onCheckedChange={(checked) => handleMapTypeChange({ target: { value: checked ? 'heatmap' : 'point' } })}
+            style={{
+              width: '50px',
+              height: '25px',
+              backgroundColor: effectiveMapType === 'heatmap' ? 'red' : 'blue',
+              borderRadius: '9999px',
+              position: 'relative',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: effectiveMapType === 'heatmap' ? 'flex-end' : 'flex-start',
+              padding: '2px',
+            }}
+          >
+            <Switch.Thumb
+              style={{
+                width: '21px',
+                height: '21px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.2s',
+              }}
+            />
+          </Switch.Root>
+          <label
+            htmlFor="mapTypeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <Thermometer style={{ color: effectiveMapType === 'heatmap' ? 'red' : '#ccc' }} /> Heatmap
+          </label>
+        </div>
       </fieldset>
 
       <fieldset>
-        <legend>Esquema de color</legend>
-        <label>
-          <input
-            type="radio"
-            name="colorScheme"
-            value="sexo"
-            checked={effectiveColorScheme === 'sexo'}
-            onChange={handleColorSchemeChange}
-          />
-          Sexo
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="colorScheme"
-            value="condicionLocalizacion"
+        <legend style={{ cursor: 'pointer' }}>Esquema de color</legend>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label
+            htmlFor="colorSchemeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <Venus style={{ color: effectiveColorScheme === 'sexo' ? 'pink' : '#ccc' }} /> Sexo
+          </label>
+          <Switch.Root
+            id="colorSchemeSwitch"
             checked={effectiveColorScheme === 'condicionLocalizacion'}
-            onChange={handleColorSchemeChange}
-          />
-          Condición de Localización
-        </label>
+            onCheckedChange={(checked) =>
+              handleColorSchemeChange({ target: { value: checked ? 'condicionLocalizacion' : 'sexo' } })
+            }
+            style={{
+              width: '50px',
+              height: '25px',
+              backgroundColor: effectiveColorScheme === 'condicionLocalizacion' ? 'green' : 'pink',
+              borderRadius: '9999px',
+              position: 'relative',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: effectiveColorScheme === 'condicionLocalizacion' ? 'flex-end' : 'flex-start',
+              padding: '2px',
+            }}
+          >
+            <Switch.Thumb
+              style={{
+                width: '21px',
+                height: '21px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                transition: 'transform 0.2s',
+              }}
+            />
+          </Switch.Root>
+          <label
+            htmlFor="colorSchemeSwitch"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '5px',
+              cursor: 'pointer',
+            }}
+          >
+            <MapPin style={{ color: effectiveColorScheme === 'condicionLocalizacion' ? 'green' : '#ccc' }} /> Condición de Localización
+          </label>
+        </div>
       </fieldset>
     </div>
   );

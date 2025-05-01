@@ -17,7 +17,7 @@ export const DataProvider = ({ children }) => {
   const [newForenseDataFetched, setNewForenseDataFetched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [daysRange, setDaysRange] = useState(5); // Default to 5 days range
+  const [daysRange, setDaysRange] = useState(30); // Default to 5 days range
   const [activeHeatmapCategories, setActiveHeatmapCategories] = useState([]); // Add this line
   const [selectedSexo, setSelectedSexo] = useState(['HOMBRE', 'MUJER']);
   const [selectedCondicion, setSelectedCondicion] = useState(['CON VIDA', 'SIN VIDA', 'NO APLICA']);
@@ -28,13 +28,17 @@ export const DataProvider = ({ children }) => {
   const [colorScheme, setColorScheme] = useState('sexo');
   const [visibleComponents, setVisibleComponents] = useState({
     filterForm: true,
-    currentState: false,
-    violenceCases: true,
-    timeGraph: false,
-    crossRef: false,
+    currentState: true,
+    //violenceCases: true,
+    //timeGraph: false,
+    //crossRef: false,
   });
   const [startDate, setStartDate] = useState('2023-01-01'); // Default start date
   const [endDate, setEndDate] = useState('2024-01-01'); // Default end date
+  const [timelinePanelOpen, setTimelinePanelOpen] = useState(true);
+  const [isTimelinePlaying, setIsTimelinePlaying] = useState(false);
+  const [timelineVelocity, setTimelineVelocity] = useState(1000);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     console.log('DataContext state initialized:', { 
@@ -358,7 +362,7 @@ export const DataProvider = ({ children }) => {
   };
 
   const filterMarkersByDate = (selectedDate, daysRange, selectedSexo, selectedCondicion, edadRange, sumScoreRange) => {
-    if (!map) return;
+    if (!map || !selectedDate) return;
   
     //console.log('Filtering markers by date...');
     //console.log('Selected Date:', selectedDate);
@@ -509,7 +513,14 @@ export const DataProvider = ({ children }) => {
     colorScheme, setColorScheme,
     visibleComponents, setVisibleComponents,
     startDate, setStartDate,
-    endDate, setEndDate
+    endDate, setEndDate,
+    timelinePanelOpen, setTimelinePanelOpen,
+    isTimelinePlaying,
+    setIsTimelinePlaying,
+    timelineVelocity,
+    setTimelineVelocity,
+    mapLoaded,
+    setMapLoaded,
   };
 
   return (

@@ -4,20 +4,10 @@ import { useData } from './context/DataContext'; // Remove DataProvider import
 import FetchCedulas from './components/FetchCedulas';
 import FetchForense from './components/FetchForense';
 import MapComponent from './components/MapComponent';
-import CurrentState from './context/currrentState';
-import DateForm from './components/DateForm';
-import Clustering from './components/Clustering';
-import Notebook from './components/Notebook';
 import PasswordCheck from './components/PasswordCheck';
+import AppLayout from './components/AppLayout';
+import './styles/FilterForm.css'; // Import FilterForm styles
 
-// Lazy load non-map components
-const TimelineSlider = lazy(() => import('./components/TimelineSlider'));
-const ViolenceCases = lazy(() => import('./components/ViolenceCases'));
-const CrossRef = lazy(() => import('./components/CrossRef'));
-const FilterForm = lazy(() => import('./components/FilterForm'));
-const LayoutForm = lazy(() => import('./components/LayoutForm'));
-const TimeGraph = lazy(() => import('./components/TimeGraph'));
-const GlobalTimeGraph = lazy(() => import('./components/GlobalTimeGraph'));
 
 const App = () => {
   const [fetchCedulas, setFetchCedulas] = useState(true);
@@ -25,6 +15,7 @@ const App = () => {
   const [fetchId, setFetchId] = useState(0);
   const [isFormsVisible, setIsFormsVisible] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [toolbarTab, setToolbarTab] = useState('tab1'); // State for toolbar tabs
 
   const {
     startDate,
@@ -38,6 +29,31 @@ const App = () => {
     mapType,
     colorScheme,
   } = useData(); // Use DataContext for shared state
+
+  // State for NotebookLoad modal in Tab 5
+  const [isNotebookModalOpen, setIsNotebookModalOpen] = useState(false);
+  const [notebookList, setNotebookList] = useState([]);
+
+  // Debug-enabled listNotebooks for Tab 5
+  const listNotebooksApp = async () => {
+    console.log('Tab5: listNotebooks called');
+    try {
+      const response = await fetch(`https://datades.abundis.com.mx/api/list.php`);
+      if (!response.ok) throw new Error('Failed to fetch notebooks');
+      const data = await response.json();
+      console.log('Tab5: listNotebooks response', data);
+      if (data.success) {
+        setNotebookList(data.notebooks);
+        setIsNotebookModalOpen(true);
+        console.log('Tab5: Modal should open now');
+      } else {
+        alert('No notebooks found.');
+      }
+    } catch (error) {
+      alert('Error fetching notebooks.');
+      console.error('Tab5: Error fetching notebooks:', error);
+    }
+  };
 
   useEffect(() => {
     console.log('App received visibleComponents:', visibleComponents);
@@ -115,80 +131,70 @@ const App = () => {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Router basename="/dist">
-        <div className="App">
-          {!isAuthenticated ? (
-            <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
-          ) : (
-            <>
-              {isFormsVisible && (
-                <div className="DateForm">
-                  <DateForm
+    <>
+      <style>
+        {`
+          .rt-TabsTriggerInnerHidden, .rt-BaseTabListTriggerInnerHidden {
+            display: none !important;
+          }
+        `}
+      </style>
+      {!isAuthenticated ? (
+        <PasswordCheck onAuthenticated={() => setIsAuthenticated(true)} />
+      ) : (
+        <>
+          <div className="AbstractFetching">
+          <FetchCedulas
+            fetchCedulas={fetchCedulas}
+            fetchId={fetchId}
+            onFetchComplete={handleFetchComplete}
+          />
+          <FetchForense
+            fetchForense={fetchForense}
+            fetchId={fetchId}
+            onFetchComplete={handleFetchComplete}
+          />
+          </div>
+          <div className="Map">
+            <MapComponent />
+          </div>
+          <Suspense fallback={<div>Loading...</div>}>
+            <Router basename="/dist">
+              <Routes>
+                <Route path="/cuaderno/:id" element={
+                  <AppLayout
+                    isNotebookRoute={true}
+                    visibleComponents={visibleComponents}
+                    toggleComponent={toggleComponent}
                     handleSubmit={handleSubmit}
                     loading={loading}
                     fetchCedulas={fetchCedulas}
                     setFetchCedulas={setFetchCedulas}
                     fetchForense={fetchForense}
                     setFetchForense={setFetchForense}
+                    listNotebooksApp={listNotebooksApp}
                   />
-                  <FetchCedulas
+                } />
+                <Route path="/" element={
+                  <AppLayout
+                    isNotebookRoute={false}
+                    visibleComponents={visibleComponents}
+                    toggleComponent={toggleComponent}
+                    handleSubmit={handleSubmit}
+                    loading={loading}
                     fetchCedulas={fetchCedulas}
-                    fetchId={fetchId}
-                    onFetchComplete={handleFetchComplete}
-                  />
-                  <FetchForense
+                    setFetchCedulas={setFetchCedulas}
                     fetchForense={fetchForense}
-                    fetchId={fetchId}
-                    onFetchComplete={handleFetchComplete}
+                    setFetchForense={setFetchForense}
+                    listNotebooksApp={listNotebooksApp}
                   />
-                  <Clustering type="personas_sin_identificar" />
-                  <GlobalTimeGraph onDateSelect={handleDateSelect} />
-                </div>
-              )}
-
-              <div className="ComponentToggles">
-                {Object.entries(visibleComponents).map(([key, value]) => (
-                  <label key={key}>
-                    <input
-                      type="checkbox"
-                      checked={value}
-                      onChange={() => toggleComponent(key)}
-                    />
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </label>
-                ))}
-              </div>
-
-              <div className="MobileContainer">
-                <div className="MapForms">
-
-                    <TimelineSlider />
-                    <LayoutForm />
-                    {visibleComponents.filterForm && <FilterForm />}
-                    {visibleComponents.currentState && <CurrentState />}
-                    {visibleComponents.violenceCases && <ViolenceCases />}
-                    {visibleComponents.timeGraph && <TimeGraph />}
-                    {visibleComponents.crossRef && <CrossRef />}
-                </div>
-              </div>
-              <div className="Map">
-                <MapComponent />
-              </div>
-            </>
-          )}
-        </div>
-        <Routes>
-          <Route
-            path="/cuaderno/:id"
-            element={
-              <Notebook />
-            }
-          />
-          <Route path="/" element={<Notebook />} />
-        </Routes>
-      </Router>
-    </Suspense>
+                } />
+              </Routes>
+            </Router>
+          </Suspense>
+        </>
+      )}
+    </>
   );
 };
 
